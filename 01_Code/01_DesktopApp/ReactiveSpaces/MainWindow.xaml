@@ -1,0 +1,22 @@
+﻿<Window x:Class="ReactiveSpaces.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Reactive Spaces Desktop App" Width="640" Height="480" WindowStyle="None" AllowsTransparency="True" ResizeMode="NoResize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20px"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="20px"/>
+            <ColumnDefinition Width="20px"/>
+        </Grid.ColumnDefinitions>
+        
+        <TextBlock Name="windowTitle" Text="Reactive Spaces"/>
+        <Button Name="minimizeButton" Grid.Row="0" Grid.Column="1" Click="onMinimizeButtonClick"/>
+        <Button Name="closeButton" Grid.Row="0" Grid.Column="2" Click="onCloseButtonClick"/>
+        
+        <Canvas Name="kinectCanvas" Grid.Row="1" Width="400" Height="400"/>
+    </Grid>
+</Window>
