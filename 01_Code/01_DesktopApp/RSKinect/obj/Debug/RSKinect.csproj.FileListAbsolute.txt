@@ -1,0 +1,6 @@
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\RSKinect\obj\Debug\RSKinect.csprojResolveAssemblyReference.cache
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\RSKinect\bin\Debug\RSKinect.dll
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\RSKinect\bin\Debug\RSKinect.pdb
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\RSKinect\bin\Debug\UnityEngine.dll
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\RSKinect\obj\Debug\RSKinect.dll
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\RSKinect\obj\Debug\RSKinect.pdb

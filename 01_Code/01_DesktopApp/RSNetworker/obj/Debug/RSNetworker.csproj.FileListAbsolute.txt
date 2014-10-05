@@ -1,0 +1,7 @@
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\RSNetworker\obj\Debug\RSNetworker.csprojResolveAssemblyReference.cache
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\RSNetworker\bin\Debug\RSNetworker.dll
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\RSNetworker\bin\Debug\RSNetworker.pdb
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\RSNetworker\bin\Debug\RSKinect.dll
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\RSNetworker\bin\Debug\RSKinect.pdb
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\RSNetworker\obj\Debug\RSNetworker.dll
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\RSNetworker\obj\Debug\RSNetworker.pdb

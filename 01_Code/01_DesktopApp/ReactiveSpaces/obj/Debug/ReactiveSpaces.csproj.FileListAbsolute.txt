@@ -14,3 +14,20 @@ D:\02_DesignStudio4\99_TermProject\03_API\01_DesktopApp\ReactiveSpaces\obj\Debug
 J:\02_DesignStudio4\99_TermProject\03_API\01_DesktopApp\ReactiveSpaces\bin\Debug\ReactiveSpaces.exe.config
 J:\02_DesignStudio4\99_TermProject\03_API\01_DesktopApp\ReactiveSpaces\obj\Debug\ReactiveSpaces.exe
 J:\02_DesignStudio4\99_TermProject\03_API\01_DesktopApp\ReactiveSpaces\obj\Debug\ReactiveSpaces.pdb
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\ReactiveSpaces\bin\Debug\ReactiveSpaces.exe.config
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\ReactiveSpaces\obj\Debug\ReactiveSpaces.exe
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\ReactiveSpaces\obj\Debug\ReactiveSpaces.pdb
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\ReactiveSpaces\bin\Debug\ReactiveSpaces.exe
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\ReactiveSpaces\bin\Debug\ReactiveSpaces.pdb
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\ReactiveSpaces\obj\Debug\ReactiveSpaces.csprojResolveAssemblyReference.cache
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\ReactiveSpaces\obj\Debug\MainWindow.baml
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\ReactiveSpaces\obj\Debug\MainWindow.g.cs
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\ReactiveSpaces\obj\Debug\App.g.cs
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\ReactiveSpaces\obj\Debug\ReactiveSpaces_MarkupCompile.cache
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\ReactiveSpaces\obj\Debug\ReactiveSpaces.g.resources
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\ReactiveSpaces\obj\Debug\ReactiveSpaces.Properties.Resources.resources
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\ReactiveSpaces\obj\Debug\ReactiveSpaces.csproj.GenerateResource.Cache
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\ReactiveSpaces\bin\Debug\RSKinect.dll
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\ReactiveSpaces\bin\Debug\RSNetworker.dll
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\ReactiveSpaces\bin\Debug\RSKinect.pdb
+D:\WORK\16_YEAR 4 (2014-2015)\03_DesignStudio4\99_TermProject\ds4-termproject\01_Code\01_DesktopApp\ReactiveSpaces\bin\Debug\RSNetworker.pdb

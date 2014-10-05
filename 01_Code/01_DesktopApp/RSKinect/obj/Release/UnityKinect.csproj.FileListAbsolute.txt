@@ -1,0 +1,6 @@
+J:\02_DesignStudio4\99_TermProject\01_DLL\UnityKinect\bin\Release\UnityKinect.dll
+J:\02_DesignStudio4\99_TermProject\01_DLL\UnityKinect\bin\Release\UnityKinect.pdb
+J:\02_DesignStudio4\99_TermProject\01_DLL\UnityKinect\bin\Release\UnityEngine.dll
+J:\02_DesignStudio4\99_TermProject\01_DLL\UnityKinect\obj\Release\UnityKinect.csprojResolveAssemblyReference.cache
+J:\02_DesignStudio4\99_TermProject\01_DLL\UnityKinect\obj\Release\UnityKinect.dll
+J:\02_DesignStudio4\99_TermProject\01_DLL\UnityKinect\obj\Release\UnityKinect.pdb

@@ -93,6 +93,16 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RSKinect\RSKinect.csproj">
+      <Project>{669bb77b-c72e-41cc-b043-ae029504ed58}</Project>
+      <Name>RSKinect</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RSNetworker\RSNetworker.csproj">
+      <Project>{3564ebb2-c163-4226-b543-d9e952966be7}</Project>
+      <Name>RSNetworker</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
