@@ -9,9 +9,9 @@ namespace RSKinect
 {
     public struct Vector3
     {
-        float x;
-        float y;
-        float z;
+        public float x;
+        public float y;
+        public float z;
         public Vector3(float _x, float _y, float _z)
         {
             x = (_x == null) ? 0 : _x;
@@ -31,7 +31,9 @@ namespace RSKinect
     }
     public struct KinectJoint
     {
+        public KinectJoints jointType;
         public Vector3 position;
+        public Vector3 screenPos;
         public bool tracked;
     }
 
@@ -74,18 +76,24 @@ namespace RSKinect
         public bool userPresent { get; internal set; }
         public int ID {get; private set;}
 
+        private KinectSensor sensor;
+
         //to store joints
         public KinectJoint[] joints { get; private set; }
 
-        public KinectSkeleton()
+        public KinectSkeleton( KinectSensor _sensor )
         {
             upToDate = false;
             userPresent = false;
             ID = -1;
 
+            sensor = _sensor;
+
+            joints = new KinectJoint[NumberOfJoints];
             for(int i = 0; i < NumberOfJoints; ++i)
             {
                 joints[i].tracked = false;
+                joints[i].jointType = (KinectJoints)i;
             }
         }
     
@@ -95,36 +103,40 @@ namespace RSKinect
 
             userPresent = skeleton.TrackingState == SkeletonTrackingState.Tracked;
 
-            applyJoint(joints[(int)KinectJoints.HEAD], skeleton.Joints[JointType.Head]);
+            applyJoint(KinectJoints.HEAD, skeleton.Joints[JointType.Head]);
 
-            applyJoint(joints[(int)KinectJoints.SHOULDER_CENTER], skeleton.Joints[JointType.ShoulderCenter]);
-            applyJoint(joints[(int)KinectJoints.SPINE], skeleton.Joints[JointType.Spine]);
-            applyJoint(joints[(int)KinectJoints.HIP_CENTER], skeleton.Joints[JointType.HipCenter]);
+            applyJoint(KinectJoints.SHOULDER_CENTER, skeleton.Joints[JointType.ShoulderCenter]);
+            applyJoint(KinectJoints.SPINE, skeleton.Joints[JointType.Spine]);
+            applyJoint(KinectJoints.HIP_CENTER, skeleton.Joints[JointType.HipCenter]);
 
-            applyJoint(joints[(int)KinectJoints.SHOULDER_LEFT], skeleton.Joints[JointType.ShoulderLeft]);
-            applyJoint(joints[(int)KinectJoints.SHOULDER_RIGHT], skeleton.Joints[JointType.ShoulderRight]);
-            applyJoint(joints[(int)KinectJoints.ELBOW_LEFT], skeleton.Joints[JointType.ElbowLeft]);
-            applyJoint(joints[(int)KinectJoints.ELBOW_RIGHT], skeleton.Joints[JointType.ElbowRight]);
-            applyJoint(joints[(int)KinectJoints.WRIST_LEFT], skeleton.Joints[JointType.WristLeft]);
-            applyJoint(joints[(int)KinectJoints.WRIST_RIGHT], skeleton.Joints[JointType.WristRight]);
-            applyJoint(joints[(int)KinectJoints.HAND_LEFT], skeleton.Joints[JointType.HandLeft]);
-            applyJoint(joints[(int)KinectJoints.HAND_RIGHT], skeleton.Joints[JointType.HandRight]);
+            applyJoint(KinectJoints.SHOULDER_LEFT, skeleton.Joints[JointType.ShoulderLeft]);
+            applyJoint(KinectJoints.SHOULDER_RIGHT, skeleton.Joints[JointType.ShoulderRight]);
+            applyJoint(KinectJoints.ELBOW_LEFT, skeleton.Joints[JointType.ElbowLeft]);
+            applyJoint(KinectJoints.ELBOW_RIGHT, skeleton.Joints[JointType.ElbowRight]);
+            applyJoint(KinectJoints.WRIST_LEFT, skeleton.Joints[JointType.WristLeft]);
+            applyJoint(KinectJoints.WRIST_RIGHT, skeleton.Joints[JointType.WristRight]);
+            applyJoint(KinectJoints.HAND_LEFT, skeleton.Joints[JointType.HandLeft]);
+            applyJoint(KinectJoints.HAND_RIGHT, skeleton.Joints[JointType.HandRight]);
 
-            applyJoint(joints[(int)KinectJoints.HIP_LEFT], skeleton.Joints[JointType.HipLeft]);
-            applyJoint(joints[(int)KinectJoints.HIP_RIGHT], skeleton.Joints[JointType.HipRight]);
-            applyJoint(joints[(int)KinectJoints.KNEE_LEFT], skeleton.Joints[JointType.KneeLeft]);
-            applyJoint(joints[(int)KinectJoints.KNEE_RIGHT], skeleton.Joints[JointType.KneeRight]);
-            applyJoint(joints[(int)KinectJoints.ANKLE_LEFT], skeleton.Joints[JointType.AnkleLeft]);
-            applyJoint(joints[(int)KinectJoints.ANKLE_RIGHT], skeleton.Joints[JointType.AnkleRight]);
-            applyJoint(joints[(int)KinectJoints.FOOT_LEFT], skeleton.Joints[JointType.FootLeft]);
-            applyJoint(joints[(int)KinectJoints.FOOT_RIGHT], skeleton.Joints[JointType.FootRight]);
+            applyJoint(KinectJoints.HIP_LEFT, skeleton.Joints[JointType.HipLeft]);
+            applyJoint(KinectJoints.HIP_RIGHT, skeleton.Joints[JointType.HipRight]);
+            applyJoint(KinectJoints.KNEE_LEFT, skeleton.Joints[JointType.KneeLeft]);
+            applyJoint(KinectJoints.KNEE_RIGHT, skeleton.Joints[JointType.KneeRight]);
+            applyJoint(KinectJoints.ANKLE_LEFT, skeleton.Joints[JointType.AnkleLeft]);
+            applyJoint(KinectJoints.ANKLE_RIGHT, skeleton.Joints[JointType.AnkleRight]);
+            applyJoint(KinectJoints.FOOT_LEFT, skeleton.Joints[JointType.FootLeft]);
+            applyJoint(KinectJoints.FOOT_RIGHT, skeleton.Joints[JointType.FootRight]);
         }
 
-        private void applyJoint(KinectJoint copyTo, Microsoft.Kinect.Joint copyFrom)
+        private void applyJoint(KinectJoints copyTo, Microsoft.Kinect.Joint copyFrom)
         {
-            copyTo.tracked = (copyFrom.TrackingState != JointTrackingState.NotTracked);
-            if(copyTo.tracked)
-                copyTo.position.Set(copyFrom.Position.X, copyFrom.Position.Y, copyFrom.Position.Z);
+            joints[(int)copyTo].tracked = (copyFrom.TrackingState != JointTrackingState.NotTracked);
+            if (joints[(int)copyTo].tracked)
+            {
+                joints[(int)copyTo].position.Set(copyFrom.Position.X, copyFrom.Position.Y, copyFrom.Position.Z);
+                DepthImagePoint point = sensor.CoordinateMapper.MapSkeletonPointToDepthPoint(copyFrom.Position, DepthImageFormat.Resolution320x240Fps30);
+                joints[(int)copyTo].screenPos.Set(point.X * 0.003125f, point.Y * 0.0041667f, copyFrom.Position.Z);
+            }
         }
     }
 

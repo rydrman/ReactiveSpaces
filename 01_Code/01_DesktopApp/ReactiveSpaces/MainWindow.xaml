@@ -20,6 +20,6 @@
 
         <Button Name="sendButton" Grid.Row="1" Grid.Column="1" Click="onSendButtonClicK"/>
         <TextBox Name="messageOutput" Text="waiting..." Grid.Row="1" Grid.Column="0"/>
-        <Canvas Name="kinectCanvas" Grid.Row="2" Width="400" Height="400" Background="BlueViolet"/>
+        <Canvas Name="kinectCanvas" Grid.Row="2" Width="320" Height="240" Background="BlueViolet"/>
     </Grid>
 </Window>

@@ -18,9 +18,9 @@ namespace RSKinect
         private DepthImageFrame lastDepthFrame;
         private Skeleton[] lastSkeletons;
 
-        public bool isNewColorFrame { get; private set; }
-        public bool isNewDepthFrame { get; private set; }
-        public bool isNewSkeletonFrame { get; private set; }
+        public bool isNewColorFrame;
+        public bool isNewDepthFrame;
+        public bool isNewSkeletonFrame;
 
         //actual exposed skeletons
         public KinectSkeleton playerOne { get; private set; }
@@ -37,10 +37,10 @@ namespace RSKinect
             skeletonStream = false;
             lastColorFrame = null;
             lastDepthFrame = null;
-            lastSkeletons = null;
+            lastSkeletons = new Skeleton[6];
 
-            playerOne = new KinectSkeleton();
-            playerTwo = new KinectSkeleton();
+            playerOne = null;
+            playerTwo = null;
         }
 
         //attempts to access kinect
@@ -83,48 +83,12 @@ namespace RSKinect
                         Console.Write("App Conflict");
                         return false;
                     }
+                    playerOne = new KinectSkeleton( sensor );
+                    playerTwo = new KinectSkeleton( sensor );
                     return true;
                 }
             }
             return false;
-        }
-
-        public void Update()
-        {
-            //skeleton data update
-            if(skeletonStream && isNewSkeletonFrame)
-            {
-                //first pass
-                for(var i = 0 ; i < 6; ++i)
-                {
-                    if (playerOne.upToDate == false 
-                        && lastSkeletons[i].TrackingId == playerOne.ID)
-                    {
-                        playerOne.copyDataFrom(lastSkeletons[i]);
-                    }
-                    else if (playerTwo.upToDate == false 
-                        && lastSkeletons[i].TrackingId == playerTwo.ID)
-                    {
-                        playerTwo.copyDataFrom(lastSkeletons[i]);
-                    }
-                }
-                //second pass fo updating
-                for (var i = 0; i < 6; ++i)
-                {
-                    if (playerOne.upToDate == false
-                        && lastSkeletons[i].TrackingState == SkeletonTrackingState.Tracked
-                        && lastSkeletons[i].TrackingId != playerTwo.ID)
-                    {
-                        playerOne.copyDataFrom(lastSkeletons[i]);
-                    }
-                    else if (playerOne.upToDate == false
-                        && lastSkeletons[i].TrackingState == SkeletonTrackingState.Tracked
-                        && lastSkeletons[i].TrackingId != playerOne.ID)
-                    {
-                        playerTwo.copyDataFrom(lastSkeletons[i]);
-                    }
-                }
-            }
         }
 
 
@@ -146,21 +110,6 @@ namespace RSKinect
                 //texture.LoadImage(pixels);
             }
         }*/
-        public bool UpdateSkeleton(KinectSkeleton skeleton)
-        {
-            if (lastSkeletons != null)
-            {
-                for(var i = 0; i < 6; ++i)
-                {
-                    if(lastSkeletons[i].TrackingId == skeleton.ID)
-                    {
-                        skeleton.copyDataFrom(lastSkeletons[i]);
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
 
         void onSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
@@ -172,6 +121,37 @@ namespace RSKinect
                 isNewSkeletonFrame = true;
                 playerOne.upToDate = false;
                 playerTwo.upToDate = false;
+
+                //first pass
+                for (var i = 0; i < 6; ++i)
+                {
+                    if (playerOne.upToDate == false
+                        && lastSkeletons[i].TrackingId == playerOne.ID)
+                    {
+                        playerOne.copyDataFrom(lastSkeletons[i]);
+                    }
+                    else if (playerTwo.upToDate == false
+                        && lastSkeletons[i].TrackingId == playerTwo.ID)
+                    {
+                        playerTwo.copyDataFrom(lastSkeletons[i]);
+                    }
+                }
+                //second pass fo updating
+                for (var i = 0; i < 6; ++i)
+                {
+                    if (playerOne.upToDate == false
+                        && lastSkeletons[i].TrackingState == SkeletonTrackingState.Tracked
+                        && lastSkeletons[i].TrackingId != playerTwo.ID)
+                    {
+                        playerOne.copyDataFrom(lastSkeletons[i]);
+                    }
+                    else if (playerOne.upToDate == false
+                        && lastSkeletons[i].TrackingState == SkeletonTrackingState.Tracked
+                        && lastSkeletons[i].TrackingId != playerOne.ID)
+                    {
+                        playerTwo.copyDataFrom(lastSkeletons[i]);
+                    }
+                }
             }
         }
         void onDepthFrameReady(object sender, DepthImageFrameReadyEventArgs e)
