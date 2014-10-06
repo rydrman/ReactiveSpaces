@@ -51,11 +51,11 @@ namespace RSNetworker
         private void StartService()
         {
             host = new ServiceHost(this);
-            host.Open();// (TimeSpan.FromHours(1.0));
+            host.Open();
             channelFactory = new ChannelFactory<IRSNetworker>("ReactiveSpacesEndpoint");
             channel = channelFactory.CreateChannel();
 
-            channel.SendMessage(System.Environment.MachineName + " is connected");
+            SendMessage(System.Environment.MachineName + " is connected");
         }
 
         public void StopService()

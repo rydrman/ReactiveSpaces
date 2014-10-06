@@ -58,5 +58,10 @@ namespace ReactiveSpaces
         {
 
         }
+
+        private void onSendButtonClicK(object sender, RoutedEventArgs e)
+        {
+            networker.SendMessage(System.Environment.MachineName + ": " + messageOutput.Text);
+        }
     }
 }

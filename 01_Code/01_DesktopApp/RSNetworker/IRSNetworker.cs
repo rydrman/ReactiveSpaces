@@ -21,14 +21,14 @@ namespace RSNetworker
     }
 
 
-    [ServiceContract]
+    [ServiceContract()]
     public interface IRSNetworker
     {
-        [OperationContract(IsOneWay = true)]
         void SendMessage(string msg);
         [OperationContract(IsOneWay = true)]
         void RecieveMessage(string msg);
 
+        [OperationContract(IsOneWay = true)]
         void RecieveKinect(KinectData newData);
         void SendKinect(KinectSkeleton newSkeleton);
 

@@ -17,8 +17,9 @@
         <TextBlock Name="windowTitle" Text="Reactive Spaces" MouseLeftButtonDown="onTitleBarMouseDown" />
         <Button Name="minimizeButton" Grid.Row="0" Grid.Column="1" Click="onMinimizeButtonClick"/>
         <Button Name="closeButton" Grid.Row="0" Grid.Column="2" Click="onCloseButtonClick"/>
-        
-        <TextBlock Name="messageOutput" Text="waiting..." Grid.Row="1" Grid.Column="0"/>
+
+        <Button Name="sendButton" Grid.Row="1" Grid.Column="1" Click="onSendButtonClicK"/>
+        <TextBox Name="messageOutput" Text="waiting..." Grid.Row="1" Grid.Column="0"/>
         <Canvas Name="kinectCanvas" Grid.Row="2" Width="400" Height="400" Background="BlueViolet"/>
     </Grid>
 </Window>
