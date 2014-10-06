@@ -1,5 +1,0 @@
-J:\02_DesignStudio4\99_TermProject\01_DLL\UnityKinect\obj\Debug\UnityKinect.csprojResolveAssemblyReference.cache
-J:\02_DesignStudio4\99_TermProject\01_DLL\UnityKinect\bin\Debug\UnityKinect.dll
-J:\02_DesignStudio4\99_TermProject\01_DLL\UnityKinect\bin\Debug\UnityKinect.pdb
-J:\02_DesignStudio4\99_TermProject\01_DLL\UnityKinect\obj\Debug\UnityKinect.dll
-J:\02_DesignStudio4\99_TermProject\01_DLL\UnityKinect\obj\Debug\UnityKinect.pdb
