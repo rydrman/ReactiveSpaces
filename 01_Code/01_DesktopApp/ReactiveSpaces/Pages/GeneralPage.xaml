@@ -1,0 +1,23 @@
+﻿<Page x:Class="ReactiveSpaces.GeneralPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" 
+      d:DesignHeight="400" d:DesignWidth="640"
+	Title="General">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20px"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        
+        <Button Name="sendButton" Grid.Row="0" Grid.Column="1" Click="onSendButtonClicK" Content="Send"/>
+        <TextBox Name="messageOutput" Text="waiting..." Grid.Row="0" Grid.Column="0"/>
+    </Grid>
+</Page>

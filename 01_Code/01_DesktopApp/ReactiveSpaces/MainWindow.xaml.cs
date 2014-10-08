@@ -24,6 +24,11 @@ namespace ReactiveSpaces
     /// </summary>
     public partial class MainWindow : Window
     {
+        //pages
+        GeneralPage generalPage;
+        KinectPage kinectPage;
+        NetworkPage networkPage;
+
         //we need instances of RSkinect and RS networker
         Networker networker;
         KinectManager kinectManager;
@@ -35,7 +40,12 @@ namespace ReactiveSpaces
         {
             InitializeComponent();
 
-            networker = new Networker(RecieveMessage, RecieveKinect);
+            //create pages
+            generalPage = new GeneralPage();
+            kinectPage = new KinectPage();
+            networkPage = new NetworkPage();
+
+            networker = new Networker(RecieveMessage, RecieveKinect, AddPeer, RemovePeer, UpdatePeer);
 
             kinectManager = new KinectManager();
             kinectManager.InitializeKinect(false, false, true);
@@ -44,44 +54,40 @@ namespace ReactiveSpaces
             timer.Tick += onTimerTick;
             timer.Interval = TimeSpan.FromSeconds(0.1);
             timer.Start();
+
+            //set handlers
+            generalPage._onSendButton = onSendMessage;
+            networkPage._onProfileChanged = ProfileChanged;
+
+            //setup data
+            networkPage.setProfile(networker.getProfile());
+
+            //navigate
+            mainFrame.Navigate(generalPage);
         }
 
         private void onTimerTick(object sender, EventArgs e)
         {
             if(kinectManager.isNewSkeletonFrame)
             {
-                if(kinectManager.playerOne != null && kinectManager.playerOne.userPresent)
+                List<KinectSkeleton> skeletons = new List<KinectSkeleton>();
+                skeletons.Add(kinectManager.playerOne);
+                skeletons.Add(kinectManager.playerTwo);
+
+                kinectPage.drawLocalSkeletons(skeletons);
+                kinectManager.isNewSkeletonFrame = false;
+
+                /*if(kinectManager.playerOne != null && kinectManager.playerOne.userPresent)
                     drawSkeletonOnCanvas(kinectManager.playerOne, kinectCanvas);
                 if (kinectManager.playerOne != null && kinectManager.playerTwo.userPresent)
-                    drawSkeletonOnCanvas(kinectManager.playerTwo, kinectCanvas);
-                kinectManager.isNewSkeletonFrame = false;
+                    drawSkeletonOnCanvas(kinectManager.playerTwo, kinectCanvas);*/
+                
             }
         }
 
         private void onSkeletonsUpdated()
         {
             
-        }
-
-        private void drawSkeletonOnCanvas(KinectSkeleton s, Canvas c)
-        {
-            c.Children.Clear();
-            for (int i = 0; i < KinectSkeleton.NumberOfJoints; ++i)
-            {
-                Ellipse jointEllipse = new Ellipse();
-                SolidColorBrush jointBrush = new SolidColorBrush();
-
-                jointBrush.Color = Color.FromArgb(255, 255, 255, 255);
-                jointEllipse.Fill = jointBrush;
-
-                jointEllipse.Width = 2;
-                jointEllipse.Height = 2;
-
-                Canvas.SetLeft(jointEllipse, s.joints[i].screenPos.x * 320);
-                Canvas.SetTop(jointEllipse, s.joints[i].screenPos.y * 240);
-
-                c.Children.Add(jointEllipse);
-            }
         }
 
         private void onCloseButtonClick(object sender, RoutedEventArgs e)
@@ -97,11 +103,14 @@ namespace ReactiveSpaces
         private void onTitleBarMouseDown(object sender, MouseButtonEventArgs e)
         {
             this.DragMove();
+            networker.RequestProfile();
         }
+
+        #region Handlers to and from networker
 
         public void RecieveMessage(string msg)
         {
-            messageOutput.Text = msg;
+            generalPage.messageOutput.Text = msg;
         }
 
         public void RecieveKinect(KinectData newData)
@@ -109,9 +118,49 @@ namespace ReactiveSpaces
 
         }
 
-        private void onSendButtonClicK(object sender, RoutedEventArgs e)
+        public void ProfileChanged(StationProfile newProfile)
         {
-            networker.SendMessage(System.Environment.MachineName + ": " + messageOutput.Text);
+            networker.onProfileChanged(newProfile);
+        }
+
+        public void AddPeer(StationProfile newPeer)
+        {
+            networkPage.addPeer(newPeer);
+        }
+        public void RemovePeer(StationProfile oldPeer)
+        {
+            networkPage.removePeer(oldPeer);
+        }
+
+        public void UpdatePeer(StationProfile oldData, StationProfile newData)
+        {
+            networkPage.updatePeer(oldData, newData);
+        }
+
+        private void onSendMessage(string message)
+        {
+            networker.SendMessage(message);
+        }
+        #endregion
+
+        private void tabButtonClick(object sender, RoutedEventArgs e)
+        {
+            Button clicked = (Button)sender;
+            switch(clicked.Name)
+            {
+                case "generalTabButton":
+                    if (mainFrame.Content.GetType() != generalPage.GetType())
+                        mainFrame.Navigate(generalPage);
+                    break;
+                case "kinectTabButton":
+                    if (mainFrame.Content.GetType() != kinectPage.GetType())
+                        mainFrame.Navigate(kinectPage);
+                    break;
+                case "networkTabButton":
+                    if (mainFrame.Content.GetType() != networkPage.GetType())
+                        mainFrame.Navigate(networkPage);
+                    break;
+            }
         }
 
     }

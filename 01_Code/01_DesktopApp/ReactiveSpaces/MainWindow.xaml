@@ -4,22 +4,30 @@
         Title="Reactive Spaces Desktop App" Width="640" Height="480" WindowStyle="None" AllowsTransparency="True" ResizeMode="NoResize">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="20px"/>
-            <RowDefinition Height="20px"/>
+            <RowDefinition Height="30px"/>
+            <RowDefinition Height="50px"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
-            <ColumnDefinition Width="20px"/>
-            <ColumnDefinition Width="20px"/>
+            <ColumnDefinition Width="30px"/>
+            <ColumnDefinition Width="30px"/>
         </Grid.ColumnDefinitions>
         
+        <!-- window controls-->
         <TextBlock Name="windowTitle" Text="Reactive Spaces" MouseLeftButtonDown="onTitleBarMouseDown" />
         <Button Name="minimizeButton" Grid.Row="0" Grid.Column="1" Click="onMinimizeButtonClick"/>
         <Button Name="closeButton" Grid.Row="0" Grid.Column="2" Click="onCloseButtonClick"/>
+        
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.ColumnSpan="3" HorizontalAlignment="Center">
+            <Button Name="generalTabButton" Content="General" Style="{StaticResource tabButton}" Click="tabButtonClick"/>
+            <Button Name="kinectTabButton" Content="Kinect" Style="{StaticResource tabButton}" Click="tabButtonClick"/>
+            <Button Name="networkTabButton" Content="Network" Style="{StaticResource tabButton}" Click="tabButtonClick"/>
+        </StackPanel>
 
-        <Button Name="sendButton" Grid.Row="1" Grid.Column="1" Click="onSendButtonClicK"/>
-        <TextBox Name="messageOutput" Text="waiting..." Grid.Row="1" Grid.Column="0"/>
-        <Canvas Name="kinectCanvas" Grid.Row="2" Width="320" Height="240" Background="BlueViolet"/>
+        <Frame Name="mainFrame" Grid.Row="2" Grid.ColumnSpan="3" Width="640" Height="400" NavigationUIVisibility="Hidden"/>
+        
+        
+        
     </Grid>
 </Window>
