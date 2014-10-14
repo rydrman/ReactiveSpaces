@@ -21,6 +21,7 @@ namespace RSNetworker
 
         //for networking
         ServiceHost host = null;
+        PeerNameResolver resolver;
         ChannelFactory<IRSNetworker> channelFactory;
         IRSNetworker channel;
 
@@ -132,6 +133,22 @@ namespace RSNetworker
             channel = channelFactory.CreateChannel();
 
             channel.InitializeMesh();
+
+            //get peers
+            PeerName peerName = new PeerName("ReactiveSpaces", PeerNameType.Unsecured);
+            //register with cloud
+            PeerNameRegistration peerReg = new PeerNameRegistration(peerName, 3030);
+            peerReg.UseAutoEndPointSelection = true;
+            peerReg.Start();
+            //find peers
+            resolver = new PeerNameResolver();
+            PeerNameRecordCollection peers = resolver.Resolve(peerName);
+
+            foreach(PeerNameRecord p in peers)
+            {
+                int i = 0;
+            }
+
 
             //register myself
             //assign myself an ID
