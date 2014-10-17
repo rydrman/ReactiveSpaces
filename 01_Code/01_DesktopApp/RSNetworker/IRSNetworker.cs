@@ -25,19 +25,23 @@ namespace RSNetworker
     public interface IRSNetworker
     {
         void SendMessage(string msg);
+
         [OperationContract(IsOneWay = true)]
         void RecieveMessage(string msg);
 
-        [OperationContract(IsOneWay=true)]
-        void RegisterProfile(StationProfile profile);
+
         [OperationContract(IsOneWay = true)]
         void RequestProfile();
+
         [OperationContract(IsOneWay = true)]
-        void UpdateProfile(StationProfile newData);
+        void UpdateRegisterProfile(StationProfile profile);
+
 
         [OperationContract(IsOneWay = true)]
         void RecieveKinect(KinectData newData);
+
         void SendKinect(KinectSkeleton newSkeleton);
+
 
         [OperationContract(IsOneWay = true)]
         void InitializeMesh();

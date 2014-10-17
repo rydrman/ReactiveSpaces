@@ -21,6 +21,7 @@ namespace RSNetworker
 
         //for networking
         ServiceHost host = null;
+        PeerNameResolver resolver;
         ChannelFactory<IRSNetworker> channelFactory;
         IRSNetworker channel;
 
@@ -82,7 +83,7 @@ namespace RSNetworker
             _onPeerAdded(profile);
         }
 
-        public void UpdateProfile(StationProfile newData)
+        public bool UpdateProfile(StationProfile newData)
         {
             foreach (StationProfile peer in currentPeers)
             {
@@ -90,8 +91,16 @@ namespace RSNetworker
                 {
                     _onPeerUpdated(peer, newData);
                     peer.Set(newData);
+                    return true;
                 }
             }
+            return false;
+        }
+
+        public void UpdateRegisterProfile(StationProfile profile)
+        {
+            if (!UpdateProfile(profile))
+                RegisterProfile(profile);
         }
 
         public StationProfile getProfile()
@@ -102,13 +111,13 @@ namespace RSNetworker
         public void onProfileChanged(StationProfile newProfile)
         {
             this.currentProfile = newProfile;
-            channel.UpdateProfile(newProfile);
+            channel.UpdateRegisterProfile(newProfile);
             //TODO tell others
         }
 
         public void RequestProfile()
         {
-            channel.RegisterProfile(currentProfile);
+            channel.UpdateRegisterProfile(currentProfile);
         }
 
         public void RecieveKinect(KinectData newData)
@@ -140,11 +149,33 @@ namespace RSNetworker
             currentProfile.location = "some place";
             currentProfile.meshID = (System.Environment.MachineName + host.ChannelDispatchers.ElementAt(0).Listener.Uri).GetHashCode();
 
+            PeerName peerName = new PeerName("ReactiveSpaces", PeerNameType.Unsecured);
+            //register with cloud
+            PeerNameRegistration peerReg = new PeerNameRegistration(peerName, 3030);
+            peerReg.Data = currentProfile.ToBytes();
+            peerReg.UseAutoEndPointSelection = true;
+            peerReg.Start();
+
+
+            //find peers
+            resolver = new PeerNameResolver();
+            PeerNameRecordCollection peers = resolver.Resolve(peerName);
+
+            foreach(PeerNameRecord p in peers)
+            {
+                StationProfile profile = new StationProfile();
+                profile.FromBytes(p.Data);
+                UpdateRegisterProfile(profile);
+            }
+
+
+            
+
             //channel.RequestProfile();
             //PeerName name = new PeerName("ReactiveSpaces", PeerNameType.Unsecured);
             //PeerNameResolver resolver = new PeerNameResolver();
             
-            channel.RegisterProfile(currentProfile);
+            channel.UpdateRegisterProfile(currentProfile);
             channel.RequestProfile();
         }
 
