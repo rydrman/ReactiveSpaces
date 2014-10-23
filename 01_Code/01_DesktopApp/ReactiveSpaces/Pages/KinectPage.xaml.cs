@@ -33,7 +33,7 @@ namespace ReactiveSpaces
             localCanvas.Children.Clear();
             foreach (KinectSkeleton s in skeletons)
             {
-                for (int i = 0; i < KinectSkeleton.NumberOfJoints; ++i)
+                for (int i = 0; i < s.numberOfJoints; ++i)
                 {
                     Ellipse jointEllipse = new Ellipse();
                     SolidColorBrush jointBrush = new SolidColorBrush();

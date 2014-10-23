@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 //using System.Threading.Tasks;
 using Microsoft.Kinect;
+using System.Runtime.Serialization.Json;
+using System.IO;
+using System.Runtime.Serialization;
 
 namespace RSKinect
 {
@@ -68,18 +71,25 @@ namespace RSKinect
         FOOT_RIGHT
     }
 
+    [DataContract]
+    [Serializable()]
     public class KinectSkeleton
     {
-        public static int NumberOfJoints = 20;
+        public int numberOfJoints = 20;
+        public string type = "skeleton";
 
         public bool upToDate {get; internal set;}
         public bool userPresent { get; internal set; }
         public int ID {get; private set;}
+        public int playerNumber = 0;
 
+        [NonSerialized()]
         private KinectSensor sensor;
 
         //to store joints
         public KinectJoint[] joints { get; private set; }
+
+        public KinectSkeleton() { }
 
         public KinectSkeleton( KinectSensor _sensor )
         {
@@ -89,17 +99,18 @@ namespace RSKinect
 
             sensor = _sensor;
 
-            joints = new KinectJoint[NumberOfJoints];
-            for(int i = 0; i < NumberOfJoints; ++i)
+            joints = new KinectJoint[numberOfJoints];
+            for(int i = 0; i < numberOfJoints; ++i)
             {
                 joints[i].tracked = false;
                 joints[i].jointType = (KinectJoints)i;
             }
         }
     
-        internal void copyDataFrom(Skeleton skeleton)
+        internal void copyDataFrom(Skeleton skeleton, int playerNum = 0)
         {
             ID = skeleton.TrackingId;
+            playerNumber = playerNum;
 
             userPresent = skeleton.TrackingState == SkeletonTrackingState.Tracked;
 
@@ -135,8 +146,17 @@ namespace RSKinect
             {
                 joints[(int)copyTo].position.Set(copyFrom.Position.X, copyFrom.Position.Y, copyFrom.Position.Z);
                 DepthImagePoint point = sensor.CoordinateMapper.MapSkeletonPointToDepthPoint(copyFrom.Position, DepthImageFormat.Resolution320x240Fps30);
-                joints[(int)copyTo].screenPos.Set(point.X * 0.003125f, point.Y * 0.0041667f, copyFrom.Position.Z);
+                joints[(int)copyTo].screenPos.Set(point.X * 0.003125f, point.Y * 0.0041667f, (float)Math.Min(copyFrom.Position.Z * 0.2, 1) );
             }
+        }
+
+        public string Serialize()
+        {
+            MemoryStream stream = new MemoryStream();
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(KinectSkeleton));
+            serializer.WriteObject(stream, this);
+
+            return stream.ToString();
         }
     }
 

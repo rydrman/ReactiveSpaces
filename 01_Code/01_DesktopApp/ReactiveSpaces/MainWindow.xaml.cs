@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using RSKinect;
 using RSNetworker;
+using RSLocalhost;
 
 namespace ReactiveSpaces
 {
@@ -31,6 +32,7 @@ namespace ReactiveSpaces
 
         //we need instances of RSkinect and RS networker
         Networker networker;
+        LocalNetworker localNet;
         KinectManager kinectManager;
 
         //for graphic updating
@@ -45,6 +47,7 @@ namespace ReactiveSpaces
             kinectPage = new KinectPage();
             networkPage = new NetworkPage();
 
+            localNet = new LocalNetworker();
             networker = new Networker(RecieveMessage, RecieveKinect, AddPeer, RemovePeer, UpdatePeer);
 
             kinectManager = new KinectManager();
@@ -68,20 +71,22 @@ namespace ReactiveSpaces
 
         private void onTimerTick(object sender, EventArgs e)
         {
+            //if theres a new frame
             if(kinectManager.isNewSkeletonFrame)
             {
+                //get the skeletons
                 List<KinectSkeleton> skeletons = new List<KinectSkeleton>();
                 skeletons.Add(kinectManager.playerOne);
                 skeletons.Add(kinectManager.playerTwo);
 
+                //draw them in the app
                 kinectPage.drawLocalSkeletons(skeletons);
                 kinectManager.isNewSkeletonFrame = false;
 
-                /*if(kinectManager.playerOne != null && kinectManager.playerOne.userPresent)
-                    drawSkeletonOnCanvas(kinectManager.playerOne, kinectCanvas);
-                if (kinectManager.playerOne != null && kinectManager.playerTwo.userPresent)
-                    drawSkeletonOnCanvas(kinectManager.playerTwo, kinectCanvas);*/
-                
+                //send to json locally
+                localNet.UpdateLocalKinect(skeletons.ElementAt(0));
+
+                //TODO send to peers
             }
         }
 
@@ -92,6 +97,9 @@ namespace ReactiveSpaces
 
         private void onCloseButtonClick(object sender, RoutedEventArgs e)
         {
+            networker.StopService();
+            localNet.Disconnect();
+            kinectManager.ReleaseKinect();
             Application.Current.Shutdown(0);
         }
 

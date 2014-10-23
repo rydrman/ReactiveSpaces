@@ -119,6 +119,10 @@
       <Project>{669bb77b-c72e-41cc-b043-ae029504ed58}</Project>
       <Name>RSKinect</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RSLocalhost\RSLocalhost.csproj">
+      <Project>{0afcb629-70c0-4a3f-b1a7-15a95213e614}</Project>
+      <Name>RSLocalhost</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RSNetworker\RSNetworker.csproj">
       <Project>{3564ebb2-c163-4226-b543-d9e952966be7}</Project>
       <Name>RSNetworker</Name>

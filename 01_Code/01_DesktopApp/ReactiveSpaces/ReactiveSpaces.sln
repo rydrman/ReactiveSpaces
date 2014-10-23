@@ -1,10 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveSpaces", "ReactiveSpaces.csproj", "{BE3EA745-5345-45F1-9B52-13E38689D367}"
 	ProjectSection(ProjectDependencies) = postProject
+		{0AFCB629-70C0-4A3F-B1A7-15A95213E614} = {0AFCB629-70C0-4A3F-B1A7-15A95213E614}
 		{669BB77B-C72E-41CC-B043-AE029504ED58} = {669BB77B-C72E-41CC-B043-AE029504ED58}
 		{3564EBB2-C163-4226-B543-D9E952966BE7} = {3564EBB2-C163-4226-B543-D9E952966BE7}
 	EndProjectSection
@@ -15,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RSNetworker", "..\RSNetwork
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RSKinect", "..\RSKinect\RSKinect.csproj", "{669BB77B-C72E-41CC-B043-AE029504ED58}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RSLocalhost", "..\RSLocalhost\RSLocalhost.csproj", "{0AFCB629-70C0-4A3F-B1A7-15A95213E614}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +37,10 @@ Global
 		{669BB77B-C72E-41CC-B043-AE029504ED58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{669BB77B-C72E-41CC-B043-AE029504ED58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{669BB77B-C72E-41CC-B043-AE029504ED58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0AFCB629-70C0-4A3F-B1A7-15A95213E614}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0AFCB629-70C0-4A3F-B1A7-15A95213E614}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0AFCB629-70C0-4A3F-B1A7-15A95213E614}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0AFCB629-70C0-4A3F-B1A7-15A95213E614}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

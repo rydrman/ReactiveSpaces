@@ -80,15 +80,27 @@ namespace RSKinect
                     catch(System.IO.IOException)
                     {
                         //another app is trying to read the data
+                        //TODO
                         Console.Write("App Conflict");
                         return false;
                     }
                     playerOne = new KinectSkeleton( sensor );
                     playerTwo = new KinectSkeleton( sensor );
+                    playerOne.playerNumber = 1;
+                    playerTwo.playerNumber = 2;
                     return true;
                 }
             }
             return false;
+        }
+
+        public void ReleaseKinect()
+        {
+            if (sensor != null && sensor.IsRunning)
+            {
+                sensor.Stop();
+                sensor = null;
+            }
         }
 
 
@@ -128,12 +140,12 @@ namespace RSKinect
                     if (playerOne.upToDate == false
                         && lastSkeletons[i].TrackingId == playerOne.ID)
                     {
-                        playerOne.copyDataFrom(lastSkeletons[i]);
+                        playerOne.copyDataFrom(lastSkeletons[i], 1);
                     }
                     else if (playerTwo.upToDate == false
                         && lastSkeletons[i].TrackingId == playerTwo.ID)
                     {
-                        playerTwo.copyDataFrom(lastSkeletons[i]);
+                        playerTwo.copyDataFrom(lastSkeletons[i], 2);
                     }
                 }
                 //second pass fo updating
@@ -143,13 +155,13 @@ namespace RSKinect
                         && lastSkeletons[i].TrackingState == SkeletonTrackingState.Tracked
                         && lastSkeletons[i].TrackingId != playerTwo.ID)
                     {
-                        playerOne.copyDataFrom(lastSkeletons[i]);
+                        playerOne.copyDataFrom(lastSkeletons[i], 1);
                     }
                     else if (playerOne.upToDate == false
                         && lastSkeletons[i].TrackingState == SkeletonTrackingState.Tracked
                         && lastSkeletons[i].TrackingId != playerOne.ID)
                     {
-                        playerTwo.copyDataFrom(lastSkeletons[i]);
+                        playerTwo.copyDataFrom(lastSkeletons[i], 2);
                     }
                 }
             }
