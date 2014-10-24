@@ -40,6 +40,7 @@ namespace ReactiveSpaces
                     SolidColorBrush jointBrush = new SolidColorBrush();
 
                     jointBrush.Color = Color.FromArgb(color, color, color, 255);
+                    jointBrush.Color = Colors.Black;
                     jointEllipse.Fill = jointBrush;
 
                     jointEllipse.Width = 5;
@@ -76,6 +77,7 @@ namespace ReactiveSpaces
                 SolidColorBrush jointBrush = new SolidColorBrush();
 
                 jointBrush.Color = color;
+                jointBrush.Color = Colors.Black;
                 jointEllipse.Fill = jointBrush;
 
                 jointEllipse.Width = 5;
