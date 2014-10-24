@@ -8,6 +8,12 @@
 	Title="Kinect">
 
     <Grid>
-        <Canvas Name="localCanvas" Grid.Row="3" Width="320" Height="240" Background="BlueViolet"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        
+        <Canvas Name="localCanvas" Grid.Column="0" Width="320" Height="240" Background="LightBlue"/>
+        <Canvas Name="remoteCanvas" Grid.Column="1" Width="320" Height="240" Background="LightYellow"/>
     </Grid>
 </Page>

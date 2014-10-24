@@ -38,9 +38,9 @@ namespace RSNetworker
 
 
         [OperationContract(IsOneWay = true)]
-        void RecieveKinect(KinectData newData);
-
-        void SendKinect(KinectSkeleton newSkeleton);
+        void PushKinectToPeers(KinectSkeleton player1, KinectSkeleton player2);
+        [OperationContract(IsOneWay = true)]
+        void RecieveKinect(int meshID, KinectSkeleton player1, KinectSkeleton player2);
 
 
         [OperationContract(IsOneWay = true)]
@@ -52,6 +52,6 @@ namespace RSNetworker
     public delegate void onPeerRemoved(StationProfile oldPeer);
     public delegate void onPeerUpdated(StationProfile oldData, StationProfile newData);
 
-    public delegate void onKinectRecieved(KinectData newData);
+    public delegate void onKinectRecieved(List<StationProfile> updatedProfile);
     public delegate void onMessageRecieved(string msg);
 }

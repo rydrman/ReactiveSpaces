@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using RSKinect;
+using RSNetworker;
 
 namespace ReactiveSpaces
 {
@@ -39,7 +40,6 @@ namespace ReactiveSpaces
                     SolidColorBrush jointBrush = new SolidColorBrush();
 
                     jointBrush.Color = Color.FromArgb(color, color, color, 255);
-                    color += step;
                     jointEllipse.Fill = jointBrush;
 
                     jointEllipse.Width = 5;
@@ -50,6 +50,41 @@ namespace ReactiveSpaces
 
                     localCanvas.Children.Add(jointEllipse);
                 }
+                color += step;
+            }
+        }
+        public void drawRemoteSkeletons(List<StationProfile> peers)
+        {
+            foreach (StationProfile s in peers)
+            {
+
+                byte step = (byte)(255 / peers.Count);
+                byte color = 0;
+                
+                remoteCanvas.Children.Clear();
+
+                drawRemoteSkeleton(s.player1, Color.FromArgb(color, color, color, 255));
+                drawRemoteSkeleton(s.player2, Color.FromArgb(color, color, color, 255));
+                color += step;
+            }
+        }
+        public void drawRemoteSkeleton(KinectSkeleton skeleton, Color color)
+        {
+            for (int i = 0; i < skeleton.numberOfJoints; ++i)
+            {
+                Ellipse jointEllipse = new Ellipse();
+                SolidColorBrush jointBrush = new SolidColorBrush();
+
+                jointBrush.Color = color;
+                jointEllipse.Fill = jointBrush;
+
+                jointEllipse.Width = 5;
+                jointEllipse.Height = 5;
+
+                Canvas.SetLeft(jointEllipse, skeleton.joints[i].screenPos.x * 320);
+                Canvas.SetTop(jointEllipse, skeleton.joints[i].screenPos.y * 240);
+
+                localCanvas.Children.Add(jointEllipse);
             }
         }
     }
