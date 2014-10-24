@@ -71,7 +71,6 @@ namespace RSKinect
         FOOT_RIGHT
     }
 
-    [DataContract]
     [Serializable()]
     public class KinectSkeleton
     {
