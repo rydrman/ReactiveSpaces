@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using RSKinect;
 
 namespace RSNetworker
 {
@@ -15,6 +16,17 @@ namespace RSNetworker
         public string location { get; set; }
         //TODO icon
         public int meshID { get; set; }
+
+        [NonSerialized()]
+        public KinectSkeleton player1;
+        [NonSerialized()]
+        public KinectSkeleton player2;
+
+        public StationProfile()
+        {
+            player1 = new KinectSkeleton();
+            player2 = new KinectSkeleton();
+        }
 
         public void Set(StationProfile newData)
         {

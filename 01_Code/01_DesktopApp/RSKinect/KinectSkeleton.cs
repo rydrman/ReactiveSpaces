@@ -71,7 +71,6 @@ namespace RSKinect
         FOOT_RIGHT
     }
 
-    [DataContract]
     [Serializable()]
     public class KinectSkeleton
     {
@@ -106,7 +105,7 @@ namespace RSKinect
                 joints[i].jointType = (KinectJoints)i;
             }
         }
-    
+
         internal void copyDataFrom(Skeleton skeleton, int playerNum = 0)
         {
             ID = skeleton.TrackingId;

@@ -10,7 +10,8 @@ namespace RSLocalhost
     enum MessageType
     {
         Custom,
-        Kinect
+        Kinect,
+        remoteKinect
     }
 
     class WebSocketMessage

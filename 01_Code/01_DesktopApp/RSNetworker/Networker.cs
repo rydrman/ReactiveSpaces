@@ -26,7 +26,6 @@ namespace RSNetworker
         IRSNetworker channel;
 
         //profile data
-        int lastMeshID = 0;
         StationProfile currentProfile;
         List<StationProfile> currentPeers;
 
@@ -58,6 +57,8 @@ namespace RSNetworker
         {
             _onMessageRecieved(msg);
         }
+
+        #region registration and updating
 
         public void RegisterProfile(StationProfile profile)
         {
@@ -120,15 +121,32 @@ namespace RSNetworker
             channel.UpdateRegisterProfile(currentProfile);
         }
 
-        public void RecieveKinect(KinectData newData)
-        {
+        #endregion
 
+        #region Kinect Updating
+
+        public void PushKinectToPeers(KinectSkeleton player1, KinectSkeleton player2)
+        {
+            channel.RecieveKinect(currentProfile.meshID, player1, player2);
         }
 
-        public void SendKinect(KinectSkeleton newSkeleton)
+        public void RecieveKinect(int meshID, KinectSkeleton player1, KinectSkeleton player2)
         {
+            if (IsMe(meshID)) return;
 
+            foreach(StationProfile s in currentPeers)
+            {
+                if(s.meshID == meshID)
+                {
+                    s.player1 = player1;
+                    s.player2 = player2;
+                    _onKinectRecieved(currentPeers);
+                    return;
+                }
+            }
         }
+
+        #endregion
 
         public void InitializeMesh(){ }
 
@@ -193,5 +211,10 @@ namespace RSNetworker
         }
 
         #endregion
+
+        private bool IsMe(int meshID)
+        {
+            return currentProfile.meshID == meshID;
+        }
     }
 }

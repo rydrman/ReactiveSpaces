@@ -86,7 +86,8 @@ namespace ReactiveSpaces
                 //send to json locally
                 localNet.UpdateLocalKinect(skeletons.ElementAt(0));
 
-                //TODO send to peers
+                //send to peers
+                networker.PushKinectToPeers(kinectManager.playerOne, kinectManager.playerTwo);
             }
         }
 
@@ -121,9 +122,9 @@ namespace ReactiveSpaces
             generalPage.messageOutput.Text = msg;
         }
 
-        public void RecieveKinect(KinectData newData)
+        public void RecieveKinect(List<StationProfile> peers)
         {
-
+            kinectPage.drawRemoteSkeletons(peers);
         }
 
         public void ProfileChanged(StationProfile newProfile)
