@@ -202,6 +202,8 @@ RS.MessageRecieved = function(e)
             case RS.MessageTypes.KINECT:
                 RS.SkeletonRecieved(message.data);
                 break;
+            case RS.MessageTypes.REMOTE_KINECT:
+                break;
             default:
                 RS.messenger.display(Message.type.WARNING, "Unkown Message Type Recieved");
         }

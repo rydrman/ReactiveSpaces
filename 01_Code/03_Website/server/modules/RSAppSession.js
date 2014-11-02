@@ -90,3 +90,26 @@ AppSession.prototype.passCustomData = function( clientFrom, message )
     }
     return true;
 }
+
+AppSession.prototype.passKinectData = function( clientFrom, message )
+{
+    var index = -1;
+    for(var i in this.peers)
+    {
+        if(this.peers[i].id == clientFrom.id)
+            index = i;
+    }
+    
+    if(index == -1)
+    {
+        console.log("!! peer not found in this session");
+        return false;
+    }
+    
+    for(var i in this.peers)
+    {
+        if(i == index) continue;
+        this.peers[i].sendKinectData( message );
+    }
+    return true;
+}
