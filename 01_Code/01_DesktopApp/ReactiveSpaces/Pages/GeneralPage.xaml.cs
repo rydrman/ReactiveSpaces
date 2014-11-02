@@ -12,6 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Threading;
+
+using RSNetworker;
 
 namespace ReactiveSpaces
 {
@@ -23,6 +26,8 @@ namespace ReactiveSpaces
         public delegate void OnSendButton(string message);
         public OnSendButton _onSendButton = null;
 
+        private bool connected = false;
+
         public GeneralPage()
         {
             InitializeComponent();
@@ -33,6 +38,26 @@ namespace ReactiveSpaces
             if (_onSendButton != null)
             {
                 _onSendButton(System.Environment.MachineName + ": " + messageOutput.Text);
+            }
+        }
+
+        public void updateAppInfo(AppInfo newInfo)
+        {
+            if(newInfo == null)
+            {
+                connected = false;
+                appName.Text = "";
+                appVersion.Text = "";
+                appStatus.Text = "Disconnected";
+                appStatus.Foreground = Brushes.Red;
+            }
+            else if(!connected)
+            {
+                connected = true;
+                appName.Text = newInfo.name;
+                appVersion.Text = newInfo.version.ToString();
+                appStatus.Text = "Connected";
+                appStatus.Foreground = Brushes.Green;
             }
         }
     }

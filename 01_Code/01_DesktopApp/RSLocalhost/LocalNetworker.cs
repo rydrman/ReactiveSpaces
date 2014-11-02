@@ -6,17 +6,23 @@ using System.Threading.Tasks;
 //using Microsoft.ServiceModel.WebSockets;
 //using System.ServiceModel.Description;
 using RSKinect;
+using RSNetworker;
 //using System.ServiceModel;
 using System.Net.Sockets;
 using System.Net;
 using System.Threading;
 using System.Security.Cryptography;
 using System.Web.Script.Serialization;
+using System.Diagnostics;
 
 namespace RSLocalhost
 {
     public class LocalNetworker
     {
+        public bool newAppInfo = false;
+        public AppInfo appInfo = null;
+        public bool connected = false;
+
         JavaScriptSerializer jSerializer;
 
         TcpListener listener;
@@ -82,6 +88,7 @@ namespace RSLocalhost
 
                     stream.Write(responseBytes, 0, responseBytes.Length);
                     streamReady = true;
+                    connected = true;
                 }
                 else
                 {
@@ -95,6 +102,19 @@ namespace RSLocalhost
                     //decode the message
                     string indata = DecodeMassage(bytes);
                     WebSocketMessage message = jSerializer.Deserialize<WebSocketMessage>(indata);
+
+                    //find the type
+                    switch(message.type)
+                    {
+                        case MessageType.AppInfo:
+                            appInfo = jSerializer.Deserialize<AppInfo>(message.data);
+                            newAppInfo = true;
+                            break;
+                        default:
+                            Debugger.Break();
+                            break;
+                    }
+
                 }
             }
             Disconnect();
@@ -113,6 +133,9 @@ namespace RSLocalhost
                 stream = null;
                 streamReady = false;
             }
+            appInfo = null;
+            connected = false;
+            newAppInfo = true;
         }
 
         public void UpdateLocalKinect(KinectSkeleton newSkeleton)

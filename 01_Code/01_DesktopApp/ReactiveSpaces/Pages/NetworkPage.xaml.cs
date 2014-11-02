@@ -23,9 +23,8 @@ namespace ReactiveSpaces
 
     public partial class NetworkPage : Page
     {
-        public delegate void ProfileChanged(StationProfile newProfile);
-        public ProfileChanged _onProfileChanged = null;
-        StationProfile currentProfile = null;
+        public bool stationProfileUpdated = false;
+        public StationProfile currentProfile = null;
 
         ObservableCollection<StationProfile> peers;
         public NetworkPage()
@@ -37,16 +36,28 @@ namespace ReactiveSpaces
             //connectedStations.DataContext = peers;
         }
 
+        public void serverConnectionChanged(bool connected)
+        {
+            if(connected)
+            {
+                serverStatus.Text = "Connected";
+                serverStatus.Foreground = Brushes.Green;
+                return;
+            }
+            serverStatus.Text = "Disconnected";
+            serverStatus.Foreground = Brushes.Red;
+        }
+
         private void onConnectClick(object sender, RoutedEventArgs e)
         {
             //TODO
         }
 
-        public void setProfile(StationProfile current)
+        public void updateStationProfile(StationProfile current)
         {
             currentName.Text = current.name;
             currentLocation.Text = current.location;
-            currentMeshID.Text = current.meshID.ToString();
+            currentSessionID.Text = current.sessionID.ToString();
             currentProfile = current;
         }
 
@@ -60,7 +71,7 @@ namespace ReactiveSpaces
             {
                 currentProfile.name = currentName.Text;
                 currentProfile.location = currentLocation.Text;
-                _onProfileChanged(currentProfile);
+                stationProfileUpdated = true;
             }
         }
 
@@ -83,7 +94,7 @@ namespace ReactiveSpaces
         {
             foreach(StationProfile p in peers)
             {
-                if(p.meshID == oldData.meshID
+                if(p.sessionID == oldData.sessionID
                     && p.name == oldData.name)
                 {
                     p.Set(newData);

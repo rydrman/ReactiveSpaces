@@ -13,6 +13,7 @@
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -21,17 +22,21 @@
         </Grid.ColumnDefinitions>
         
         <!-- current profile-->
-        <TextBlock Text="Station Profile:" Grid.Row="0" Width="640" VerticalAlignment="Center" FontSize="18" Grid.ColumnSpan="2"/>
-        <TextBlock Text="Name:" Grid.Row="1" Margin="0 0 10 0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-        <TextBox Name="currentName" Width="200" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" KeyDown="onProfileChanged" LostFocus="onProfileLostFocus"/>
-        <TextBlock Text="Location:" Grid.Row="2" Margin="0 0 10 0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-        <TextBox Name="currentLocation" Width="200" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" KeyDown="onProfileChanged" LostFocus="onProfileLostFocus"/>
-        <TextBlock Text="Mesh ID:" Grid.Row="3" Margin="0 0 10 0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-        <TextBox Name="currentMeshID" Width="200" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False"/>
+        <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2" VerticalAlignment="Center">
+            <TextBlock Text="Server Status: " Grid.Row="0" VerticalAlignment="Center" FontSize="18" Grid.ColumnSpan="2"/>
+            <TextBlock Name="serverStatus" Text="Disconnected" Grid.Row="0" VerticalAlignment="Center" FontSize="18" Grid.ColumnSpan="2" Foreground="Red"/>
+        </StackPanel>
+        <TextBlock Text="Station Profile:" Grid.Row="1" Width="640" VerticalAlignment="Center" FontSize="18" Grid.ColumnSpan="2"/>
+        <TextBlock Text="Name:" Grid.Row="2" Margin="0 0 10 0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+        <TextBox Name="currentName" Width="200" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" KeyDown="onProfileChanged" LostFocus="onProfileLostFocus"/>
+        <TextBlock Text="Location:" Grid.Row="3" Margin="0 0 10 0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+        <TextBox Name="currentLocation" Width="200" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" KeyDown="onProfileChanged" LostFocus="onProfileLostFocus"/>
+        <TextBlock Text="Session ID:" Grid.Row="4" Margin="0 0 10 0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+        <TextBox Name="currentSessionID" Width="200" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False"/>
         
         <!-- connected peers -->
         <DataGrid Name="connectedStations" CanUserAddRows="False" CanUserResizeColumns="True" 
-                  CanUserSortColumns="True" IsReadOnly="True" Grid.Row="4" Height="200" ItemsSource="{Binding}"
+                  CanUserSortColumns="True" IsReadOnly="True" Grid.Row="5" Height="200" ItemsSource="{Binding}"
                   AutoGenerateColumns="False" Grid.ColumnSpan="2">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name" Binding="{Binding Path=name}" Width="250"/>

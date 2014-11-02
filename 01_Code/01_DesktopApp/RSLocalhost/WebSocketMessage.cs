@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RSKinect;
+using RSNetworker;
 
 namespace RSLocalhost
 {
     enum MessageType
     {
+        AppInfo,
         Custom,
         Kinect,
         remoteKinect
@@ -16,7 +18,7 @@ namespace RSLocalhost
 
     class WebSocketMessage
     {
-        public MessageType Type = MessageType.Custom;
+        public MessageType type = MessageType.Custom;
         public string data { get; set; }
     }
 
@@ -24,5 +26,12 @@ namespace RSLocalhost
     {
         public MessageType type = MessageType.Kinect;
         public KinectSkeleton data { get; set; }
+    }
+
+    class AppInfoMessage
+    {
+        public MessageType type = MessageType.AppInfo;
+
+        public AppInfo data { get; set; }
     }
 }

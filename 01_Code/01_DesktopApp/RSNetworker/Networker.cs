@@ -3,218 +3,214 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.ServiceModel;
-using System.Net.PeerToPeer;
+using System.Diagnostics;
+
+using System.Net.Sockets;
+using System.Net;
+using System.Threading;
+using System.Security.Cryptography;
+using System.Web.Script.Serialization;
+
 using RSKinect;
 
 namespace RSNetworker
 {
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
-    public class Networker : IRSNetworker
+
+    public class Networker
     {
-        //handlers
-        onKinectRecieved _onKinectRecieved = null;
-        onMessageRecieved _onMessageRecieved = null;
-        onPeerAdded _onPeerAdded = null;
-        onPeerRemoved _onPeerRemoved = null;
-        onPeerUpdated _onPeerUpdated = null;
+        //flags for watching
+        public bool connected = false;
+        public bool connectionChanged = false;
+        public bool stationProfileUpdated = true;
+        public bool peerListUpdated = false;
 
-        //for networking
-        ServiceHost host = null;
-        PeerNameResolver resolver;
-        ChannelFactory<IRSNetworker> channelFactory;
-        IRSNetworker channel;
+        //data to show
+        public StationProfile currentProfile;
+        public List<StationProfile> currentPeers;
+        AppInfo currentApp = null;
 
-        //profile data
-        StationProfile currentProfile;
-        List<StationProfile> currentPeers;
+        JavaScriptSerializer jSerializer;
 
-        public Networker(onMessageRecieved messageCallback, 
-            onKinectRecieved kinectCallback,
-            onPeerAdded peerAddCallback,
-            onPeerRemoved peerRemovedCallback,
-            onPeerUpdated peerUpdateCallback)
+        TcpListener listener;
+        Int32 listenerPort;
+        Thread listenThread = null;
+
+        string serverBaseURL = "reactivespacesapi.com";
+        int serverPort = 8080;
+        TcpClient server = null;
+        Task serverThread = null;
+        NetworkStream serverStream = null;
+        bool serverReady = false;
+
+        public Networker()
         {
-            _onKinectRecieved = kinectCallback;
-            _onMessageRecieved = messageCallback;
-            _onPeerAdded = peerAddCallback;
-            _onPeerRemoved = peerRemovedCallback;
-            _onPeerUpdated = peerUpdateCallback;
-
-            currentProfile = null;
+            currentProfile = new StationProfile();
             currentPeers = new List<StationProfile>();
 
-            StartService();
-        }
+            jSerializer = new JavaScriptSerializer();
 
-        public void SendMessage(string msg)
-        {
-            if (channel != null)
-                channel.RecieveMessage(msg);
-        }
+            server = new TcpClient();
+            SocketError result = ConnectToServer();
 
-        public void RecieveMessage(string msg)
-        {
-            _onMessageRecieved(msg);
-        }
-
-        #region registration and updating
-
-        public void RegisterProfile(StationProfile profile)
-        {
-            //check for known peer
-            foreach(StationProfile peer in currentPeers)
+            if(result != SocketError.Success)
             {
-                if (peer.name == profile.name
-                    && peer.meshID == profile.meshID
-                    && peer.location == profile.location)
-                    return;
-            }
-            //check if it's me
-            if (currentProfile != null
-                && currentProfile.name == profile.name
-                && currentProfile.meshID == profile.meshID
-                && currentProfile.location == profile.location)
+                //connection not made
+                Debugger.Break();
                 return;
-
-            //Add to list
-            currentPeers.Add(profile);
-
-            //update ui
-            _onPeerAdded(profile);
-        }
-
-        public bool UpdateProfile(StationProfile newData)
-        {
-            foreach (StationProfile peer in currentPeers)
-            {
-                if (peer.meshID == newData.meshID)
-                {
-                    _onPeerUpdated(peer, newData);
-                    peer.Set(newData);
-                    return true;
-                }
             }
-            return false;
+
+            //listener = new TcpListener(IPAddress.Any, 0);
+            //listenerPort = ((IPEndPoint)listener.LocalEndpoint).Port;
+            //listener.Start();
+
+            //listenThread = new Thread(WaitForConnection);
+            //listenThread.Start();
         }
 
-        public void UpdateRegisterProfile(StationProfile profile)
+        private SocketError ConnectToServer()
         {
-            if (!UpdateProfile(profile))
-                RegisterProfile(profile);
+            IPAddress[] addresses = System.Net.Dns.GetHostAddresses(serverBaseURL);
+
+            if (addresses.Length == 0)
+            {
+                return SocketError.AddressNotAvailable;
+            }
+
+            IPEndPoint serverEndPoint = new IPEndPoint(addresses[0], serverPort);
+            try
+            {
+                server.Connect(serverEndPoint);
+            }
+            catch(SocketException e)
+            {
+                return e.SocketErrorCode;
+            }
+            serverStream = server.GetStream();
+            serverReady = true;
+
+            //write station profile
+            sendStationProfile();
+
+            serverThread = new Task(ServerConnectionHandler);
+            serverThread.Start();
+
+            return SocketError.Success;
         }
 
-        public StationProfile getProfile()
+        private void ServerConnectionHandler()
         {
-            return currentProfile;
+            connected = true;
+            connectionChanged = true;
+
+            while(server.Connected)
+            {
+                while (serverStream != null && !serverStream.DataAvailable);
+
+                if (serverStream == null) return;
+
+                byte[] bytes = new byte[server.Available];
+                serverStream.Read(bytes, 0, bytes.Length);
+
+                String data = Encoding.UTF8.GetString(bytes);
+
+                if (data.StartsWith("\0"))
+                {
+                    //TODO server shutdown
+                    Disconnect();
+                    break;
+                }
+
+                SocketMessage message = jSerializer.Deserialize<SocketMessage>(data);
+
+                switch(message.type)
+                {
+                    case MessageType.AppInfo:
+                        AppInfo appInfo = jSerializer.Deserialize<AppInfo>(message.data);
+                        break;
+                    case MessageType.StationProfile:
+                        //should only ever get assigned an id
+                        StationProfile profile = jSerializer.Deserialize<StationProfile>(message.data);
+                        currentProfile.sessionID = profile.sessionID;
+                        stationProfileUpdated = true;
+                        break;
+                    default:
+                        Debugger.Break();
+                        break;
+                }
+
+                //serverStream.Write(responseBytes, 0, responseBytes.Length);
+            }
+            Disconnect();
         }
 
-        public void onProfileChanged(StationProfile newProfile)
+        public void Disconnect()
+        {
+            if (server != null)
+            {
+                if (serverStream != null)
+                    serverStream.Close();
+                server.Close();
+
+                server = null;
+                serverStream = null;
+                serverReady = false;
+            }
+            connected = false;
+            connectionChanged = true;
+        }
+
+        public void updateAppInfo(AppInfo newInfo)
+        {
+            currentApp = newInfo;
+
+            SocketMessage message = new SocketMessage();
+
+            if(null == newInfo)
+            {
+                //the app was closed
+                message.type = MessageType.AppInfo;
+                message.data = null;
+            }
+            else
+            {
+                //the app was connected
+                message.type = MessageType.AppInfo;
+                message.data = jSerializer.Serialize(newInfo);
+            }
+
+            string json = jSerializer.Serialize(message);
+            byte[] msgBytes = Encoding.UTF8.GetBytes(json);
+
+            //tell server
+            if(serverReady)
+            {
+                serverStream.Write(msgBytes, 0, msgBytes.Length);
+            }
+            else
+            {
+                //TODO how did we get to this state... 
+                //retry connection?
+                Debugger.Break();
+            }
+        }
+
+        public void updateStationProfile(StationProfile newProfile)
         {
             this.currentProfile = newProfile;
-            channel.UpdateRegisterProfile(newProfile);
-            //TODO tell others
+            sendStationProfile();
         }
-
-        public void RequestProfile()
+        void sendStationProfile()
         {
-            channel.UpdateRegisterProfile(currentProfile);
-        }
+            SocketMessage message = new SocketMessage();
+            message.type = MessageType.StationProfile;
+            message.data = jSerializer.Serialize(currentProfile);
 
-        #endregion
+            string json = jSerializer.Serialize(message);
 
-        #region Kinect Updating
+            byte[] messageBytes = Encoding.UTF8.GetBytes(json);
 
-        public void PushKinectToPeers(KinectSkeleton player1, KinectSkeleton player2)
-        {
-            channel.RecieveKinect(currentProfile.meshID, player1, player2);
-        }
-
-        public void RecieveKinect(int meshID, KinectSkeleton player1, KinectSkeleton player2)
-        {
-            if (IsMe(meshID)) return;
-
-            foreach(StationProfile s in currentPeers)
-            {
-                if(s.meshID == meshID)
-                {
-                    s.player1 = player1;
-                    s.player2 = player2;
-                    _onKinectRecieved(currentPeers);
-                    return;
-                }
-            }
-        }
-
-        #endregion
-
-        public void InitializeMesh(){ }
-
-        #region Functions for Creating Connections
-        private void StartService()
-        {
-            host = new ServiceHost(this);
-            host.Open();
-            channelFactory = new ChannelFactory<IRSNetworker>("ReactiveSpacesEndpoint");
-            channel = channelFactory.CreateChannel();
-
-            channel.InitializeMesh();
-
-            //register myself
-            //assign myself an ID
-            currentProfile = new StationProfile();
-            currentProfile.name = System.Environment.MachineName;
-            currentProfile.location = "some place";
-            currentProfile.meshID = (System.Environment.MachineName + host.ChannelDispatchers.ElementAt(0).Listener.Uri).GetHashCode();
-
-            PeerName peerName = new PeerName("ReactiveSpaces", PeerNameType.Unsecured);
-            //register with cloud
-            PeerNameRegistration peerReg = new PeerNameRegistration(peerName, 3030);
-            peerReg.Data = currentProfile.ToBytes();
-            peerReg.UseAutoEndPointSelection = true;
-            peerReg.Start();
-
-
-            //find peers
-            resolver = new PeerNameResolver();
-            PeerNameRecordCollection peers = resolver.Resolve(peerName);
-
-            foreach(PeerNameRecord p in peers)
-            {
-                StationProfile profile = new StationProfile();
-                profile.FromBytes(p.Data);
-                UpdateRegisterProfile(profile);
-            }
-
-
-            
-
-            //channel.RequestProfile();
-            //PeerName name = new PeerName("ReactiveSpaces", PeerNameType.Unsecured);
-            //PeerNameResolver resolver = new PeerNameResolver();
-            
-            channel.UpdateRegisterProfile(currentProfile);
-            channel.RequestProfile();
-        }
-
-        public void StopService()
-        {
-            if (host != null)
-            {
-                //TODO send the disconnect message
-                if(host.State != CommunicationState.Closed)
-                {
-                    channelFactory.Close();
-                    host.Close();
-                }
-            }
-        }
-
-        #endregion
-
-        private bool IsMe(int meshID)
-        {
-            return currentProfile.meshID == meshID;
+            if (serverStream != null)
+                serverStream.Write(messageBytes, 0, messageBytes.Length);
         }
     }
 }
