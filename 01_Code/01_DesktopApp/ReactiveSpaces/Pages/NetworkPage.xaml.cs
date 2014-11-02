@@ -81,24 +81,12 @@ namespace ReactiveSpaces
             currentLocation.Text = currentProfile.location;
         }
 
-        public void addPeer(StationProfile peer)
+        public void updatePeerList(List<StationProfile> newData)
         {
-            peers.Add(peer);
-        }
-        public void removePeer(StationProfile peer)
-        {
-
-        }
-
-        public void updatePeer(StationProfile oldData, StationProfile newData)
-        {
-            foreach(StationProfile p in peers)
+            peers.Clear();
+            foreach(StationProfile p in newData)
             {
-                if(p.sessionID == oldData.sessionID
-                    && p.name == oldData.name)
-                {
-                    p.Set(newData);
-                }
+                peers.Add(p);
             }
         }
 
