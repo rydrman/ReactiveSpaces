@@ -20,9 +20,9 @@
         <Button Name="closeButton" Grid.Row="0" Grid.Column="2" Click="onCloseButtonClick"/>
         
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.ColumnSpan="3" HorizontalAlignment="Center">
-            <Button Name="generalTabButton" Content="General" Style="{StaticResource tabButton}" Click="tabButtonClick"/>
-            <Button Name="kinectTabButton" Content="Kinect" Style="{StaticResource tabButton}" Click="tabButtonClick"/>
-            <Button Name="networkTabButton" Content="Network" Style="{StaticResource tabButton}" Click="tabButtonClick"/>
+            <ToggleButton Name="generalTabButton" Content="General" Style="{StaticResource tabButton}" Click="tabButtonClick"/>
+            <ToggleButton Name="kinectTabButton" Content="Kinect" Style="{StaticResource tabButton}" Click="tabButtonClick"/>
+            <ToggleButton Name="networkTabButton" Content="Network" Style="{StaticResource tabButton}" Click="tabButtonClick"/>
         </StackPanel>
 
         <Frame Name="mainFrame" Grid.Row="2" Grid.ColumnSpan="3" Width="640" Height="400" NavigationUIVisibility="Hidden"/>

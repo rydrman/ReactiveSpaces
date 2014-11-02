@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -62,7 +63,7 @@ namespace ReactiveSpaces
             generalPage._onSendButton = onSendMessage;
 
             //setup data
-            //networkPage.setProfile(networker.getProfile());
+            networkPage._onReconnect = onReconnect;
 
             //navigate
             mainFrame.Navigate(generalPage);
@@ -152,6 +153,11 @@ namespace ReactiveSpaces
 
         #region Handlers to and from networker
 
+        public void onReconnect()
+        {
+            networker.reconnect();
+        }
+
         public void RecieveMessage(string msg)
         {
             generalPage.messageOutput.Text = msg;
@@ -185,20 +191,29 @@ namespace ReactiveSpaces
 
         private void tabButtonClick(object sender, RoutedEventArgs e)
         {
-            Button clicked = (Button)sender;
+            ToggleButton clicked = (ToggleButton)sender;
             switch(clicked.Name)
             {
                 case "generalTabButton":
                     if (mainFrame.Content.GetType() != generalPage.GetType())
                         mainFrame.Navigate(generalPage);
+                    clicked.IsChecked = true;
+                    kinectTabButton.IsChecked = false;
+                    networkTabButton.IsChecked = false;
                     break;
                 case "kinectTabButton":
                     if (mainFrame.Content.GetType() != kinectPage.GetType())
                         mainFrame.Navigate(kinectPage);
+                    clicked.IsChecked = true;
+                    generalTabButton.IsChecked = false;
+                    networkTabButton.IsChecked = false;
                     break;
                 case "networkTabButton":
                     if (mainFrame.Content.GetType() != networkPage.GetType())
                         mainFrame.Navigate(networkPage);
+                    clicked.IsChecked = true;
+                    generalTabButton.IsChecked = false;
+                    kinectTabButton.IsChecked = false;
                     break;
             }
         }

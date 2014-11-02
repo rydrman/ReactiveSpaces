@@ -26,6 +26,9 @@ namespace ReactiveSpaces
         public bool stationProfileUpdated = false;
         public StationProfile currentProfile = null;
 
+        public delegate void OnReconnect();
+        public OnReconnect _onReconnect = null;
+
         ObservableCollection<StationProfile> peers;
         public NetworkPage()
         {
@@ -50,7 +53,8 @@ namespace ReactiveSpaces
 
         private void onConnectClick(object sender, RoutedEventArgs e)
         {
-            //TODO
+            if (_onReconnect != null)
+                _onReconnect();
         }
 
         public void updateStationProfile(StationProfile current)
