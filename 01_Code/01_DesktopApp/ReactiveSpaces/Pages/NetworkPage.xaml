@@ -25,6 +25,7 @@
         <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2" VerticalAlignment="Center">
             <TextBlock Text="Server Status: " Grid.Row="0" VerticalAlignment="Center" FontSize="18" Grid.ColumnSpan="2"/>
             <TextBlock Name="serverStatus" Text="Disconnected" Grid.Row="0" VerticalAlignment="Center" FontSize="18" Grid.ColumnSpan="2" Foreground="Red"/>
+            <Button Name="connect" Style="{StaticResource iconButton}" Margin="2 0 0 0" Padding="5" Grid.Column="1" Click="onConnectClick">&#xE149;</Button>
         </StackPanel>
         <TextBlock Text="Station Profile:" Grid.Row="1" Width="640" VerticalAlignment="Center" FontSize="18" Grid.ColumnSpan="2"/>
         <TextBlock Text="Name:" Grid.Row="2" Margin="0 0 10 0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
@@ -41,7 +42,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name" Binding="{Binding Path=name}" Width="250"/>
                 <DataGridTextColumn Header="Location" Binding="{Binding Path=location}" Width="290"/>
-                <DataGridTextColumn Header="meshID" Binding="{Binding Path=meshID}" Width="*"/>
+                <DataGridTextColumn Header="ID" Binding="{Binding Path=id}" Width="*"/>
             </DataGrid.Columns>
         </DataGrid>
         <!--<Button Content="Connect" Grid.Row="4" Click="onConnectClick" />-->

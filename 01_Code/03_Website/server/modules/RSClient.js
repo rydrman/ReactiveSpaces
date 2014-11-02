@@ -16,6 +16,7 @@ var Client = module.exports = function(socket)
     
     this.socket = socket;
     this.socket.setEncoding('utf8');
+    this.messagePiece = null;
     
     //events
     this.onClose = null;
@@ -98,6 +99,8 @@ Client.prototype.sendCustomData = function( message )
 
 Client.prototype.appDisconected = function()
 {
+    if(this.appInfo != null)
+        console.log("Client app disconnected " + this.stationProfile.name + "(" + this.id + ")");
     if(null != this.onAppDisconnected)
         this.onAppDisconnected(this);
     this.appInfo = null;
@@ -105,14 +108,19 @@ Client.prototype.appDisconected = function()
 
 Client.prototype.onDisconnect = function()
 {
-    if(null!= this.appInfo)
-        this.appDisconected();
+    this.appDisconected();
     if(this.onClose != null)
         this.onClose(this);
 }
 
 Client.prototype.onData = function(json)
 {
+    if(this.messagePiece != null)
+    {
+        json = this.messagePiece + json;
+        this.messagePiece = null;
+        console.log("end piece concat");
+    }
     var messages = json.split('\0');
     for(var i in messages)
     {
@@ -121,7 +129,19 @@ Client.prototype.onData = function(json)
         var message = new SocketMessage();
         var success = message.SetFromIncoming( messages[i] );
 
-        if(!success) continue;
+        if(!success)
+        {
+            if(i == messages.length -1 && this.messagePiece == null)
+            {
+                this.messagePiece = messages[i];
+                console.log("end piece stored");
+            }   
+            else if(i == 0)
+            {
+                console.log("end piece no match---------");
+            }
+            continue;
+        }
         
         switch(message.type)
         {    
@@ -156,4 +176,5 @@ Client.prototype.onData = function(json)
                 console.log("Message recieved of unknown type: " + message.type);
         }
     }
+    console.log("\n<------------------------------>");
 }

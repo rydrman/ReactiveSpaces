@@ -88,8 +88,11 @@ ClientManager.prototype.unmatchClient = function(client)
     var session = client.session;
     if(session != null)
     {
-        session.removePeer(client);
+        var success = session.removePeer(client);
         client.session = null;
+        
+        if(success)
+            console.log("Client " + client.stationProfile.name + "(" + client.id + ") removed from session " + session.id);
         
         if(session.peers.length == 0)
         {
@@ -107,6 +110,8 @@ ClientManager.prototype.unmatchClient = function(client)
                 this.openSessions.push(session);
         }
     }
+    else
+        console.log("No client session to Unmatch");
 
 }
                             

@@ -35,6 +35,8 @@ namespace RSNetworker
         Int32 listenerPort;
         Thread listenThread = null;
 
+        string missingPiece = null;
+
         string serverBaseURL = "reactivespacesapi.com";
         int serverPort = 8080;
         TcpClient server = null;
@@ -60,13 +62,12 @@ namespace RSNetworker
 
             jSerializer = new JavaScriptSerializer();
 
-            server = new TcpClient();
             SocketError result = ConnectToServer();
 
             if(result != SocketError.Success)
             {
                 //connection not made
-                Debugger.Break();
+                //Debugger.Break();
                 return;
             }
 
@@ -80,6 +81,7 @@ namespace RSNetworker
 
         private SocketError ConnectToServer()
         {
+            server = new TcpClient();
             IPAddress[] addresses = System.Net.Dns.GetHostAddresses(serverBaseURL);
 
             if (addresses.Length == 0)
@@ -99,32 +101,38 @@ namespace RSNetworker
             serverStream = server.GetStream();
             serverReady = true;
 
-            //write station profile
-            sendStationProfile();
-
-            serverThread = new Task(ServerConnectionHandler);
-            serverThread.Start();
+            if (serverThread == null)
+            {
+                serverThread = new Task(ServerConnectionHandler);
+            }
+            if(serverThread.Status != TaskStatus.Running)
+            {
+                sendStationProfile();
+                serverThread.Start();
+            }
 
             return SocketError.Success;
         }
 
         private void ServerConnectionHandler()
         {
+            handlerStart:
+
             connected = true;
             connectionChanged = true;
 
-            while(server.Connected)
+            while(connected && server.Connected)
             {
                 try
                 {
-                    while (serverStream != null && !serverStream.DataAvailable) ;
+                    while (connected && serverStream != null && !serverStream.DataAvailable) ;
                 }
                 catch(Exception e)
                 {
                     break;
                 }
 
-                if (serverStream == null) return;
+                if (serverStream == null || !connected) break;
 
                 byte[] bytes = new byte[server.Available];
                 serverStream.Read(bytes, 0, bytes.Length);
@@ -135,8 +143,15 @@ namespace RSNetworker
                 {
                     //TODO server shutdown
                     Disconnect();
-                    break;
+                    return;
                 }
+
+                if (missingPiece != null)
+                {
+                    inData = missingPiece + inData;
+                    missingPiece = null;
+                }
+
                 char[] splitter = {'\0'};
                 string[] inMessages = inData.Split(splitter);
 
@@ -151,6 +166,10 @@ namespace RSNetworker
                     }
                     catch(Exception e)
                     {
+                        if(missingPiece == null && data == inMessages.Last())
+                        {
+                            missingPiece = data;
+                        }
                         continue;
                     }
              
@@ -195,7 +214,12 @@ namespace RSNetworker
 
                 //serverStream.Write(responseBytes, 0, responseBytes.Length);
             }
+
             Disconnect();
+            ConnectToServer();
+            //reconnect
+
+            goto handlerStart;
         }
 
         public void sendCustomData(string data)
@@ -218,6 +242,14 @@ namespace RSNetworker
                     Disconnect();
                 }
             }
+        }
+
+        public void reconnect()
+        {
+            if (serverThread == null)
+                ConnectToServer();
+            else
+                connected = false;
         }
 
         public void Disconnect()
