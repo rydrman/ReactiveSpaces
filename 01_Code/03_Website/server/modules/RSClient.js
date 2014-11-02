@@ -94,14 +94,15 @@ Client.prototype.removePeer = function( profile )
 
 Client.prototype.sendCustomData = function( message )
 {
-    var string = JSON.stringify(message);
-    this.socket.write(string + "\0");
+    var string = message.getJSON();
+    this.socket.write(string);
 }
 
 Client.prototype.sendKinectData = function( message )
 {
-    var string = JSON.stringify(message);
-    this.socket.write(string + "\0");
+    
+    var string = message.getJSON();
+    this.socket.write(string);
 }
 
 Client.prototype.appDisconected = function()

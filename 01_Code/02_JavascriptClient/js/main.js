@@ -28,17 +28,17 @@ function onLoad()
 
 function onSkeletonUpdated(skeleton)
 {
-    if(!e) e = window.event;
+    //if(!e) e = window.event;
     
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    RS.DrawSkeleton(ctx, skeleton);
+    //ctx.clearRect(0, 0, canvas.width, canvas.height);
+    //RS.DrawSkeleton(ctx, skeleton);
 }
 
 function onRemoteSkeletonUpdated(peer, skeleton)
 {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    RS.DrawSkeleton(ctx, skeleton);
-    debugger;
+    //ctx.clearRect(0, 0, canvas.width, canvas.height);
+    //RS.DrawSkeleton(ctx, skeleton);
+    //debugger;
 }
 
 function onMessageRecieved(peer, data)
@@ -95,6 +95,20 @@ function render()
     ctx.beginPath();
     ctx.arc(ball.x, ball.y, 20, 0, Math.PI*2, false);
     ctx.fill();
+    
+    //draw local skeleton
+    if(RS.player1.userPresent)
+        RS.DrawSkeleton(ctx, RS.player1);
+    if(RS.player2.userPresent)
+        RS.DrawSkeleton(ctx, RS.player2);
+    
+    for(var i in RS.remotePlayers)
+    {
+        if(RS.remotePlayers[i].player1.userPresent)
+            RS.DrawSkeleton(ctx, RS.remotePlayers[i].player1);
+        if(RS.remotePlayers[i].player2.userPresent)
+            RS.DrawSkeleton(ctx, RS.remotePlayers[i].player2);
+    }
     
     //////////////////////
 }
