@@ -140,7 +140,7 @@ namespace ReactiveSpaces
                 localNet.UpdateLocalKinect(skeletons.ElementAt(0));
 
                 //send to peers
-                //networker.PushKinectToPeers(kinectManager.playerOne, kinectManager.playerTwo);
+                networker.updateLocalKinect(kinectManager.playerOne, kinectManager.playerTwo);    
             }
         }
 
