@@ -13,7 +13,8 @@ namespace RSNetworker
         PeerConnect,
         PeerUpdate,
         PeerDisconnect,
-        Custom
+        Custom,
+        Kinect
     }
 
     class SocketMessage

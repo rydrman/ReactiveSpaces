@@ -40,5 +40,6 @@ SocketMessage.types = {
     PEER_CONNECT: 2,
     PEER_UPDATE: 3,
     PEER_DISCONNECT: 4,
-    CUSTOM: 5
+    CUSTOM: 5,
+    KINECT: 6
 };

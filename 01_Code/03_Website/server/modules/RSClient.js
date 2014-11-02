@@ -27,6 +27,7 @@ var Client = module.exports = function(socket)
     
     var self = this;
     socket.on('end', function(){self.onDisconnect.call(self)});
+    socket.on('error', function(e){self.onError.call(self, e)});
     socket.on('data', function(data){self.onData.call(self, data)});
     
     //var message = new SocketMessage( SocketMessage.Types.MESSAGE, "hi" );
@@ -97,6 +98,12 @@ Client.prototype.sendCustomData = function( message )
     this.socket.write(string + "\0");
 }
 
+Client.prototype.sendKinectData = function( message )
+{
+    var string = JSON.stringify(message);
+    this.socket.write(string + "\0");
+}
+
 Client.prototype.appDisconected = function()
 {
     if(this.appInfo != null)
@@ -118,9 +125,10 @@ Client.prototype.onData = function(json)
     if(this.messagePiece != null)
     {
         json = this.messagePiece + json;
-        this.messagePiece = null;
-        console.log("end piece concat");
+        //console.log("end piece concat");
     }
+    this.messagePiece = null;
+    
     var messages = json.split('\0');
     for(var i in messages)
     {
@@ -131,15 +139,10 @@ Client.prototype.onData = function(json)
 
         if(!success)
         {
-            if(i == messages.length -1 && this.messagePiece == null)
-            {
-                this.messagePiece = messages[i];
-                console.log("end piece stored");
-            }   
-            else if(i == 0)
-            {
-                console.log("end piece no match---------");
-            }
+
+            this.messagePiece = messages[i];
+            //console.log("piece stored"); 
+            
             continue;
         }
         
@@ -170,12 +173,23 @@ Client.prototype.onData = function(json)
                 message.data = JSON.stringify(newData);
                 if(this.onCustomData != null)
                     this.onCustomData(this, message);
-                return;
-
+                continue;
+                
+            case SocketMessage.types.KINECT:
+                break;
+                
             default:
                 console.log("Message recieved of unknown type: " + message.type);
-                return;
+                continue;
         }
+        console.log("\n< " + message.type + " ------------------------------>\n");
     }
-    console.log("\n<------------------------------>");
+    
+}
+
+Client.prototype.onError = function(e)
+{
+    //socket exception.. break it off
+    this.socket.close();
+    console.log("Exception caught" + e);
 }

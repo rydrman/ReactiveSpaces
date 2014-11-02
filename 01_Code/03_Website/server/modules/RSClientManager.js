@@ -33,6 +33,9 @@ ClientManager.prototype.addClient = function( socket )
     newClient.onCustomData = function(client, message){
         self.passCustomData.call(self, client, message);
     };
+    newClient.onKinectData = function(client, message){
+        self.passKinectData.call(self, client, message);
+    };
     this.clients.push( newClient );
     
     console.log("Client Connected " + newClient.socket.remoteAddress + ":" + newClient.socket.remotePort);
@@ -58,12 +61,12 @@ ClientManager.prototype.matchClient = function(client)
         {
             var result = session.addPeer( client );
             
-            console.log("Client matched to session " + session.id);
+            console.log("Client matched to session " + session.id + " -> " + session.peers.length);
             
             //it's full
             if(result == true)
             {
-                console.log("Session " + session.id + " full");
+                console.log("Session " + session.id + " full" + " -> " + session.peers.length);
                 this.openSessions.splice(i, 1);
             }
             return;
@@ -92,7 +95,7 @@ ClientManager.prototype.unmatchClient = function(client)
         client.session = null;
         
         if(success)
-            console.log("Client " + client.stationProfile.name + "(" + client.id + ") removed from session " + session.id);
+            console.log("Client " + client.stationProfile.name + "(" + client.id + ") removed from session " + session.id + " -> " + session.peers.length);
         
         if(session.peers.length == 0)
         {
@@ -127,11 +130,23 @@ ClientManager.prototype.passCustomData = function(client, message)
 {
     if(client.session == null)
     {
-        console.log("!! Custom Data but no session??");
+        //console.log("!! Custom Data but no session??");
         return;
     }
     
     client.session.passCustomData(client, message);
+    
+}
+
+ClientManager.prototype.passKinectData = function(client, message)
+{
+    if(client.session == null)
+    {
+        //console.log("!! Custom Data but no session??");
+        return;
+    }
+    
+    client.session.passKinectData(client, message);
     
 }
 

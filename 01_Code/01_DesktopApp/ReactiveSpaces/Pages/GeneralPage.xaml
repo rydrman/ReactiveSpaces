@@ -23,14 +23,16 @@
         <!-- current profile-->
         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center">
             <TextBlock Text="App Connection: " Grid.Row="0" VerticalAlignment="Center" FontSize="18"/>
+            <TextBlock Name="listenStatus" Text="Not Listening" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" FontSize="18" Foreground="Red"/>
+            <TextBlock Text=" | " Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" FontSize="18" Foreground="Gray"/>
             <TextBlock Name="appStatus" Text="Disconnected" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" FontSize="18" Foreground="Red"/>
         </StackPanel>
         <TextBlock Text="Name:" Grid.Row="1" Margin="0 0 10 0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
         <TextBox Name="appName" Width="200" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False"/>
         <TextBlock Text="Version:" Grid.Row="2" Margin="0 0 10 0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
         <TextBox Name="appVersion" Width="200" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False"/>
-        <TextBlock Text="--?--" Grid.Row="3" Margin="0 0 10 0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-        <TextBox Name="currentMeshID" Width="200" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False"/>
+        <TextBlock Text="Max Players" Grid.Row="3" Margin="0 0 10 0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+        <TextBox Name="maxPlayers" Width="200" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False"/>
         
         <Button Name="sendButton" Grid.Row="4" Grid.Column="1" Click="onSendButtonClicK" Content="Send"/>
         <TextBox Name="messageOutput" Text="waiting..." Grid.Row="4" Grid.Column="0"/>

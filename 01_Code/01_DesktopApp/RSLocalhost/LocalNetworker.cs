@@ -24,6 +24,10 @@ namespace RSLocalhost
         public bool connected = false;
         public string customData = "";
         public bool newCustomData = false;
+        public bool closing = false;
+
+        public bool listening = false;
+        public bool listeningChanged = false;
 
         Networker networker = null;
 
@@ -45,26 +49,49 @@ namespace RSLocalhost
             networker._onPeerAdded = addPeer;
             networker._onPeerUpdated = updatePeer;
             networker._onPeerRemoved = removePeer;
+            networker._onRemoteKinectRecieved = UpdateRemoteKinect;
 
             listener = new TcpListener(IPAddress.Any, 8080);
-            listener.Start();
 
+            StartListenerThread();
+        }
+
+        private void StartListenerThread()
+        {
             listenThread = new Thread(WaitForConnection);
-            listenThread.Start();
 
+            listenThread.Start();
         }
 
         private void WaitForConnection()
         {
         connectionStart:
 
+            listener.Start();
+            listening = true;
+            listeningChanged = true;
+
             streamReady = false;
-            client = listener.AcceptTcpClient();
+            try
+            {
+                client = listener.AcceptTcpClient();
+                listener.Stop();
+                listening = false;
+                listeningChanged = true;
+                connected = true;
+            }
+            catch
+            {
+                if (closing) return;
+                goto connectionStart;
+            }
             stream = client.GetStream();
 
-            while(client.Connected)
+            while(connected && client != null && client.Connected)
             {
-                while (!stream.DataAvailable);
+                while (connected && !stream.DataAvailable);
+
+                if (!connected) break;
 
                 byte[] bytes = new byte[client.Available];
                 stream.Read(bytes, 0, bytes.Length);
@@ -129,6 +156,11 @@ namespace RSLocalhost
                         switch (message.type)
                         {
                             case MessageType.AppInfo:
+                                if(appInfo != null)
+                                {
+                                    appInfo = null;
+                                    networker.updateAppInfo(null);
+                                }
                                 appInfo = jSerializer.Deserialize<AppInfo>(message.data);
                                 newAppInfo = true;
                                 break;
@@ -143,8 +175,23 @@ namespace RSLocalhost
 
                 }
             }
+            if (closing)
+            {
+                listening = false;
+                listeningChanged = true;
+                return;
+            }
+
             Disconnect();
             goto connectionStart;
+        }
+
+        public void Reconnect()
+        {
+            if (listenThread == null)
+                StartListenerThread();
+            else
+                connected = false;
         }
 
         public void Disconnect()
@@ -160,6 +207,8 @@ namespace RSLocalhost
                 streamReady = false;
             }
             appInfo = null;
+            networker.updateAppInfo(null);
+
             connected = false;
             newAppInfo = true;
         }
@@ -260,6 +309,7 @@ namespace RSLocalhost
                 return;
 
             WebSocketMessage message = new WebSocketMessage();
+            message.type = MessageType.Kinect;
             message.data = jSerializer.Serialize(newSkeleton);
 
             string src = jSerializer.Serialize(message);
@@ -277,6 +327,31 @@ namespace RSLocalhost
                 }
             }
             
+        }
+
+        public void UpdateRemoteKinect(KinectSkeleton remoteSkeleton)
+        {
+            if (!streamReady || client == null || !client.Connected)
+                return;
+
+            WebSocketMessage message = new WebSocketMessage();
+            message.type = MessageType.RemoteKinect;
+            message.data = jSerializer.Serialize(remoteSkeleton);
+
+            string src = jSerializer.Serialize(message);
+            byte[] msg = CreateMessage(src + "\0");
+
+            if (connected && null != stream)
+            {
+                try
+                {
+                    stream.Write(msg, 0, msg.Length);
+                }
+                catch (System.IO.IOException e)
+                {
+                    Disconnect();
+                }
+            }
         }
 
         //takes 4 DeriveBytes as Encoding keys

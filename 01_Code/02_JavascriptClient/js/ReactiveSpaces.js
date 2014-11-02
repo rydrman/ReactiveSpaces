@@ -89,6 +89,14 @@ RS.Connect = function( appName, appVersion, port )
     RS.socket.onmessage = RS.MessageRecieved;
     RS.socket.onerror = RS.SocketError;
     
+    //unload event
+    var f = window.onbeforeunload;
+    window.onbeforeunload = function()
+    {
+        if(typeof(f) == 'funciton') f();
+        RS.Disconnect();
+    }
+    
     return true;
 } 
 
@@ -193,6 +201,8 @@ RS.MessageRecieved = function(e)
                 break;
             case RS.MessageTypes.KINECT:
                 RS.SkeletonRecieved(message.data);
+                break;
+            case RS.MessageTypes.REMOTE_KINECT:
                 break;
             default:
                 RS.messenger.display(Message.type.WARNING, "Unkown Message Type Recieved");
