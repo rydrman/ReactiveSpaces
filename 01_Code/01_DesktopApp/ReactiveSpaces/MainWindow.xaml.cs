@@ -99,6 +99,13 @@ namespace ReactiveSpaces
                 networker.stationProfileUpdated = false;
             }
 
+            //peer list
+            if (networker.peerListUpdated)
+            {
+                networker.peerListUpdated = false;
+                networkPage.updatePeerList(networker.currentPeers);
+            }
+
             //if theres a new frame
             if(kinectManager.isNewSkeletonFrame)
             {
@@ -158,20 +165,6 @@ namespace ReactiveSpaces
         public void ProfileChanged(StationProfile newProfile)
         {
             //networker.onProfileChanged(newProfile);
-        }
-
-        public void AddPeer(StationProfile newPeer)
-        {
-            networkPage.addPeer(newPeer);
-        }
-        public void RemovePeer(StationProfile oldPeer)
-        {
-            networkPage.removePeer(oldPeer);
-        }
-
-        public void UpdatePeer(StationProfile oldData, StationProfile newData)
-        {
-            networkPage.updatePeer(oldData, newData);
         }
 
         private void onSendMessage(string message)

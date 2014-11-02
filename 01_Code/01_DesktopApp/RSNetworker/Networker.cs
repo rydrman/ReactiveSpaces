@@ -133,6 +133,18 @@ namespace RSNetworker
                         currentProfile.sessionID = profile.sessionID;
                         stationProfileUpdated = true;
                         break;
+                    case MessageType.PeerConnect:
+                        StationProfile newPeer = jSerializer.Deserialize<StationProfile>(message.data);
+                        updateAddPeer(newPeer);
+                        break;
+                    case MessageType.PeerUpdate:
+                        StationProfile peer = jSerializer.Deserialize<StationProfile>(message.data);
+                        updateAddPeer(peer);
+                        break;
+                    case MessageType.PeerDisconnect:
+                        StationProfile oldPeer = jSerializer.Deserialize<StationProfile>(message.data);
+                        updateAddPeer(oldPeer);
+                        break;
                     default:
                         Debugger.Break();
                         break;
@@ -211,6 +223,40 @@ namespace RSNetworker
 
             if (serverStream != null)
                 serverStream.Write(messageBytes, 0, messageBytes.Length);
+        }
+
+        void updateAddPeer(StationProfile newPeer)
+        {
+            foreach (StationProfile s in currentPeers)
+            {
+                if(s.sessionID == newPeer.sessionID)
+                {
+                    //TODO tell local client
+                    s.name = newPeer.name;
+                    s.location = newPeer.location;
+                    peerListUpdated = true;
+                    return;
+                }
+            }
+            //otherwise add it
+            currentPeers.Add(newPeer);
+            peerListUpdated = true;
+        }
+        void removePeer(StationProfile oldPeer)
+        {
+            StationProfile toRemove = null;
+            foreach (StationProfile s in currentPeers)
+            {
+                if (s.sessionID == oldPeer.sessionID)
+                {
+                    toRemove = s;
+                }
+            }
+            if(toRemove != null)
+            {
+                currentPeers.Remove(toRemove);
+                peerListUpdated = true;
+            }
         }
     }
 }

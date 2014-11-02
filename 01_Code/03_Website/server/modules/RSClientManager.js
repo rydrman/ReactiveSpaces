@@ -53,8 +53,8 @@ ClientManager.prototype.matchClient = function(client)
             {
                 console.log("Session " + session.id + " full");
                 this.openSessions.splice(i, 1);
-                return;
             }
+            return;
         }
     }
     

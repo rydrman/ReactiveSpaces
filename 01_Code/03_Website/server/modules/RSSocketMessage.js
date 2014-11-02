@@ -8,7 +8,14 @@ var SocketMessage = module.exports = function(type, data)
 
 SocketMessage.prototype.SetFromIncoming = function(json)
 {
-    var message = JSON.parse(json);
+    try{
+        var message = JSON.parse(json);
+    }
+    catch(e)
+    {
+        console.log(e.message);
+        console.log(json);
+    }
     
     this.type = message.type;
     this.data = (message.data == null) ? null : JSON.parse(message.data);
