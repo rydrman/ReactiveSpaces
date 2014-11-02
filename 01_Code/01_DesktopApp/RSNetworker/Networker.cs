@@ -221,6 +221,10 @@ namespace RSNetworker
                             if (null != _onCustomDataRecieved)
                                 _onCustomDataRecieved(message.data);
                             break;
+                        case MessageType.Kinect:
+                            KinectSkeleton skeleton = jSerializer.Deserialize<KinectSkeleton>(message.data);
+                            processRemoteKinect(skeleton);
+                            break;
                         default:
                             Debugger.Break();
                             break;

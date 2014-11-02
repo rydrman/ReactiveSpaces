@@ -176,7 +176,9 @@ Client.prototype.onData = function(json)
                 continue;
                 
             case SocketMessage.types.KINECT:
-                break;
+                if(this.onKinectData != null)
+                    this.onKinectData(this, message);
+                continue;
                 
             default:
                 console.log("Message recieved of unknown type: " + message.type);
