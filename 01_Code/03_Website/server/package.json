@@ -1,0 +1,8 @@
+{
+  "name": "RSManager",
+  "version": "0.0.1",
+  "description": "Reactive Spaces Endpoint Manager",
+  "dependencies": {
+    "socket.io": "^1.0.6"
+  }
+}

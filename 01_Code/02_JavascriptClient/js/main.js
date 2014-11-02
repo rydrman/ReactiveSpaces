@@ -9,7 +9,9 @@ function onLoad()
     
     RS.addEventListener("localskeleton", onSkeletonUpdated);
     
-    RS.Connect();
+    RS.ActivateMessenger();
+    
+    RS.Connect("My App", 1.0);
 }
 
 function onSkeletonUpdated(e)

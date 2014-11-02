@@ -10,29 +10,12 @@ using RSKinect;
 namespace RSNetworker
 {
     [Serializable()]
-    public class AppInfo
-    {
-        public string name;
-        public float version { get; set; }
-        public int maxPeers;
-
-        public AppInfo() { }
-
-        public AppInfo(string _name, float _version, int _peers)
-        {
-            name = _name;
-            version = _version;
-            maxPeers = _peers;
-        }
-    }
-
-    [Serializable()]
     public class StationProfile
     {
         public string name { get; set; }
         public string location { get; set; }
-        public int sessionID { get; set; }
         //TODO icon
+        public int meshID { get; set; }
 
         [NonSerialized()]
         public KinectSkeleton player1;
@@ -43,20 +26,15 @@ namespace RSNetworker
         {
             player1 = new KinectSkeleton();
             player2 = new KinectSkeleton();
-
-            name = "Default Station Name";
-            location = "Default Station Location";
-            sessionID = -1;
         }
 
         public void Set(StationProfile newData)
         {
             name = newData.name;
             location = newData.location;
-            sessionID = newData.sessionID;
         }
 
-        /*public byte[] ToBytes()
+        public byte[] ToBytes()
         {
             BinaryFormatter formatter = new BinaryFormatter();
             MemoryStream stream = new MemoryStream();
@@ -73,6 +51,7 @@ namespace RSNetworker
             StationProfile profile = (StationProfile)formatter.Deserialize(stream);
 
             Set(profile);
-        }*/
+            meshID = profile.meshID;
+        }
     }
 }

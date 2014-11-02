@@ -48,22 +48,21 @@ namespace ReactiveSpaces
             networkPage = new NetworkPage();
 
             localNet = new LocalNetworker();
-            networker = new Networker(RecieveMessage, RecieveKinect, AddPeer, RemovePeer, UpdatePeer);
+            networker = new Networker();
 
             kinectManager = new KinectManager();
             kinectManager.InitializeKinect(false, false, true);
 
             timer = new DispatcherTimer();
             timer.Tick += onTimerTick;
-            timer.Interval = TimeSpan.FromSeconds(0.1);
+            timer.Interval = TimeSpan.FromSeconds(0.05);
             timer.Start();
 
             //set handlers
             generalPage._onSendButton = onSendMessage;
-            networkPage._onProfileChanged = ProfileChanged;
 
             //setup data
-            networkPage.setProfile(networker.getProfile());
+            //networkPage.setProfile(networker.getProfile());
 
             //navigate
             mainFrame.Navigate(generalPage);
@@ -71,6 +70,35 @@ namespace ReactiveSpaces
 
         private void onTimerTick(object sender, EventArgs e)
         {
+            //networker stuff
+            if (localNet.newAppInfo)
+            {
+                generalPage.updateAppInfo(localNet.appInfo);
+                networker.updateAppInfo(localNet.appInfo);
+                localNet.newAppInfo = false;
+            }
+
+            //remote stuff
+            if(networker.connectionChanged)
+            {
+                networkPage.serverConnectionChanged(networker.connected);
+                networker.connectionChanged = false;
+            }
+
+            //ui profile update
+            if(networkPage.stationProfileUpdated)
+            {
+                networker.updateStationProfile(networkPage.currentProfile);
+                networkPage.stationProfileUpdated = false;
+            }
+
+            //station profile
+            if(networker.stationProfileUpdated)
+            {
+                networkPage.updateStationProfile(networker.currentProfile);
+                networker.stationProfileUpdated = false;
+            }
+
             //if theres a new frame
             if(kinectManager.isNewSkeletonFrame)
             {
@@ -87,7 +115,7 @@ namespace ReactiveSpaces
                 localNet.UpdateLocalKinect(skeletons.ElementAt(0));
 
                 //send to peers
-                networker.PushKinectToPeers(kinectManager.playerOne, kinectManager.playerTwo);
+                //networker.PushKinectToPeers(kinectManager.playerOne, kinectManager.playerTwo);
             }
         }
 
@@ -98,7 +126,7 @@ namespace ReactiveSpaces
 
         private void onCloseButtonClick(object sender, RoutedEventArgs e)
         {
-            networker.StopService();
+            networker.Disconnect();
             localNet.Disconnect();
             kinectManager.ReleaseKinect();
             Application.Current.Shutdown(0);
@@ -112,7 +140,7 @@ namespace ReactiveSpaces
         private void onTitleBarMouseDown(object sender, MouseButtonEventArgs e)
         {
             this.DragMove();
-            networker.RequestProfile();
+            //networker.RequestProfile();
         }
 
         #region Handlers to and from networker
@@ -129,7 +157,7 @@ namespace ReactiveSpaces
 
         public void ProfileChanged(StationProfile newProfile)
         {
-            networker.onProfileChanged(newProfile);
+            //networker.onProfileChanged(newProfile);
         }
 
         public void AddPeer(StationProfile newPeer)
@@ -148,8 +176,18 @@ namespace ReactiveSpaces
 
         private void onSendMessage(string message)
         {
-            networker.SendMessage(message);
+            //networker.SendMessage(message);
         }
+        #endregion
+
+        #region handlers to and from local networker
+
+        public void onAppInfoUpdated(AppInfo newInfo)
+        {
+            generalPage.updateAppInfo(newInfo);
+            networker.updateAppInfo(newInfo);
+        }
+
         #endregion
 
         private void tabButtonClick(object sender, RoutedEventArgs e)

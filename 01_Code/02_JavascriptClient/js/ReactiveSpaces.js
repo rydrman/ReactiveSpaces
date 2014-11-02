@@ -10,12 +10,19 @@ window.RS = window.ReactiveSpaces = {version: 0.1};
 
 //constants etc
 RS.BASEURL = "ws://localhost";
-RS.DEFAULTPORT = 8080;
+RS.LOCALPORT = 8080;
+
+//app info
+RS.appInfo = {
+    name: "Default App Name",
+    version: "1.0.0.0",
+    maxPeers: 4
+}
 
 //connection vars
 RS.socketSupported = false;
 RS.socket = null;
-RS.connected = false
+RS.connected = false;
 
 //to keep skeletons
 RS.player1;
@@ -28,6 +35,11 @@ RS.listeners = {
     remoteskeleton: [],
     messagerecieved: []
 };
+
+//for error reporting
+RS.messenger = {display:function(t,m,s,ms){
+    console.log( "RS: " + m + " -> " +s);
+}};
 
 //////////////////////////////////////////////////////
 ////                 Setup Logic                  ////
@@ -44,46 +56,67 @@ if(window.WebSocket)
 ////                  Functions                   ////
 //////////////////////////////////////////////////////
 
-RS.Connect = function( port )
+RS.Connect = function( appName, appVersion, port )
 {
-    //ser/reset skeletons
+    
+    //check for connection
+    if(RS.connected)
+    {
+        RS.Disconnect();
+    }
+    
+    //set params if defined
+    if(typeof(appName) != 'undefined') RS.appInfo.name = appName;
+    if(typeof(appVersion) != 'undefined') RS.appInfo.version = appVersion;
+    if(typeof(port) != 'undefined') RS.LOCALPORT = port;
+
+    //set/reset
     RS.player1 = new RS.Skeleton();
     RS.player2 = new RS.Skeleton();
-    
-    //set to default if not defined
-    port = (typeof(port) == 'undefined') ? RS.DEFAULTPORT : port;
     
     //check for support
     if(!RS.socketSupported)
     {
-        //TODO make this better
-        throw new Error("Web Sockets not supported by this browser. Please upgrade.");
+        RS.messenger.display(Message.type.ERROR, "Web Sockets not supported.", "Please upgrade to a compatible browser");
+        return false;
     }
     
-    RS.socket = new WebSocket(RS.BASEURL + ":" +  port + "/ReactiveSpaces");
+    RS.socket = new WebSocket(RS.BASEURL + ":" + RS.LOCALPORT + "/ReactiveSpaces");
     
     RS.socket.onopen = RS.SocketOpened;
     RS.socket.onclose = RS.SocketClosed;
     RS.socket.onmessage = RS.MessageRecieved;
     RS.socket.onerror = RS.SocketError;
+    
+    RS.connected = true;
+    
+    return true;
 } 
+
+RS.Disconnect = function()
+{
+    if(null != RS.socket)
+        RS.socket.close();
+    RS.connected = false;
+}
 
 RS.SocketError = function(err)
 {
-    console.log("REACTIVE SPACES: error, see developer console (F12) for more information");
+    RS.messenger.display(Message.type.ERROR, "Web Socket Error", "See developer console (F12) for more information.");
     console.log(err);
 }
 
 RS.SocketOpened = function()
 {
-    var obj = {
-        type : 0,
-        data : "hi"
+    var msg = {
+        type : RS.MessageTypes.APP_INFO,
+        data : JSON.stringify(RS.appInfo)
     };
     
     RS.connected = true;
     
-    RS.socket.send(JSON.stringify(obj));
+    RS.socket.send(JSON.stringify(msg));
+    
     console.log("REACTIVE SPACES: connected to " + RS.socket.url);
 }
 
@@ -96,9 +129,13 @@ RS.MessageRecieved = function(e)
 {
     var message = JSON.parse(e.data);
     
-    if(message.type == RS.MessageTypes.KINECT)
+    switch(message.type)
     {
-        RS.SkeletonRecieved(message.data);
+        case RS.MessageTypes.KINECT:
+            RS.SkeletonRecieved(message.data);
+            break;
+        default:
+            RS.messenger.display(Message.type.WARNING, "Unkown Message Type Recieved");
     }
 }
 
@@ -130,10 +167,15 @@ RS.SkeletonRecieved = function(skeleton)
     }
 }
 
+RS.ActivateMessenger = function()
+{
+    RS.messenger = new Messenger();
+}
+
 RS.addEventListener = function(event, callback)
 {
     if(typeof(RS.listeners[event]) == 'undefined')
-        throw new Error("event type not valid for Reactive Spaces");
+        RS.messenger.display(Message.type.WARNING, "Event type not valid for Reactive Spaces", "Make sure you use the RS.EventTypes enumerator");
     
     RS.listeners[event].push(callback);
 }
@@ -173,7 +215,7 @@ RS.Skeleton = function()
 RS.Skeleton.prototype.Update = function( skeleton )
 {
     if(this.joints.length != skeleton.joints.length)
-        throw new Error("recieved skeleton does not have the same number of joints...");
+        RS.messenger.display(Message.type.ERROR, "Recieved skeleton does not have the same number of joints...");
     
     this.userPresent = skeleton.userPresent;
     this.ID = skeleton.ID;
@@ -365,9 +407,10 @@ RS.JointTypes = {
 //MESSAGE TYPES
 //enumerator for incoming websocket messages
 RS.MessageTypes = {
-    CUSTOM: 0,
-    KINECT: 1,
-    REMOTE_KINECT: 2
+    APP_INFO: 0,
+    CUSTOM: 1,
+    KINECT: 2,
+    REMOTE_KINECT: 3
 }
 
 //EVENT TYPES
