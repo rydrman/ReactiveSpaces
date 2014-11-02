@@ -143,7 +143,13 @@ RS.MessageRecieved = function(e)
             continue;
         }
         
-        message.data = JSON.parse(message.data);
+        try{
+            message.data = JSON.parse(message.data);
+        }
+        catch(e)
+        {
+            RS.messenger.display(Message.type.ERROR, "Cannot parse incoming message data");
+        }
         
         switch(message.type)
         {

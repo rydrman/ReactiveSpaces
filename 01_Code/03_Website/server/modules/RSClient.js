@@ -10,7 +10,7 @@ var Client = module.exports = function(socket)
     this.stationProfile = {
         name: "unset",
         location: "unset",
-        sessionID: -1
+        id: -1
     };
     this.appInfo = null;
     
@@ -46,7 +46,7 @@ Client.prototype.profileRecieved = function( id )
     }
 
     console.log("Client profile " + this.id +" recieved: " + this.stationProfile.name + " , " + this.stationProfile.location);
-    this.stationProfile.sessionID = this.id;
+    this.stationProfile.id = this.id;
 
     //send to client
     var message = new SocketMessage(SocketMessage.types.STATION_PROFILE, this.stationProfile);

@@ -31,7 +31,7 @@ namespace RSNetworker
     {
         public string name { get; set; }
         public string location { get; set; }
-        public int sessionID { get; set; }
+        public int id { get; set; }
         //TODO icon
 
         [NonSerialized()]
@@ -46,14 +46,14 @@ namespace RSNetworker
 
             name = "Default Station Name";
             location = "Default Station Location";
-            sessionID = -1;
+            id = -1;
         }
 
         public void Set(StationProfile newData)
         {
             name = newData.name;
             location = newData.location;
-            sessionID = newData.sessionID;
+            id = newData.id;
         }
 
         /*public byte[] ToBytes()

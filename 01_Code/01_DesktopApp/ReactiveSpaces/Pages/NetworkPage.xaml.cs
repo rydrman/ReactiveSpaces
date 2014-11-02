@@ -57,7 +57,7 @@ namespace ReactiveSpaces
         {
             currentName.Text = current.name;
             currentLocation.Text = current.location;
-            currentSessionID.Text = current.sessionID.ToString();
+            currentSessionID.Text = current.id.ToString();
             currentProfile = current;
         }
 

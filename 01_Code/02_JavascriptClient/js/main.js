@@ -75,7 +75,7 @@ function render()
     var y = 30;
     for(var i in RS.remotePlayers)
     {
-        ctx.fillText(RS.remotePlayers.name + " -> " + RS.remotePlayers[i].location + " -> " + RS.remotePlayers[i].id,
+        ctx.fillText(RS.remotePlayers[i].name + " -> " + RS.remotePlayers[i].location + " -> " + RS.remotePlayers[i].id,
                      10, y);
         y += 30;
     }

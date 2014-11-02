@@ -162,7 +162,7 @@ namespace RSNetworker
                         case MessageType.StationProfile:
                             //should only ever get assigned an id
                             StationProfile profile = jSerializer.Deserialize<StationProfile>(message.data);
-                            currentProfile.sessionID = profile.sessionID;
+                            currentProfile.id = profile.id;
                             stationProfileUpdated = true;
                             break;
                         case MessageType.PeerConnect:
@@ -294,7 +294,7 @@ namespace RSNetworker
         {
             foreach (StationProfile s in currentPeers)
             {
-                if(s.sessionID == newPeer.sessionID)
+                if(s.id == newPeer.id)
                 {
                     //TODO tell local client
                     s.name = newPeer.name;
@@ -312,7 +312,7 @@ namespace RSNetworker
             StationProfile toRemove = null;
             foreach (StationProfile s in currentPeers)
             {
-                if (s.sessionID == oldPeer.sessionID)
+                if (s.id == oldPeer.id)
                 {
                     toRemove = s;
                 }
