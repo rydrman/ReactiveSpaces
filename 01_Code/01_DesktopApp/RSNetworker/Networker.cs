@@ -298,13 +298,21 @@ namespace RSNetworker
             //tell server
             if(serverReady)
             {
-                serverStream.Write(msgBytes, 0, msgBytes.Length);
+                try
+                {
+                    serverStream.Write(msgBytes, 0, msgBytes.Length);
+                }
+                catch(System.IO.IOException e)
+                {
+                    Disconnect();
+                }
+                
             }
             else
             {
                 //TODO how did we get to this state... 
                 //retry connection?
-                Debugger.Break();
+                reconnect();
             }
         }
 

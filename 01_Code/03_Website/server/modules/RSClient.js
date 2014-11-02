@@ -174,6 +174,7 @@ Client.prototype.onData = function(json)
 
             default:
                 console.log("Message recieved of unknown type: " + message.type);
+                return;
         }
     }
     console.log("\n<------------------------------>");
