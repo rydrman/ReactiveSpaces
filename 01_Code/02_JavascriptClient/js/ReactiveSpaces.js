@@ -142,7 +142,9 @@ RS.MessageRecieved = function(e)
         catch(e){
             continue;
         }
-
+        
+        message.data = JSON.parse(message.data);
+        
         switch(message.type)
         {
             case RS.MessageTypes.PEER_CONNECT:
@@ -174,7 +176,6 @@ RS.MessageRecieved = function(e)
                 }
                 break;
             case RS.MessageTypes.CUSTOM:
-                var data = JSON.parse(message.data);
                 var sender = null;
                 for(var i in this.remotePlayers)
                 {
