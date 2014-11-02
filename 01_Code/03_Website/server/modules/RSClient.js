@@ -19,6 +19,7 @@ var Client = module.exports = function(socket)
     
     //events
     this.onClose = null;
+    this.onProfileUpdated = null;
     this.onAppConnected = null;
     this.onAppDisconnected = null;
     
@@ -35,11 +36,15 @@ Client.prototype.profileRecieved = function( id )
 {
     if(this.ready)
     {
-        console.log("Client profile updated: " + this.stationProfile.name + " , " + this.stationProfile.location);
+        console.log("Client " + this.id + " profile updated: " + this.stationProfile.name + " , " + this.stationProfile.location);
+        if(this.onProfileUpdated != null)
+        {
+            this.onProfileUpdated(this);
+        }
         return;
     }
 
-    console.log("Client profile recieved: " + this.stationProfile.name + " , " + this.stationProfile.location);
+    console.log("Client profile " + this.id +" recieved: " + this.stationProfile.name + " , " + this.stationProfile.location);
     this.stationProfile.sessionID = this.id;
 
     //send to client

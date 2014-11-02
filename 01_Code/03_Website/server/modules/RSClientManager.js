@@ -21,6 +21,9 @@ ClientManager.prototype.addClient = function( socket )
     newClient.onClose = function(client){
         self.removeClient.call(self, client);
     };
+    newClient.onProfileUpdated = function(client){
+        self.clientProfileUpdated.call(self, client);
+    };
     newClient.onAppConnected = function(client){
         self.matchClient.call(self, client);
     };
@@ -30,6 +33,12 @@ ClientManager.prototype.addClient = function( socket )
     this.clients.push( newClient );
     
     console.log("Client Connected " + newClient.socket.remoteAddress + ":" + newClient.socket.remotePort);
+}
+
+ClientManager.prototype.clientProfileUpdated = function(client)
+{
+    if(client.session != null)
+        client.session.updatePeer(client);
 }
 
 ClientManager.prototype.matchClient = function(client)

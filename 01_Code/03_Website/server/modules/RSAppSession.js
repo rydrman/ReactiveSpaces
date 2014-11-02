@@ -38,6 +38,7 @@ AppSession.prototype.updatePeer = function( client )
     
     for(var i in this.peers)
     {
+        if(i == index) continue;
         this.peers[i].updatePeer( client.stationProfile );
     }
     return true;
@@ -60,6 +61,7 @@ AppSession.prototype.removePeer = function( client )
     
     for(var i in this.peers)
     {
+        if(i == index) continue;
         this.peers[i].removePeer( client.stationProfile );
     }
     this.peers.splice(i, 1);
