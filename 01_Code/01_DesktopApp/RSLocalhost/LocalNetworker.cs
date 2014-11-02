@@ -173,7 +173,7 @@ namespace RSLocalhost
             string msgString = jSerializer.Serialize(message);
             byte[] bytes = Encoding.UTF8.GetBytes(msgString);
 
-            if(null != stream)
+            if(connected && null != stream)
             {
                 try
                 {
@@ -196,7 +196,7 @@ namespace RSLocalhost
             string msgString = jSerializer.Serialize(message);
             byte[] bytes = Encoding.UTF8.GetBytes(msgString);
 
-            if (null != stream)
+            if (connected && null != stream)
             {
                 try
                 {
@@ -218,7 +218,7 @@ namespace RSLocalhost
             string msgString = jSerializer.Serialize(message);
             byte[] bytes = Encoding.UTF8.GetBytes(msgString);
 
-            if (null != stream)
+            if (connected && null != stream)
             {
                 try
                 {
@@ -241,7 +241,7 @@ namespace RSLocalhost
             string json = jSerializer.Serialize(message) + "\0";
             byte[] bytes = Encoding.UTF8.GetBytes(json);
 
-            if (stream != null)
+            if (connected && stream != null)
             {
                 try
                 {
@@ -265,13 +265,16 @@ namespace RSLocalhost
             string src = jSerializer.Serialize(message);
             byte[] msg = CreateMessage(src + "\0");
 
-            try
+            if (connected && null != stream)
             {
-                stream.Write(msg, 0, msg.Length);
-            }
-            catch(System.IO.IOException e)
-            {
-                Disconnect();
+                try
+                {
+                    stream.Write(msg, 0, msg.Length);
+                }
+                catch (System.IO.IOException e)
+                {
+                    Disconnect();
+                }
             }
             
         }
