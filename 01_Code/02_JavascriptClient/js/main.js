@@ -18,6 +18,7 @@ function onLoad()
            speedX: 50, speedY: 50};
     
     RS.addEventListener("localskeleton", onSkeletonUpdated);
+    RS.addEventListener("remoteskeleton", onRemoteSkeletonUpdated);
     RS.addEventListener("messagerecieved", onMessageRecieved);
     
     RS.ActivateMessenger();
@@ -25,12 +26,19 @@ function onLoad()
     RS.Connect("My App", 1.0);
 }
 
-function onSkeletonUpdated(e)
+function onSkeletonUpdated(skeleton)
 {
     if(!e) e = window.event;
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    RS.DrawSkeleton(ctx, e.skeleton);
+    RS.DrawSkeleton(ctx, skeleton);
+}
+
+function onRemoteSkeletonUpdated(peer, skeleton)
+{
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    RS.DrawSkeleton(ctx, skeleton);
+    debugger;
 }
 
 function onMessageRecieved(peer, data)

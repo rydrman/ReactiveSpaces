@@ -203,6 +203,7 @@ RS.MessageRecieved = function(e)
                 RS.SkeletonRecieved(message.data);
                 break;
             case RS.MessageTypes.REMOTE_KINECT:
+                RS.RemoteSkeletonRecieved(message.data);
                 break;
             default:
                 RS.messenger.display(Message.type.WARNING, "Unkown Message Type Recieved");
@@ -232,9 +233,32 @@ RS.SkeletonRecieved = function(skeleton)
     if(null == updated) return;
     
     //dispatch event to all listeners
-    for(var i in RS.listeners.localskeleton)
+    RS.fireEvent(RS.EventTypes.localskeleton, updated);
+}
+
+RS.RemoteSkeletonRecieved = function(skeleton)
+{
+    for(var i in this.remotePlayers)
     {
-        RS.listeners.localskeleton[i].call(window, { skeleton: updated } );
+        var player, updated = null;
+        if(this.remotePlayers[i].id == skeleton.stationID)
+        {
+            player = this.remotePlayers[i];
+            if(skeleton.playerNumber == 1)
+            {
+                player.player1.Update( skeleton );
+                updated = player.player1;
+            }
+            else if(skeleton.playerNumber == 2)
+            {
+                player.player2.Update( skeleton );
+                updated = player.player2;
+            }
+            if(null == updated) return;
+            
+            //dispatch event to all listeners
+            RS.fireEvent(RS.EventTypes.remoteskeleton, player, updated);
+        }
     }
 }
 

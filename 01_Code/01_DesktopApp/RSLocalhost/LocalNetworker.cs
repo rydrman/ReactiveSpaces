@@ -89,9 +89,9 @@ namespace RSLocalhost
 
             while(connected && client != null && client.Connected)
             {
-                while (connected && !stream.DataAvailable);
+                while (connected && stream != null && !stream.DataAvailable);
 
-                if (!connected) break;
+                if (!connected || stream == null) break;
 
                 byte[] bytes = new byte[client.Available];
                 stream.Read(bytes, 0, bytes.Length);
@@ -296,7 +296,7 @@ namespace RSLocalhost
                 {
                     stream.Write(bytes, 0, bytes.Length);
                 }
-                catch (System.IO.IOException e)
+                catch (Exception e)//System.IO.IOException e)
                 {
                     Disconnect();
                 }

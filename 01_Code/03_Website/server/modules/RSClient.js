@@ -192,6 +192,7 @@ Client.prototype.onData = function(json)
 Client.prototype.onError = function(e)
 {
     //socket exception.. break it off
-    this.socket.close();
+    if(typeof(this.socket.close) == 'function')
+        this.socket.close();
     console.log("Exception caught" + e);
 }
