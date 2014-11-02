@@ -162,6 +162,8 @@ RS.MessageRecieved = function(e)
         switch(message.type)
         {
             case RS.MessageTypes.PEER_CONNECT:
+                message.data.player1 = new RS.Skeleton();
+                message.data.player2 = new RS.Skeleton();
                 RS.remotePlayers.push(message.data);
                 RS.fireEvent(RS.EventTypes.playerjoined, message.data);
                 break;

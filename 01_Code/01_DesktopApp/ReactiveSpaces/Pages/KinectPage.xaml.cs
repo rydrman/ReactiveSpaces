@@ -72,16 +72,17 @@ namespace ReactiveSpaces
         }
         public void drawRemoteSkeletons(List<StationProfile> peers)
         {
+            remoteCanvas.Children.Clear();
             foreach (StationProfile s in peers)
             {
 
                 byte step = (byte)(255 / peers.Count);
                 byte color = 0;
-                
-                remoteCanvas.Children.Clear();
 
-                drawRemoteSkeleton(s.player1, Color.FromArgb(color, color, color, 255));
-                drawRemoteSkeleton(s.player2, Color.FromArgb(color, color, color, 255));
+                if(s.player1.userPresent)
+                    drawRemoteSkeleton(s.player1, Color.FromArgb(color, color, color, 255));
+                if(s.player2.userPresent)
+                    drawRemoteSkeleton(s.player2, Color.FromArgb(color, color, color, 255));
                 color += step;
             }
         }
