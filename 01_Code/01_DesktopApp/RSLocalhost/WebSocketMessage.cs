@@ -13,25 +13,15 @@ namespace RSLocalhost
         AppInfo,
         Custom,
         Kinect,
-        remoteKinect
+        RemoteKinect,
+        PeerConnect,
+        PeerUpdate,
+        PeerDisconnect
     }
 
     class WebSocketMessage
     {
         public MessageType type = MessageType.Custom;
         public string data { get; set; }
-    }
-
-    class WebSocketSkeleton
-    {
-        public MessageType type = MessageType.Kinect;
-        public KinectSkeleton data { get; set; }
-    }
-
-    class AppInfoMessage
-    {
-        public MessageType type = MessageType.AppInfo;
-
-        public AppInfo data { get; set; }
     }
 }

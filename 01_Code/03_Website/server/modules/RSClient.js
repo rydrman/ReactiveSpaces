@@ -19,8 +19,10 @@ var Client = module.exports = function(socket)
     
     //events
     this.onClose = null;
+    this.onProfileUpdated = null;
     this.onAppConnected = null;
     this.onAppDisconnected = null;
+    this.onCustomData = null;
     
     var self = this;
     socket.on('end', function(){self.onDisconnect.call(self)});
@@ -35,18 +37,22 @@ Client.prototype.profileRecieved = function( id )
 {
     if(this.ready)
     {
-        console.log("Client profile updated: " + this.stationProfile.name + " , " + this.stationProfile.location);
+        console.log("Client " + this.id + " profile updated: " + this.stationProfile.name + " , " + this.stationProfile.location);
+        if(this.onProfileUpdated != null)
+        {
+            this.onProfileUpdated(this);
+        }
         return;
     }
 
-    console.log("Client profile recieved: " + this.stationProfile.name + " , " + this.stationProfile.location);
+    console.log("Client profile " + this.id +" recieved: " + this.stationProfile.name + " , " + this.stationProfile.location);
     this.stationProfile.sessionID = this.id;
 
     //send to client
     var message = new SocketMessage(SocketMessage.types.STATION_PROFILE, this.stationProfile);
     var string = message.getJSON();
 
-    this.socket.write(string);
+    this.socket.write(string + "\0");
 
     this.ready = true;
 }
@@ -65,7 +71,7 @@ Client.prototype.addPeer = function( profile )
     var message = new SocketMessage(SocketMessage.types.PEER_CONNECT, profile);
     var string = message.getJSON();
 
-    this.socket.write(string);
+    this.socket.write(string + "\0");
 }
 
 Client.prototype.updatePeer = function( profile )
@@ -73,7 +79,7 @@ Client.prototype.updatePeer = function( profile )
     var message = new SocketMessage(SocketMessage.types.PEER_UPDATE, profile);
     var string = message.getJSON();
 
-    this.socket.write(string);
+    this.socket.write(string + "\0");
 }
 
 Client.prototype.removePeer = function( profile )
@@ -81,7 +87,13 @@ Client.prototype.removePeer = function( profile )
     var message = new SocketMessage(SocketMessage.types.PEER_DISCONNECT, profile);
     var string = message.getJSON();
 
-    this.socket.write(string);
+    this.socket.write(string + "\0");
+}
+
+Client.prototype.sendCustomData = function( message )
+{
+    var string = JSON.stringify(message);
+    this.socket.write(string + "\0");
 }
 
 Client.prototype.appDisconected = function()
@@ -93,34 +105,55 @@ Client.prototype.appDisconected = function()
 
 Client.prototype.onDisconnect = function()
 {
+    if(null!= this.appInfo)
+        this.appDisconected();
     if(this.onClose != null)
         this.onClose(this);
 }
 
 Client.prototype.onData = function(json)
 {
-    var message = new SocketMessage();
-    message.SetFromIncoming( json );
-    
-    switch(message.type)
-    {    
-        case SocketMessage.types.APP_INFO:
-            if(message.data == null)
-            {
-                this.appDisconected();
+    var messages = json.split('\0');
+    for(var i in messages)
+    {
+        if(messages[i] == "") continue;
+        
+        var message = new SocketMessage();
+        var success = message.SetFromIncoming( messages[i] );
+
+        if(!success) continue;
+        
+        switch(message.type)
+        {    
+            case SocketMessage.types.APP_INFO:
+                if(message.data == null)
+                {
+                    this.appDisconected();
+                    break;
+                }
+                this.appInfo = message.data;
+                this.appConnected();
                 break;
-            }
-            this.appInfo = message.data;
-            this.appConnected();
-            break;
-            
-        case SocketMessage.types.STATION_PROFILE:
-            this.stationProfile.name = message.data.name;
-            this.stationProfile.location = message.data.location;
-            this.profileRecieved();
-            break;
-            
-        default:
-            console.log("Message recieved of unknown type: " + message.type);
+
+            case SocketMessage.types.STATION_PROFILE:
+                this.stationProfile.name = message.data.name;
+                this.stationProfile.location = message.data.location;
+                this.profileRecieved();
+                break;
+                
+            case SocketMessage.types.CUSTOM:
+                //add my id and re-encode
+                var newData = {
+                    id: this.id,
+                    userData: message.data
+                }
+                message.data = JSON.stringify(newData);
+                if(this.onCustomData != null)
+                    this.onCustomData(this, message);
+                break;
+
+            default:
+                console.log("Message recieved of unknown type: " + message.type);
+        }
     }
 }

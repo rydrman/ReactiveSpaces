@@ -38,6 +38,7 @@ AppSession.prototype.updatePeer = function( client )
     
     for(var i in this.peers)
     {
+        if(i == index) continue;
         this.peers[i].updatePeer( client.stationProfile );
     }
     return true;
@@ -60,8 +61,32 @@ AppSession.prototype.removePeer = function( client )
     
     for(var i in this.peers)
     {
+        if(i == index) continue;
         this.peers[i].removePeer( client.stationProfile );
     }
     this.peers.splice(i, 1);
+    return true;
+}
+
+AppSession.prototype.passCustomData = function( clientFrom, message )
+{
+    var index = -1;
+    for(var i in this.peers)
+    {
+        if(this.peers[i].id == clientFrom.id)
+            index = i;
+    }
+    
+    if(index == -1)
+    {
+        console.log("!! peer not found in this session");
+        return false;
+    }
+    
+    for(var i in this.peers)
+    {
+        if(i == index) continue;
+        this.peers[i].sendCustomData( message );
+    }
     return true;
 }

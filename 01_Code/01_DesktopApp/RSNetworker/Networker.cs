@@ -42,6 +42,17 @@ namespace RSNetworker
         NetworkStream serverStream = null;
         bool serverReady = false;
 
+        //so that we can skip the ui
+        //delegat functions to local networker
+        public delegate void onCustomDataRecieved(string data);
+        public onCustomDataRecieved _onCustomDataRecieved = null;
+        public delegate void onPeerAdded(StationProfile peer);
+        public onPeerAdded _onPeerAdded = null;
+        public delegate void onPeerUpdated(StationProfile peer);
+        public onPeerUpdated _onPeerUpdated = null;
+        public delegate void onPeerRemoved(StationProfile peer);
+        public onPeerRemoved _onPeerRemoved = null;
+
         public Networker()
         {
             currentProfile = new StationProfile();
@@ -104,55 +115,109 @@ namespace RSNetworker
 
             while(server.Connected)
             {
-                while (serverStream != null && !serverStream.DataAvailable);
+                try
+                {
+                    while (serverStream != null && !serverStream.DataAvailable) ;
+                }
+                catch(Exception e)
+                {
+                    break;
+                }
 
                 if (serverStream == null) return;
 
                 byte[] bytes = new byte[server.Available];
                 serverStream.Read(bytes, 0, bytes.Length);
 
-                String data = Encoding.UTF8.GetString(bytes);
+                String inData = Encoding.UTF8.GetString(bytes);
 
-                if (data.StartsWith("\0"))
+                if (inData.StartsWith("\0"))
                 {
                     //TODO server shutdown
                     Disconnect();
                     break;
                 }
+                char[] splitter = {'\0'};
+                string[] inMessages = inData.Split(splitter);
 
-                SocketMessage message = jSerializer.Deserialize<SocketMessage>(data);
-
-                switch(message.type)
+                foreach (string data in inMessages)
                 {
-                    case MessageType.AppInfo:
-                        AppInfo appInfo = jSerializer.Deserialize<AppInfo>(message.data);
-                        break;
-                    case MessageType.StationProfile:
-                        //should only ever get assigned an id
-                        StationProfile profile = jSerializer.Deserialize<StationProfile>(message.data);
-                        currentProfile.sessionID = profile.sessionID;
-                        stationProfileUpdated = true;
-                        break;
-                    case MessageType.PeerConnect:
-                        StationProfile newPeer = jSerializer.Deserialize<StationProfile>(message.data);
-                        updateAddPeer(newPeer);
-                        break;
-                    case MessageType.PeerUpdate:
-                        StationProfile peer = jSerializer.Deserialize<StationProfile>(message.data);
-                        updateAddPeer(peer);
-                        break;
-                    case MessageType.PeerDisconnect:
-                        StationProfile oldPeer = jSerializer.Deserialize<StationProfile>(message.data);
-                        updateAddPeer(oldPeer);
-                        break;
-                    default:
-                        Debugger.Break();
-                        break;
+                    if (data == "") continue;
+
+                    SocketMessage message;
+                    try
+                    {
+                        message = jSerializer.Deserialize<SocketMessage>(data);
+                    }
+                    catch(Exception e)
+                    {
+                        continue;
+                    }
+             
+                    switch (message.type)
+                    {
+                        case MessageType.AppInfo:
+                            AppInfo appInfo = jSerializer.Deserialize<AppInfo>(message.data);
+                            break;
+                        case MessageType.StationProfile:
+                            //should only ever get assigned an id
+                            StationProfile profile = jSerializer.Deserialize<StationProfile>(message.data);
+                            currentProfile.sessionID = profile.sessionID;
+                            stationProfileUpdated = true;
+                            break;
+                        case MessageType.PeerConnect:
+                            StationProfile newPeer = jSerializer.Deserialize<StationProfile>(message.data);
+                            updateAddPeer(newPeer);
+                            if (null != _onPeerAdded)
+                                _onPeerAdded(newPeer);
+                            break;
+                        case MessageType.PeerUpdate:
+                            StationProfile peer = jSerializer.Deserialize<StationProfile>(message.data);
+                            updateAddPeer(peer);
+                            if (null != _onPeerUpdated)
+                                _onPeerUpdated(peer);
+                            break;
+                        case MessageType.PeerDisconnect:
+                            StationProfile oldPeer = jSerializer.Deserialize<StationProfile>(message.data);
+                            updateAddPeer(oldPeer);
+                            if (null != _onPeerRemoved)
+                                _onPeerRemoved(oldPeer);
+                            break;
+                        case MessageType.Custom:
+                            if (null != _onCustomDataRecieved)
+                                _onCustomDataRecieved(message.data);
+                            break;
+                        default:
+                            Debugger.Break();
+                            break;
+                    }
                 }
 
                 //serverStream.Write(responseBytes, 0, responseBytes.Length);
             }
             Disconnect();
+        }
+
+        public void sendCustomData(string data)
+        {
+            SocketMessage message = new SocketMessage();
+            message.type = MessageType.Custom;
+            message.data = data;
+
+            string json = jSerializer.Serialize(message) + "\0";
+            byte[] bytes = Encoding.UTF8.GetBytes(json);
+
+            if (serverStream != null && serverStream.CanWrite)
+            {
+                try
+                {
+                    serverStream.Write(bytes, 0, bytes.Length);
+                }
+                catch(System.IO.IOException e)
+                {
+                    Disconnect();
+                }
+            }
         }
 
         public void Disconnect()
@@ -190,7 +255,7 @@ namespace RSNetworker
                 message.data = jSerializer.Serialize(newInfo);
             }
 
-            string json = jSerializer.Serialize(message);
+            string json = jSerializer.Serialize(message) + "\0";
             byte[] msgBytes = Encoding.UTF8.GetBytes(json);
 
             //tell server
@@ -217,7 +282,7 @@ namespace RSNetworker
             message.type = MessageType.StationProfile;
             message.data = jSerializer.Serialize(currentProfile);
 
-            string json = jSerializer.Serialize(message);
+            string json = jSerializer.Serialize(message) + "\0";
 
             byte[] messageBytes = Encoding.UTF8.GetBytes(json);
 

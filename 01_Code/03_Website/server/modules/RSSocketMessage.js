@@ -13,12 +13,15 @@ SocketMessage.prototype.SetFromIncoming = function(json)
     }
     catch(e)
     {
-        console.log(e.message);
-        console.log(json);
+        //DEBUG
+        //console.log(e.message);
+        //console.log(json);
+        return false;
     }
     
     this.type = message.type;
     this.data = (message.data == null) ? null : JSON.parse(message.data);
+    return true;
     
 }
 
@@ -28,7 +31,7 @@ SocketMessage.prototype.getJSON = function()
     if(this.data != null)
         msg.data = JSON.stringify(this.data);
     
-    return JSON.stringify(msg);
+    return JSON.stringify(msg) + "\0";
 }
 
 SocketMessage.types = {
@@ -36,5 +39,6 @@ SocketMessage.types = {
     STATION_PROFILE: 1,
     PEER_CONNECT: 2,
     PEER_UPDATE: 3,
-    PEER_DISCONNECT: 4
+    PEER_DISCONNECT: 4,
+    CUSTOM: 5
 };
