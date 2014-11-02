@@ -22,9 +22,25 @@ namespace ReactiveSpaces
     /// </summary>
     public partial class KinectPage : Page
     {
+
+        public delegate void OnRefreshClick();
+        public OnRefreshClick _onRefreshClick = null;
+
         public KinectPage()
         {
             InitializeComponent();
+        }
+
+        public void onRefreshClick(object sender, RoutedEventArgs e)
+        {
+            if(_onRefreshClick != null)
+                _onRefreshClick();
+        }
+
+        public void setKinectStatus(string statusText, Brush color)
+        {
+            kinectStatus.Text = statusText;
+            kinectStatus.Foreground = color;
         }
 
         public void drawLocalSkeletons(List<KinectSkeleton> skeletons)

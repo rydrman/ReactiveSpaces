@@ -75,8 +75,14 @@ namespace ReactiveSpaces
             if (localNet.newAppInfo)
             {
                 generalPage.updateAppInfo(localNet.appInfo);
-                networker.updateAppInfo(localNet.appInfo);
+                if(localNet.appInfo != null)
+                    networker.updateAppInfo(localNet.appInfo);
                 localNet.newAppInfo = false;
+            }
+            if(localNet.listeningChanged)
+            {
+                generalPage.updateListenState(localNet.listening);
+                localNet.listeningChanged = false;
             }
 
             //remote stuff
@@ -84,6 +90,11 @@ namespace ReactiveSpaces
             {
                 networkPage.serverConnectionChanged(networker.connected);
                 networker.connectionChanged = false;
+            }
+            if(networker.newRemoteKinect)
+            {
+                kinectPage.drawRemoteSkeletons(networker.currentPeers);
+                networker.newRemoteKinect = false;
             }
 
             //ui profile update
@@ -107,6 +118,12 @@ namespace ReactiveSpaces
                 networkPage.updatePeerList(networker.currentPeers);
             }
 
+            //check status
+            if(kinectManager.statusChanged)
+            {
+                kinectPage.setKinectStatus(kinectManager.status, kinectManager.statusBrush);
+                kinectManager.statusChanged = false;
+            }
             //if theres a new frame
             if(kinectManager.isNewSkeletonFrame)
             {
@@ -134,6 +151,8 @@ namespace ReactiveSpaces
 
         private void onCloseButtonClick(object sender, RoutedEventArgs e)
         {
+            networker.closing = true;
+            localNet.closing = true;
             networker.Disconnect();
             localNet.Disconnect();
             kinectManager.ReleaseKinect();
@@ -156,7 +175,7 @@ namespace ReactiveSpaces
         public void onReconnect()
         {
             localNet.Disconnect();
-            networker.reconnect();
+            networker.Reconnect();
         }
 
         public void RecieveMessage(string msg)

@@ -10,6 +10,7 @@ using System.Net;
 using System.Threading;
 using System.Security.Cryptography;
 using System.Web.Script.Serialization;
+using System.IO;
 
 using RSKinect;
 
@@ -23,6 +24,8 @@ namespace RSNetworker
         public bool connectionChanged = false;
         public bool stationProfileUpdated = true;
         public bool peerListUpdated = false;
+        public bool newRemoteKinect = false;
+        public bool closing = false;
 
         //data to show
         public StationProfile currentProfile;
@@ -30,10 +33,6 @@ namespace RSNetworker
         AppInfo currentApp = null;
 
         JavaScriptSerializer jSerializer;
-
-        TcpListener listener;
-        Int32 listenerPort;
-        Thread listenThread = null;
 
         string missingPiece = null;
         int failedMessages = 0;
@@ -55,10 +54,23 @@ namespace RSNetworker
         public onPeerUpdated _onPeerUpdated = null;
         public delegate void onPeerRemoved(StationProfile peer);
         public onPeerRemoved _onPeerRemoved = null;
+        public delegate void OnRemoteKinectRecieved(KinectSkeleton skeleton);
+        public OnRemoteKinectRecieved _onRemoteKinectRecieved = null;
 
         public Networker()
         {
+            //check for saved profile
             currentProfile = new StationProfile();
+            if (File.Exists("profile.bin"))
+            {
+                using(FileStream fStream = File.OpenRead("profile.bin"))
+                {
+                    byte[] profileBytes = new byte[fStream.Length];
+                    fStream.Read(profileBytes, 0, profileBytes.Length);
+                    currentProfile.FromBytes(profileBytes);
+                    stationProfileUpdated = true;
+                }
+            }
             currentPeers = new List<StationProfile>();
 
             jSerializer = new JavaScriptSerializer();
@@ -71,13 +83,6 @@ namespace RSNetworker
                 //Debugger.Break();
                 return;
             }
-
-            //listener = new TcpListener(IPAddress.Any, 0);
-            //listenerPort = ((IPEndPoint)listener.LocalEndpoint).Port;
-            //listener.Start();
-
-            //listenThread = new Thread(WaitForConnection);
-            //listenThread.Start();
         }
 
         private SocketError ConnectToServer()
@@ -103,6 +108,8 @@ namespace RSNetworker
             serverReady = true;
 
             sendStationProfile();
+            if (currentApp != null)
+                updateAppInfo(currentApp);
 
             if (serverThread == null)
             {
@@ -127,12 +134,14 @@ namespace RSNetworker
             {
                 try
                 {
-                    while (connected && serverStream != null && !serverStream.DataAvailable) ;
+                    while (!closing && connected && serverStream != null && !serverStream.DataAvailable) ;
                 }
                 catch(Exception e)
                 {
                     break;
                 }
+
+                if (closing) return;
 
                 if (serverStream == null || !connected) break;
 
@@ -250,7 +259,7 @@ namespace RSNetworker
             }
         }
 
-        public void reconnect()
+        public void Reconnect()
         {
             if (serverThread == null)
                 ConnectToServer();
@@ -260,6 +269,15 @@ namespace RSNetworker
 
         public void Disconnect()
         {
+            if(closing)
+            {
+                //save out our profile
+                using (FileStream fStream = File.OpenWrite("profile.bin"))
+                {
+                    byte[] profile = currentProfile.ToBytes();
+                    fStream.Write(profile, 0, profile.Length);
+                }
+            }
             if (server != null)
             {
                 if (serverStream != null)
@@ -313,7 +331,7 @@ namespace RSNetworker
             {
                 //TODO how did we get to this state... 
                 //retry connection?
-                reconnect();
+                Reconnect();
             }
         }
 
@@ -332,8 +350,24 @@ namespace RSNetworker
 
             byte[] messageBytes = Encoding.UTF8.GetBytes(json);
 
-            if (serverStream != null)
-                serverStream.Write(messageBytes, 0, messageBytes.Length);
+            if (serverReady)
+            {
+                try
+                {
+                    serverStream.Write(messageBytes, 0, messageBytes.Length);
+                }
+                catch (System.IO.IOException e)
+                {
+                    Disconnect();
+                }
+
+            }
+            else
+            {
+                //TODO how did we get to this state... 
+                //retry connection?
+                Reconnect();
+            }
         }
 
         void updateAddPeer(StationProfile newPeer)
@@ -367,6 +401,74 @@ namespace RSNetworker
             {
                 currentPeers.Remove(toRemove);
                 peerListUpdated = true;
+            }
+        }
+
+        public void updateLocalKinect(KinectSkeleton p1, KinectSkeleton p2)
+        {
+            if (this.currentApp == null)
+                return;
+
+            p1.stationID = this.currentProfile.id;
+            p2.stationID = this.currentProfile.id;
+            this.currentProfile.player1 = p1;
+            this.currentProfile.player2 = p2;
+
+            KinectSkeleton[] skeletons = { p1, p2 };
+            foreach (KinectSkeleton s in skeletons)
+            {
+                SocketMessage msg = new SocketMessage();
+                msg.type = MessageType.Kinect;
+                msg.data = jSerializer.Serialize(s);
+
+                string data = jSerializer.Serialize(msg);
+                byte[] messageBytes = Encoding.UTF8.GetBytes(data);
+
+                if (serverReady)
+                {
+                    try
+                    {
+                        serverStream.Write(messageBytes, 0, messageBytes.Length);
+                    }
+                    catch (System.IO.IOException e)
+                    {
+                        Disconnect();
+                    }
+
+                }
+                else
+                {
+                    //TODO how did we get to this state... 
+                    //retry connection?
+                    Reconnect();
+                }
+            }
+        }
+
+        void processRemoteKinect(KinectSkeleton remote)
+        {
+            foreach (StationProfile peer in currentPeers)
+            {
+                if (peer.id == remote.stationID)
+                {
+                    switch(remote.playerNumber)
+                    {
+                        case 1:
+                            peer.player1 = remote;
+                            break;
+                        case 2:
+                            peer.player2 = remote;
+                            break;
+                        default:
+                            Debugger.Break();
+                            return;
+                    }
+                    if (_onRemoteKinectRecieved != null)
+                    {
+                        _onRemoteKinectRecieved(remote);
+                        newRemoteKinect = true;
+                    }
+                }
             }
         }
     }

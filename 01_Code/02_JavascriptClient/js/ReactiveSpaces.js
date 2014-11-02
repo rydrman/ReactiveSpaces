@@ -89,6 +89,14 @@ RS.Connect = function( appName, appVersion, port )
     RS.socket.onmessage = RS.MessageRecieved;
     RS.socket.onerror = RS.SocketError;
     
+    //unload event
+    var f = window.onbeforeunload;
+    window.onbeforeunload = function()
+    {
+        if(typeof(f) == 'funciton') f();
+        RS.Disconnect();
+    }
+    
     return true;
 } 
 

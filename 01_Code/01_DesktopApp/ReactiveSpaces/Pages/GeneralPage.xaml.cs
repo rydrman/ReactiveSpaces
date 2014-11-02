@@ -41,6 +41,21 @@ namespace ReactiveSpaces
             }
         }
 
+
+        public void updateListenState(bool listening)
+        {
+            if(listening)
+            {
+                listenStatus.Text = "Listening";
+                listenStatus.Foreground = Brushes.Green;
+            }
+            else
+            {
+                listenStatus.Text = "Not Listening";
+                listenStatus.Foreground = Brushes.Gray;
+            }
+        }
+
         public void updateAppInfo(AppInfo newInfo)
         {
             if(newInfo == null)
@@ -48,6 +63,7 @@ namespace ReactiveSpaces
                 connected = false;
                 appName.Text = "";
                 appVersion.Text = "";
+                maxPlayers.Text = "";
                 appStatus.Text = "Disconnected";
                 appStatus.Foreground = Brushes.Red;
             }
@@ -55,7 +71,8 @@ namespace ReactiveSpaces
             {
                 connected = true;
                 appName.Text = newInfo.name;
-                appVersion.Text = newInfo.version.ToString();
+                appVersion.Text = newInfo.version.ToString("0.00");
+                maxPlayers.Text = newInfo.maxPeers.ToString();
                 appStatus.Text = "Connected";
                 appStatus.Foreground = Brushes.Green;
             }

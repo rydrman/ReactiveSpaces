@@ -7,13 +7,23 @@
       d:DesignHeight="400" d:DesignWidth="640"
 	Title="Kinect">
 
-    <Grid>
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        
-        <Canvas Name="localCanvas" Grid.Column="0" Width="320" Height="240" Background="LightBlue"/>
-        <Canvas Name="remoteCanvas" Grid.Column="1" Width="320" Height="240" Background="LightYellow"/>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center">
+            <TextBlock Text="Kinect Status: " Grid.Row="0" VerticalAlignment="Center" FontSize="18"/>
+            <TextBlock Name="kinectStatus" Text="No Device Found" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" FontSize="18" Foreground="Red"/>
+            <Button Name="refresh" Style="{StaticResource iconButton}" Margin="2 0 0 0" Padding="5" Grid.Column="1" Click="onRefreshClick">&#xE149;</Button>
+        </StackPanel>
+
+        <Canvas Name="localCanvas" Grid.Row="1" Grid.Column="0" Width="320" Height="240" Background="LightBlue"/>
+        <Canvas Name="remoteCanvas" Grid.Row="1" Grid.Column="1" Width="320" Height="240" Background="LightYellow"/>
     </Grid>
 </Page>

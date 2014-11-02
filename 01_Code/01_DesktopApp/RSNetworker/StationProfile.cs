@@ -54,9 +54,12 @@ namespace RSNetworker
             name = newData.name;
             location = newData.location;
             id = newData.id;
+
+            player1.stationID = id;
+            player2.stationID = id;
         }
 
-        /*public byte[] ToBytes()
+        public byte[] ToBytes()
         {
             BinaryFormatter formatter = new BinaryFormatter();
             MemoryStream stream = new MemoryStream();
@@ -73,6 +76,6 @@ namespace RSNetworker
             StationProfile profile = (StationProfile)formatter.Deserialize(stream);
 
             Set(profile);
-        }*/
+        }
     }
 }

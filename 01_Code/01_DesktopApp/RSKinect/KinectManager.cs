@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 //using System.Threading.Tasks;
+using System.Windows.Media;
 using Microsoft.Kinect;
 
 namespace RSKinect
 {
     public class KinectManager
     {
+        public bool statusChanged = false;
+        public bool connected = false;
+        public string status = "";
+        public Brush statusBrush = Brushes.Red;
+
         public bool colorStream {get; private set;}
         public bool depthStream { get; private set; }
         public bool skeletonStream { get; private set; }
@@ -81,15 +87,86 @@ namespace RSKinect
                     {
                         //another app is trying to read the data
                         //TODO
-                        Console.Write("App Conflict");
+                        status = "Device In Use";
+                        statusBrush = Brushes.Red;
                         return false;
                     }
                     playerOne = new KinectSkeleton( sensor );
                     playerTwo = new KinectSkeleton( sensor );
                     playerOne.playerNumber = 1;
                     playerTwo.playerNumber = 2;
+
+                    status = "Connected";
+                    statusBrush = Brushes.Green;
+                    connected = true;
+                    statusChanged = true;
                     return true;
                 }
+                else
+                {
+                    sensor = KinectSensor.KinectSensors[0];
+                    SetStatus(sensor.Status);
+                }
+                KinectSensor.KinectSensors.StatusChanged += SensorStatusChanged;
+            }
+            status = "No Devices Found";
+            statusBrush = Brushes.Red;
+            statusChanged = true;
+            return false;
+        }
+
+        private void SensorStatusChanged(object sender, StatusChangedEventArgs e)
+        {
+            if (((KinectSensor)sender).UniqueKinectId == sensor.UniqueKinectId)
+            {
+                bool result = SetStatus(e.Status);
+                statusChanged = true;
+            }
+            else if( sensor.Status != KinectStatus.Connected
+                && ((KinectSensor)sender).Status == KinectStatus.Connected)
+            {
+                InitializeKinect(colorStream, depthStream, skeletonStream);
+                statusChanged = true;
+            }
+        }
+
+        private bool SetStatus(KinectStatus kStatus)
+        {
+            statusBrush = Brushes.Red;
+            switch (kStatus)
+            {
+                case KinectStatus.Connected:
+                    status = "Connected";
+                    statusBrush = Brushes.Green;
+                    connected = true;
+                    return true;
+                case KinectStatus.DeviceNotGenuine:
+                    status = "Device Not Genuine";
+                    break;
+                case KinectStatus.DeviceNotSupported:
+                    status = "Device Not Supported";
+                    break;
+                case KinectStatus.Error:
+                    status = "Unknown Device Error";
+                    break;
+                case KinectStatus.Initializing:
+                    status = "Device Initializing";
+                    break;
+                case KinectStatus.InsufficientBandwidth:
+                    status = "Insufficient Bandwidth on USB";
+                    break;
+                case KinectStatus.NotPowered:
+                    status = "Device Not Powered";
+                    break;
+                case KinectStatus.NotReady:
+                    status = "Device Was Not Ready";
+                    break;
+                case KinectStatus.Undefined:
+                    status = "Device Status Unknown";
+                    break;
+                case KinectStatus.Disconnected:
+                    status = "Disconneted";
+                    break;
             }
             return false;
         }
@@ -101,6 +178,8 @@ namespace RSKinect
                 sensor.Stop();
                 sensor = null;
             }
+            status = "Disconnected";
+            statusBrush = Brushes.Gray;
         }
 
 

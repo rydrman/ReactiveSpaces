@@ -75,12 +75,12 @@ namespace RSKinect
     public class KinectSkeleton
     {
         public int numberOfJoints = 20;
-        public string type = "skeleton";
 
         public bool upToDate {get; internal set;}
         public bool userPresent { get; internal set; }
         public int ID {get; private set;}
         public int playerNumber = 0;
+        public int stationID = -1;
 
         [NonSerialized()]
         private KinectSensor sensor;
