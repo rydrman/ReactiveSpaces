@@ -171,7 +171,7 @@ namespace RSLocalhost
             message.data = jSerializer.Serialize(peer);
 
             string msgString = jSerializer.Serialize(message);
-            byte[] bytes = Encoding.UTF8.GetBytes(msgString);
+            byte[] bytes = CreateMessage(msgString);
 
             if(connected && null != stream)
             {
@@ -194,7 +194,7 @@ namespace RSLocalhost
             message.data = jSerializer.Serialize(peer);
 
             string msgString = jSerializer.Serialize(message);
-            byte[] bytes = Encoding.UTF8.GetBytes(msgString);
+            byte[] bytes = CreateMessage(msgString);
 
             if (connected && null != stream)
             {
@@ -216,7 +216,7 @@ namespace RSLocalhost
             message.data = jSerializer.Serialize(peer);
 
             string msgString = jSerializer.Serialize(message);
-            byte[] bytes = Encoding.UTF8.GetBytes(msgString);
+            byte[] bytes = CreateMessage(msgString);
 
             if (connected && null != stream)
             {
@@ -239,7 +239,7 @@ namespace RSLocalhost
             message.data = data;
 
             string json = jSerializer.Serialize(message) + "\0";
-            byte[] bytes = Encoding.UTF8.GetBytes(json);
+            byte[] bytes = CreateMessage(json);
 
             if (connected && stream != null)
             {
