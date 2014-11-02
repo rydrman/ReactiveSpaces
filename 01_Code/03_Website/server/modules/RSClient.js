@@ -170,7 +170,7 @@ Client.prototype.onData = function(json)
                 message.data = JSON.stringify(newData);
                 if(this.onCustomData != null)
                     this.onCustomData(this, message);
-                break;
+                return;
 
             default:
                 console.log("Message recieved of unknown type: " + message.type);

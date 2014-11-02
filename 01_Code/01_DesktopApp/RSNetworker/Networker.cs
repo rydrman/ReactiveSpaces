@@ -102,13 +102,14 @@ namespace RSNetworker
             serverStream = server.GetStream();
             serverReady = true;
 
+            sendStationProfile();
+
             if (serverThread == null)
             {
                 serverThread = new Task(ServerConnectionHandler);
             }
             if(serverThread.Status != TaskStatus.Running)
             {
-                sendStationProfile();
                 serverThread.Start();
             }
 
