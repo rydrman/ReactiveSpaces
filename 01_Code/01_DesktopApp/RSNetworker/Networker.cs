@@ -36,6 +36,7 @@ namespace RSNetworker
         Thread listenThread = null;
 
         string missingPiece = null;
+        int failedMessages = 0;
 
         string serverBaseURL = "reactivespacesapi.com";
         int serverPort = 8080;
@@ -169,6 +170,10 @@ namespace RSNetworker
                         if(missingPiece == null && data == inMessages.Last())
                         {
                             missingPiece = data;
+                        }
+                        else
+                        {
+                            failedMessages++;
                         }
                         continue;
                     }
