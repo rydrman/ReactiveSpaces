@@ -337,12 +337,19 @@ RS.Skeleton = function()
 //skeleton: the skeleton object to copy data from
 RS.Skeleton.prototype.Update = function( skeleton )
 {
-    if(this.joints.length != skeleton.joints.length)
-        RS.messenger.display(Message.type.ERROR, "Recieved skeleton does not have the same number of joints...");
     
     this.userPresent = skeleton.userPresent;
     this.ID = skeleton.ID;
     this.playerNumber = skeleton.playerNumber;
+    
+    if(skeleton.joints == null)
+    {
+        for(var i in RS.JointTypes)
+        {
+            this.joints.push( new RS.SkeletonJoint() );
+        }
+        return;
+    }
     
     for(var i in this.joints)
     {
