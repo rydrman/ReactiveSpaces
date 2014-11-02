@@ -426,7 +426,7 @@ namespace RSNetworker
                 msg.data = jSerializer.Serialize(s);
 
                 string data = jSerializer.Serialize(msg);
-                byte[] messageBytes = Encoding.UTF8.GetBytes(data);
+                byte[] messageBytes = Encoding.UTF8.GetBytes(data + "\0");
 
                 if (serverReady)
                 {
