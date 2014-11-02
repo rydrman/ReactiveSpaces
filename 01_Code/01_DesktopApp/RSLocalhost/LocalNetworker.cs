@@ -22,6 +22,10 @@ namespace RSLocalhost
         public bool newAppInfo = false;
         public AppInfo appInfo = null;
         public bool connected = false;
+        public string customData = "";
+        public bool newCustomData = false;
+
+        Networker networker = null;
 
         JavaScriptSerializer jSerializer;
 
@@ -32,9 +36,15 @@ namespace RSLocalhost
         NetworkStream stream = null;
         bool streamReady = false;
 
-        public LocalNetworker()
+        public LocalNetworker(Networker net)
         {
             jSerializer = new JavaScriptSerializer();
+
+            networker = net;
+            networker._onCustomDataRecieved = RecieveCustomData;
+            networker._onPeerAdded = addPeer;
+            networker._onPeerUpdated = updatePeer;
+            networker._onPeerRemoved = removePeer;
 
             listener = new TcpListener(IPAddress.Any, 8080);
             listener.Start();
@@ -100,19 +110,35 @@ namespace RSLocalhost
                     }
 
                     //decode the message
-                    string indata = DecodeMassage(bytes);
-                    WebSocketMessage message = jSerializer.Deserialize<WebSocketMessage>(indata);
+                    string[] inMessages = DecodeMassage(bytes);
 
-                    //find the type
-                    switch(message.type)
+                    foreach (string indata in inMessages)
                     {
-                        case MessageType.AppInfo:
-                            appInfo = jSerializer.Deserialize<AppInfo>(message.data);
-                            newAppInfo = true;
-                            break;
-                        default:
-                            Debugger.Break();
-                            break;
+                        if (indata == "") continue;
+
+                        WebSocketMessage message;
+                        try
+                        {
+                            message = jSerializer.Deserialize<WebSocketMessage>(indata);
+                        }
+                        catch(Exception e){
+                            continue;
+                        }
+
+                        //find the type
+                        switch (message.type)
+                        {
+                            case MessageType.AppInfo:
+                                appInfo = jSerializer.Deserialize<AppInfo>(message.data);
+                                newAppInfo = true;
+                                break;
+                            case MessageType.Custom:
+                                networker.sendCustomData(message.data);
+                                break;
+                            default:
+                                Debugger.Break();
+                                break;
+                        }
                     }
 
                 }
@@ -138,24 +164,114 @@ namespace RSLocalhost
             newAppInfo = true;
         }
 
+        public void addPeer(StationProfile peer)
+        {
+            WebSocketMessage message = new WebSocketMessage();
+            message.type = MessageType.PeerConnect;
+            message.data = jSerializer.Serialize(peer);
+
+            string msgString = jSerializer.Serialize(message);
+            byte[] bytes = Encoding.UTF8.GetBytes(msgString);
+
+            if(null != stream)
+            {
+                try
+                {
+                    stream.Write(bytes, 0, bytes.Length);
+                }
+                catch(System.IO.IOException e)
+                {
+                    Disconnect();
+                }
+            }
+
+        }
+
+        public void updatePeer(StationProfile peer)
+        {
+            WebSocketMessage message = new WebSocketMessage();
+            message.type = MessageType.PeerUpdate;
+            message.data = jSerializer.Serialize(peer);
+
+            string msgString = jSerializer.Serialize(message);
+            byte[] bytes = Encoding.UTF8.GetBytes(msgString);
+
+            if (null != stream)
+            {
+                try
+                {
+                    stream.Write(bytes, 0, bytes.Length);
+                }
+                catch (System.IO.IOException e)
+                {
+                    Disconnect();
+                }
+            }
+        }
+
+        public void removePeer(StationProfile peer)
+        {
+            WebSocketMessage message = new WebSocketMessage();
+            message.type = MessageType.PeerDisconnect;
+            message.data = jSerializer.Serialize(peer);
+
+            string msgString = jSerializer.Serialize(message);
+            byte[] bytes = Encoding.UTF8.GetBytes(msgString);
+
+            if (null != stream)
+            {
+                try
+                {
+                    stream.Write(bytes, 0, bytes.Length);
+                }
+                catch (System.IO.IOException e)
+                {
+                    Disconnect();
+                }
+            }
+        }
+
+        public void RecieveCustomData(string data)
+        {
+            //send to local
+            WebSocketMessage message = new WebSocketMessage();
+            message.type = MessageType.Custom;
+            message.data = data;
+
+            string json = jSerializer.Serialize(message) + "\0";
+            byte[] bytes = Encoding.UTF8.GetBytes(json);
+
+            if (stream != null)
+            {
+                try
+                {
+                    stream.Write(bytes, 0, bytes.Length);
+                }
+                catch (System.IO.IOException e)
+                {
+                    Disconnect();
+                }
+            }
+        }
+
         public void UpdateLocalKinect(KinectSkeleton newSkeleton)
         {
             if (!streamReady || client == null || !client.Connected)
                 return;
 
-            WebSocketSkeleton message = new WebSocketSkeleton();
-            message.data = newSkeleton;
+            WebSocketMessage message = new WebSocketMessage();
+            message.data = jSerializer.Serialize(newSkeleton);
 
             string src = jSerializer.Serialize(message);
-            byte[] msg = CreateMessage(src);
+            byte[] msg = CreateMessage(src + "\0");
 
             try
             {
                 stream.Write(msg, 0, msg.Length);
             }
-            catch(Exception e)
+            catch(System.IO.IOException e)
             {
-                int i = 0;
+                Disconnect();
             }
             
         }
@@ -191,7 +307,7 @@ namespace RSLocalhost
             return output.ToArray();
         }
 
-        private string DecodeMassage(byte[] src)
+        private string[] DecodeMassage(byte[] src)
         {
 
             long length = src[1] - 128;
@@ -215,7 +331,9 @@ namespace RSLocalhost
             {
                 decoded[i] = (byte)(src[i + pos] ^ key[i % 4]);
             }
-            return Encoding.UTF8.GetString(decoded);
+            string full = Encoding.UTF8.GetString(decoded);
+            char[] splitter = {'\0'};
+            return full.Split(splitter);
         }
 
         ~LocalNetworker()

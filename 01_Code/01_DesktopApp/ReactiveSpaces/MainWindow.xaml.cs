@@ -47,8 +47,8 @@ namespace ReactiveSpaces
             kinectPage = new KinectPage();
             networkPage = new NetworkPage();
 
-            localNet = new LocalNetworker();
             networker = new Networker();
+            localNet = new LocalNetworker(networker);
 
             kinectManager = new KinectManager();
             kinectManager.InitializeKinect(false, false, true);

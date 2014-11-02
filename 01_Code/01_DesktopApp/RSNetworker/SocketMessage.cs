@@ -12,7 +12,8 @@ namespace RSNetworker
         StationProfile,
         PeerConnect,
         PeerUpdate,
-        PeerDisconnect
+        PeerDisconnect,
+        Custom
     }
 
     class SocketMessage

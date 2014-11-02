@@ -30,6 +30,9 @@ ClientManager.prototype.addClient = function( socket )
     newClient.onAppDisconnected = function(client){
         self.unmatchClient.call(self, client);
     };
+    newClient.onCustomData = function(client, message){
+        self.passCustomData.call(self, client, message);
+    };
     this.clients.push( newClient );
     
     console.log("Client Connected " + newClient.socket.remoteAddress + ":" + newClient.socket.remotePort);
@@ -82,7 +85,29 @@ ClientManager.prototype.matchClient = function(client)
 
 ClientManager.prototype.unmatchClient = function(client)
 {
-    console.log("TODO: unmatch client");
+    var session = client.session;
+    if(session != null)
+    {
+        session.removePeer(client);
+        client.session = null;
+        
+        if(session.peers.length == 0)
+        {
+            //close session
+            session = null;
+            var index = this.openSessions.indexOf(session);
+            if(index != -1)
+                this.openSessions.splice(index, 1);
+        }
+        else
+        {
+            //open if back up 
+            var index = this.openSessions.indexOf(session);
+            if(index == -1)
+                this.openSessions.push(session);
+        }
+    }
+
 }
                             
 ClientManager.prototype.removeClient = function( client )
@@ -91,5 +116,17 @@ ClientManager.prototype.removeClient = function( client )
     
     console.log("Client Disconnected " + client.stationProfile.name + " , " + client.stationProfile.location);
     console.log("Clients Remaining: " + this.clients.length);
+}
+
+ClientManager.prototype.passCustomData = function(client, message)
+{
+    if(client.session == null)
+    {
+        console.log("!! Custom Data but no session??");
+        return;
+    }
+    
+    client.session.passCustomData(client, message);
+    
 }
 

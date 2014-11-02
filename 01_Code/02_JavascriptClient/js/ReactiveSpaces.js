@@ -73,6 +73,7 @@ RS.Connect = function( appName, appVersion, port )
     //set/reset
     RS.player1 = new RS.Skeleton();
     RS.player2 = new RS.Skeleton();
+    RS.remotePlayers = [];
     
     //check for support
     if(!RS.socketSupported)
@@ -88,8 +89,6 @@ RS.Connect = function( appName, appVersion, port )
     RS.socket.onmessage = RS.MessageRecieved;
     RS.socket.onerror = RS.SocketError;
     
-    RS.connected = true;
-    
     return true;
 } 
 
@@ -104,6 +103,7 @@ RS.SocketError = function(err)
 {
     RS.messenger.display(Message.type.ERROR, "Web Socket Error", "See developer console (F12) for more information.");
     console.log(err);
+    RS.connected = false;
 }
 
 RS.SocketOpened = function()
@@ -115,7 +115,7 @@ RS.SocketOpened = function()
     
     RS.connected = true;
     
-    RS.socket.send(JSON.stringify(msg));
+    RS.socket.send(JSON.stringify(msg) + "\0");
     
     console.log("REACTIVE SPACES: connected to " + RS.socket.url);
 }
@@ -123,19 +123,73 @@ RS.SocketOpened = function()
 RS.SocketClosed = function()
 {
     console.log("REACTIVE SPACES: disconnected from " + RS.socket.url);
+    RS.socket = null;
+    RS.connected = false;
 }
 
 RS.MessageRecieved = function(e)
 {
-    var message = JSON.parse(e.data);
+    var messages = e.data.split('\0');
     
-    switch(message.type)
+    for(var i in messages)
     {
-        case RS.MessageTypes.KINECT:
-            RS.SkeletonRecieved(message.data);
-            break;
-        default:
-            RS.messenger.display(Message.type.WARNING, "Unkown Message Type Recieved");
+        if(messages[i] == "") continue;
+        
+        var message;
+        try{
+            message = JSON.parse(messages[i]);
+        }
+        catch(e){
+            continue;
+        }
+
+        switch(message.type)
+        {
+            case RS.MessageTypes.PEER_CONNECT:
+                RS.remotePlayers.push(message.data);
+                RS.fireEvent(RS.EventTypes.playerjoined, message.data);
+                break;
+            case RS.MessageTypes.PEER_UPDATE:
+                for(var i in RS.remotePlayers)
+                {
+                    if(RS.remotePlayers[i].id == message.data.id)
+                    {
+                        RS.remotePlayers[i].name = message.data.name;
+                        RS.remotePlayers[i].location = message.data.location;
+                    }
+                    RS.fireEvent(RS.EventTypes.playerupdated, RS.remotePlayers[i]);
+                    break;
+                }
+                break;
+            case RS.MessageTypes.PEER_DISCONNECT:
+                for(var i in RS.remotePlayers)
+                {
+                    if(RS.remotePlayers[i].id == message.data.id)
+                    {
+                        var player = RS.remotePlayers[i];
+                        RS.remotePlayers.splice(i, 1);
+                        RS.fireEvent(RS.EventTypes.playerleft, player);
+                        break;
+                    }
+                }
+                break;
+            case RS.MessageTypes.CUSTOM:
+                var data = JSON.parse(message.data);
+                var sender = null;
+                for(var i in this.remotePlayers)
+                {
+                    if(this.remotePlayers[i].id == data.id)
+                        sender = this.remotePlayers[i];
+                }
+                if(sender != null)
+                    RS.fireEvent(RS.EventTypes.messagerecieved, sender, data.userData);
+                break;
+            case RS.MessageTypes.KINECT:
+                RS.SkeletonRecieved(message.data);
+                break;
+            default:
+                RS.messenger.display(Message.type.WARNING, "Unkown Message Type Recieved");
+        }
     }
 }
 
@@ -182,6 +236,32 @@ RS.addEventListener = function(event, callback)
 
 RS.removeEventListener = function(event, callback)
 {
+}
+
+RS.fireEvent = function(eventType, data, data2)
+{
+    for(var i in RS.listeners[eventType])
+    {
+        RS.listeners[eventType][i](data, data2);
+    }
+}
+
+RS.Send = function( object )
+{
+    if(!RS.connected)
+        return false;
+    
+    if(typeof(object) == 'undefined')
+        RS.messenger.display(Message.type.WARNING, "Cannot sent undefined message", "Make sure you pass RS.Send a defined variable / object");
+    
+    var message = {
+        type: RS.MessageTypes.CUSTOM,
+        data: JSON.stringify(object)
+    }
+    
+    var string = JSON.stringify(message);
+    
+    RS.socket.send(string + "\0");
 }
 
 //////////////////////////////////////////////////////
@@ -410,7 +490,10 @@ RS.MessageTypes = {
     APP_INFO: 0,
     CUSTOM: 1,
     KINECT: 2,
-    REMOTE_KINECT: 3
+    REMOTE_KINECT: 3,
+    PEER_CONNECT: 4,
+    PEER_UPDATE: 5,
+    PEER_DISCONNNECT: 6
 }
 
 //EVENT TYPES
@@ -419,5 +502,8 @@ RS.MessageTypes = {
 RS.EventTypes = {
     localskeleton: 0,
     remoteskeleton: 1,
-    messagerecieved: 2   
+    messagerecieved: 2,
+    playerjoined: 3,
+    playerupdated: 4,
+    playerleft: 5
 }
