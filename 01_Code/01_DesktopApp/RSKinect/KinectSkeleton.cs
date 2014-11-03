@@ -182,11 +182,6 @@ namespace RSKinect
             }
         }
 
-        public Deserialize(string obj)
-        {
-
-        }
-
         public string Serialize()
         {
             MemoryStream stream = new MemoryStream();
