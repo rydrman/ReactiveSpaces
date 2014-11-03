@@ -53,7 +53,6 @@ namespace RSKinect
         {
             position = new Vector3();
             screenPos = new Vector3();
-            tracked = false;
         }
     }
 
@@ -114,12 +113,12 @@ namespace RSKinect
             sensor = null;
 
             joints = new KinectJoint[numberOfJoints];
-            //for (int i = 0; i < numberOfJoints; ++i)
-            //{
-            //    joints[i] = new KinectJoint();
-            //    joints[i].tracked = false;
-            //    joints[i].jointType = (KinectJoints)i;
-            //}
+            for (int i = 0; i < numberOfJoints; ++i)
+            {
+                joints[i] = new KinectJoint();
+                //joints[i].tracked = false;
+                //joints[i].jointType = (KinectJoints)i;
+            }
         }
 
         public KinectSkeleton( KinectSensor _sensor )
