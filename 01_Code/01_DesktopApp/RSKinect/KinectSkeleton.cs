@@ -105,7 +105,22 @@ namespace RSKinect
         //to store joints
         public KinectJoint[] joints { get; private set; }
 
-        public KinectSkeleton() { }
+        public KinectSkeleton() 
+        {
+            upToDate = false;
+            userPresent = false;
+            ID = -1;
+
+            sensor = null;
+
+            joints = new KinectJoint[numberOfJoints];
+            for (int i = 0; i < numberOfJoints; ++i)
+            {
+                joints[i] = new KinectJoint();
+                joints[i].tracked = false;
+                joints[i].jointType = (KinectJoints)i;
+            }
+        }
 
         public KinectSkeleton( KinectSensor _sensor )
         {
