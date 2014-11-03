@@ -10,34 +10,51 @@ using System.Runtime.Serialization;
 
 namespace RSKinect
 {
-    public struct Vector3
+    [Serializable()]
+    public class Vector3
     {
-        public float x;
-        public float y;
-        public float z;
+        public float x { get; set; }
+        public float y { get; set; }
+        public float z { get; set; }
+
+        public Vector3()
+        {
+            x = 0;
+            y = 0;
+            z = 0;
+        }
         public Vector3(float _x, float _y, float _z)
         {
-            x = (_x == null) ? 0 : _x;
-            y = (_y == null) ? 0 : _y; 
-            z = (_z == null) ? 0 : _z; 
+            x = _x;
+            y = _y; 
+            z = _z; 
         }
         public void Set(float _x, float _y, float _z)
         {
-            x = (_x == null) ? 0 : _x;
-            y = (_y == null) ? 0 : _y; 
-            z = (_z == null) ? 0 : _z; 
+            x = _x;
+            y = _y; 
+            z = _z; 
         }
         public override string ToString()
         {
             return (String.Format("({0}, {1}, {2})", x, y, z));
         }
     }
-    public struct KinectJoint
+
+    [Serializable()]
+    public class KinectJoint
     {
-        public KinectJoints jointType;
-        public Vector3 position;
-        public Vector3 screenPos;
-        public bool tracked;
+        public KinectJoints jointType { get; set; }
+        public Vector3 position { get; set; }
+        public Vector3 screenPos { get; set; }
+        public bool tracked { get; set; }
+
+        public KinectJoint()
+        {
+            position = new Vector3();
+            screenPos = new Vector3();
+            tracked = false;
+        }
     }
 
     public enum KinectJoints
@@ -101,6 +118,7 @@ namespace RSKinect
             joints = new KinectJoint[numberOfJoints];
             for(int i = 0; i < numberOfJoints; ++i)
             {
+                joints[i] = new KinectJoint();
                 joints[i].tracked = false;
                 joints[i].jointType = (KinectJoints)i;
             }
