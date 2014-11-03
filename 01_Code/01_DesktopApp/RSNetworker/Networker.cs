@@ -442,7 +442,7 @@ namespace RSNetworker
                     {
                         serverStream.Write(messageBytes, 0, messageBytes.Length);
                     }
-                    catch (System.IO.IOException e)
+                    catch (Exception e)
                     {
                         Disconnect();
                     }
