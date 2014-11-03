@@ -72,8 +72,16 @@ Client.prototype.addPeer = function( profile )
 {
     var message = new SocketMessage(SocketMessage.types.PEER_CONNECT, profile);
     var string = message.getJSON();
-
-    this.socket.write(string + "\0");
+    
+    try{
+        this.socket.write(string);
+    }
+    catch(e)
+    {
+        console.log("addPeer exceptionCaugt: " + e.message);
+        if(this.socket.close)
+            this.socket.close();
+    }
 }
 
 Client.prototype.updatePeer = function( profile )
@@ -81,7 +89,15 @@ Client.prototype.updatePeer = function( profile )
     var message = new SocketMessage(SocketMessage.types.PEER_UPDATE, profile);
     var string = message.getJSON();
 
-    this.socket.write(string + "\0");
+    try{
+        this.socket.write(string);
+    }
+    catch(e)
+    {
+        console.log("updatePeer exceptionCaugt: " + e.message);
+        if(this.socket.close)
+            this.socket.close();
+    }
 }
 
 Client.prototype.removePeer = function( profile )
@@ -89,20 +105,46 @@ Client.prototype.removePeer = function( profile )
     var message = new SocketMessage(SocketMessage.types.PEER_DISCONNECT, profile);
     var string = message.getJSON();
 
-    this.socket.write(string + "\0");
+    try{
+        this.socket.write(string);
+    }
+    catch(e)
+    {
+        console.log("removePeer exceptionCaugt: " + e.message);
+        if(this.socket.close)
+            this.socket.close();
+    }
 }
 
 Client.prototype.sendCustomData = function( message )
 {
     var string = message.getJSON();
-    this.socket.write(string);
+    
+    try{
+        this.socket.write(string + "\0");
+    }
+    catch(e)
+    {
+        console.log("sendCustom exceptionCaugt: " + e.message);
+        if(this.socket.close)
+            this.socket.close();
+    }
 }
 
 Client.prototype.sendKinectData = function( message )
 {
     
     var string = message.getJSON();
-    this.socket.write(string);
+    
+    try{
+        this.socket.write(string + "\0");
+    }
+    catch(e)
+    {
+        console.log("sendKinect exceptionCaugt: " + e.message);
+        if(this.socket.close)
+            this.socket.close();
+    }
 }
 
 Client.prototype.appDisconected = function()

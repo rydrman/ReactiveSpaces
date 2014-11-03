@@ -63,13 +63,17 @@ namespace RSNetworker
             currentProfile = new StationProfile();
             if (File.Exists("profile.bin"))
             {
-                using(FileStream fStream = File.OpenRead("profile.bin"))
+                try
                 {
-                    byte[] profileBytes = new byte[fStream.Length];
-                    fStream.Read(profileBytes, 0, profileBytes.Length);
-                    currentProfile.FromBytes(profileBytes);
-                    stationProfileUpdated = true;
+                    using (FileStream fStream = File.OpenRead("profile.bin"))
+                    {
+                        byte[] profileBytes = new byte[fStream.Length];
+                        fStream.Read(profileBytes, 0, profileBytes.Length);
+                        currentProfile.FromBytes(profileBytes);
+                        stationProfileUpdated = true;
+                    }
                 }
+                catch { }
             }
             currentPeers = new List<StationProfile>();
 
@@ -276,11 +280,15 @@ namespace RSNetworker
             if(closing)
             {
                 //save out our profile
-                using (FileStream fStream = File.OpenWrite("profile.bin"))
+                try
                 {
-                    byte[] profile = currentProfile.ToBytes();
-                    fStream.Write(profile, 0, profile.Length);
+                    using (FileStream fStream = File.OpenWrite("profile.bin"))
+                    {
+                        byte[] profile = currentProfile.ToBytes();
+                        fStream.Write(profile, 0, profile.Length);
+                    }
                 }
+                catch { }
             }
             if (server != null)
             {
