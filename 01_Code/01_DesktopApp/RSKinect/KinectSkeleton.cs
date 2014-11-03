@@ -107,19 +107,19 @@ namespace RSKinect
 
         public KinectSkeleton() 
         {
-            upToDate = false;
-            userPresent = false;
-            ID = -1;
+            //upToDate = false;
+            //userPresent = false;
+            //ID = -1;
 
             sensor = null;
 
             joints = new KinectJoint[numberOfJoints];
-            for (int i = 0; i < numberOfJoints; ++i)
-            {
-                joints[i] = new KinectJoint();
-                joints[i].tracked = false;
-                joints[i].jointType = (KinectJoints)i;
-            }
+            //for (int i = 0; i < numberOfJoints; ++i)
+            //{
+            //    joints[i] = new KinectJoint();
+            //    joints[i].tracked = false;
+            //    joints[i].jointType = (KinectJoints)i;
+            //}
         }
 
         public KinectSkeleton( KinectSensor _sensor )
@@ -180,6 +180,11 @@ namespace RSKinect
                 DepthImagePoint point = sensor.CoordinateMapper.MapSkeletonPointToDepthPoint(copyFrom.Position, DepthImageFormat.Resolution320x240Fps30);
                 joints[(int)copyTo].screenPos.Set(point.X * 0.003125f, point.Y * 0.0041667f, (float)Math.Min(copyFrom.Position.Z * 0.2, 1) );
             }
+        }
+
+        public Deserialize(string obj)
+        {
+
         }
 
         public string Serialize()
