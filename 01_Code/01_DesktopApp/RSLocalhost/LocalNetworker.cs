@@ -89,7 +89,14 @@ namespace RSLocalhost
 
             while(connected && client != null && client.Connected)
             {
-                while (connected && stream != null && !stream.DataAvailable);
+                try
+                {
+                    while (connected && stream != null && !stream.DataAvailable) ;
+                }
+                catch
+                {
+                    break;
+                }
 
                 if (!connected || stream == null) break;
 

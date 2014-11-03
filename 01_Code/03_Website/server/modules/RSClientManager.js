@@ -134,7 +134,12 @@ ClientManager.prototype.passCustomData = function(client, message)
         return;
     }
     
-    client.session.passCustomData(client, message);
+    var result = client.session.passCustomData(client, message);
+    if(false == result)
+    {
+        client.session = null;
+        this.matchClient(client);
+    }
     
 }
 
@@ -146,7 +151,11 @@ ClientManager.prototype.passKinectData = function(client, message)
         return;
     }
     
-    client.session.passKinectData(client, message);
-    
+    var result = client.session.passKinectData(client, message);
+    if(false == result)
+    {
+        client.session = null;
+        this.matchClient(client);
+    }
 }
 
