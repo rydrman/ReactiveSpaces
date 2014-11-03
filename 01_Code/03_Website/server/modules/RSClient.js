@@ -73,15 +73,7 @@ Client.prototype.addPeer = function( profile )
     var message = new SocketMessage(SocketMessage.types.PEER_CONNECT, profile);
     var string = message.getJSON();
     
-    try{
-        this.socket.write(string);
-    }
-    catch(e)
-    {
-        console.log("addPeer exceptionCaugt: " + e.message);
-        if(this.socket.close)
-            this.socket.close();
-    }
+    this.trySend(string);
 }
 
 Client.prototype.updatePeer = function( profile )
@@ -89,15 +81,7 @@ Client.prototype.updatePeer = function( profile )
     var message = new SocketMessage(SocketMessage.types.PEER_UPDATE, profile);
     var string = message.getJSON();
 
-    try{
-        this.socket.write(string);
-    }
-    catch(e)
-    {
-        console.log("updatePeer exceptionCaugt: " + e.message);
-        if(this.socket.close)
-            this.socket.close();
-    }
+    this.trySend(string);
 }
 
 Client.prototype.removePeer = function( profile )
@@ -105,46 +89,20 @@ Client.prototype.removePeer = function( profile )
     var message = new SocketMessage(SocketMessage.types.PEER_DISCONNECT, profile);
     var string = message.getJSON();
 
-    try{
-        this.socket.write(string);
-    }
-    catch(e)
-    {
-        console.log("removePeer exceptionCaugt: " + e.message);
-        if(this.socket.close)
-            this.socket.close();
-    }
+    this.trySend(string);
 }
 
 Client.prototype.sendCustomData = function( message )
 {
     var string = message.getJSON();
-    
-    try{
-        this.socket.write(string + "\0");
-    }
-    catch(e)
-    {
-        console.log("sendCustom exceptionCaugt: " + e.message);
-        if(this.socket.close)
-            this.socket.close();
-    }
+    this.trySend(string);
 }
 
 Client.prototype.sendKinectData = function( message )
 {
     
     var string = message.getJSON();
-    
-    try{
-        this.socket.write(string + "\0");
-    }
-    catch(e)
-    {
-        console.log("sendKinect exceptionCaugt: " + e.message);
-        if(this.socket.close)
-            this.socket.close();
-    }
+    this.trySend(string);
 }
 
 Client.prototype.appDisconected = function()
@@ -232,10 +190,33 @@ Client.prototype.onData = function(json)
     
 }
 
+Client.prototype.trySend = function(string)
+{
+    try{
+        this.socket.write(string + "\0");
+    }
+    catch(e)
+    {
+        console.log("send exceptionCaugt: " + e.message);
+        this.onDisconnect();
+        if(this.socket.close)
+            this.socket.close();
+    }
+}
+
 Client.prototype.onError = function(e)
 {
+    console.log("Exception caught ->" + e);
+    console.log("Attempt to close connection...");
     //socket exception.. break it off
     if(typeof(this.socket.close) == 'function')
+    {
         this.socket.close();
-    console.log("Exception caught" + e);
+        console.log("success");
+    }
+    else
+    {
+        console.log("failed. Removing entry...");
+        this.onDisconnect();
+    }
 }
