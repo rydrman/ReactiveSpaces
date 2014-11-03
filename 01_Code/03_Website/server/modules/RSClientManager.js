@@ -120,9 +120,25 @@ ClientManager.prototype.unmatchClient = function(client)
                             
 ClientManager.prototype.removeClient = function( client )
 {
-    this.clients.splice(this.clients.indexOf(client), 1);
+    var index = -1;
+    for(var i in this.clients)
+    {
+        if(this.clients[i].id == client.id)
+        {
+            index = i;
+            break;
+        }
+    }
+    if(index != -1)
+    {
+        this.clients.splice(index, 1);
+        console.log("Client Disconnected " + client.stationProfile.name + " , " + client.stationProfile.location);
+    }
+    else
+    {
+        consol.log("Error: Cannot remove client... not found");
+    }
     
-    console.log("Client Disconnected " + client.stationProfile.name + " , " + client.stationProfile.location);
     console.log("Clients Remaining: " + this.clients.length);
 }
 
