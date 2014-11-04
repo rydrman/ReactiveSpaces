@@ -28,6 +28,7 @@ namespace RSNetworker
         public bool closing = false;
 
         //data to show
+        DateTime lastSkeleton;
         public StationProfile currentProfile;
         public List<StationProfile> currentPeers;
         AppInfo currentApp = null;
@@ -59,6 +60,7 @@ namespace RSNetworker
 
         public Networker()
         {
+            lastSkeleton = DateTime.Now;
             //check for saved profile
             currentProfile = new StationProfile();
             if (File.Exists("profile.bin"))
@@ -145,6 +147,7 @@ namespace RSNetworker
                     break;
                 }
 
+                //only time we actually want this thread to run to completion
                 if (closing) return;
 
                 if (serverStream == null || !connected) break;
@@ -154,12 +157,13 @@ namespace RSNetworker
 
                 String inData = Encoding.UTF8.GetString(bytes);
 
-                if (inData.StartsWith("\0"))
-                {
+                //not sure that this is a real thing
+                //if (inData.StartsWith("\0\0\0"))
+                //{
                     //TODO server shutdown
-                    Disconnect();
-                    return;
-                }
+                    //Disconnect();
+                    //break;
+                //}
 
                 if (missingPiece != null)
                 {
@@ -240,6 +244,7 @@ namespace RSNetworker
             }
 
             Disconnect();
+            System.Threading.Thread.Sleep(100);
             ConnectToServer();
             //reconnect
 
@@ -291,15 +296,17 @@ namespace RSNetworker
                 }
                 catch { }
             }
-            if (server != null)
+            if (serverStream != null)
             {
-                if (serverStream != null)
-                    serverStream.Close();
-                server.Close();
-
-                server = null;
+                serverStream.Close();
                 serverStream = null;
                 serverReady = false;
+            }
+            if (server != null)
+            {
+                server.Close();
+                serverReady = false;
+                server = null;
             }
             connected = false;
             connectionChanged = true;
@@ -421,6 +428,12 @@ namespace RSNetworker
         {
             if (this.currentApp == null)
                 return;
+
+            //if it hasn't been long enough
+            if (DateTime.Now.Millisecond - lastSkeleton.Millisecond < 500)
+                return;
+            else
+                lastSkeleton = DateTime.Now;
 
             p1.stationID = this.currentProfile.id;
             p2.stationID = this.currentProfile.id;

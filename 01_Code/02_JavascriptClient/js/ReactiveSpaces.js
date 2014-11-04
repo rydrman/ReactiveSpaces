@@ -11,6 +11,7 @@ window.RS = window.ReactiveSpaces = {version: 0.1};
 //constants etc
 RS.BASEURL = "ws://localhost";
 RS.LOCALPORT = 8080;
+RS.MESSAGE_DELAY = 100;
 
 //app info
 RS.appInfo = {
@@ -23,6 +24,8 @@ RS.appInfo = {
 RS.socketSupported = false;
 RS.socket = null;
 RS.connected = false;
+//RS.userClosed = false;
+RS.lastMessage = new Date().getMilliseconds;
 
 //to keep skeletons
 RS.player1;
@@ -30,11 +33,7 @@ RS.player2;
 RS.remotePlayers = [];
 
 //to store event listeners
-RS.listeners = {
-    localskeleton: [],
-    remoteskeleton: [],
-    messagerecieved: []
-};
+RS.listeners = [];
 
 //for error reporting
 RS.messenger = {display:function(t,m,s,ms){
@@ -82,12 +81,8 @@ RS.Connect = function( appName, appVersion, port )
         return false;
     }
     
-    RS.socket = new WebSocket(RS.BASEURL + ":" + RS.LOCALPORT + "/ReactiveSpaces");
-    
-    RS.socket.onopen = RS.SocketOpened;
-    RS.socket.onclose = RS.SocketClosed;
-    RS.socket.onmessage = RS.MessageRecieved;
-    RS.socket.onerror = RS.SocketError;
+    //RS.userClosed = false;
+    RS.OpenSocket();
     
     //unload event
     var f = window.onbeforeunload;
@@ -97,21 +92,37 @@ RS.Connect = function( appName, appVersion, port )
         RS.Disconnect();
     }
     
+    
     return true;
 } 
+
+RS.OpenSocket = function()
+{
+    if(RS.connected || RS.socket != null)
+        return;
+    RS.socket = new WebSocket(RS.BASEURL + ":" + RS.LOCALPORT + "/ReactiveSpaces");
+    
+    RS.socket.onopen = RS.SocketOpened;
+    RS.socket.onclose = RS.SocketClosed;
+    RS.socket.onmessage = RS.MessageRecieved;
+    RS.socket.onerror = RS.SocketError;
+}
 
 RS.Disconnect = function()
 {
     if(null != RS.socket)
         RS.socket.close();
     RS.connected = false;
+    //RS.userClosed = true;
 }
 
 RS.SocketError = function(err)
 {
-    RS.messenger.display(Message.type.ERROR, "Web Socket Error", "See developer console (F12) for more information.");
+    RS.messenger.display(Message.type.ERROR, "Web Socket Error", "Trying to reconnect...");
     console.log(err);
     RS.connected = false;
+    //try reconnecting
+    //RS.OpenSocket();
 }
 
 RS.SocketOpened = function()
@@ -133,6 +144,9 @@ RS.SocketClosed = function()
     console.log("REACTIVE SPACES: disconnected from " + RS.socket.url);
     RS.socket = null;
     RS.connected = false;
+    
+    //if(!RS.userClosed)
+    //    RS.OpenSocket();
 }
 
 RS.MessageRecieved = function(e)
@@ -192,14 +206,16 @@ RS.MessageRecieved = function(e)
                 }
                 break;
             case RS.MessageTypes.CUSTOM:
+                //one more level of abstraction...
+                message.data = JSON.parse(message.data);
                 var sender = null;
-                for(var i in this.remotePlayers)
+                for(var i in RS.remotePlayers)
                 {
-                    if(this.remotePlayers[i].id == data.id)
-                        sender = this.remotePlayers[i];
+                    if(RS.remotePlayers[i].id == message.data.id)
+                        sender = RS.remotePlayers[i];
                 }
                 if(sender != null)
-                    RS.fireEvent(RS.EventTypes.messagerecieved, sender, data.userData);
+                    RS.fireEvent(RS.EventTypes.messagerecieved, sender, message.data.userData);
                 break;
             case RS.MessageTypes.KINECT:
                 RS.SkeletonRecieved(message.data);
@@ -271,10 +287,13 @@ RS.ActivateMessenger = function()
 
 RS.addEventListener = function(event, callback)
 {
-    if(typeof(RS.listeners[event]) == 'undefined')
+    var eventType = RS.EventTypes[event];
+    if(typeof(eventType) == 'undefined')
         RS.messenger.display(Message.type.WARNING, "Event type not valid for Reactive Spaces", "Make sure you use the RS.EventTypes enumerator");
     
-    RS.listeners[event].push(callback);
+    if(typeof(RS.listeners[eventType]) == 'undefined')
+        RS.listeners[eventType] = [];
+    RS.listeners[eventType].push(callback);
 }
 
 RS.removeEventListener = function(event, callback)
@@ -296,6 +315,11 @@ RS.Send = function( object )
     
     if(typeof(object) == 'undefined')
         RS.messenger.display(Message.type.WARNING, "Cannot sent undefined message", "Make sure you pass RS.Send a defined variable / object");
+    
+    var now = new Date().getMilliseconds;
+    if(now - RS.lastMessage < RS.MESSAGE_DELAY)
+        return;
+        //RS.messenger.display(Message.type.WARNING, "Message not sent, too soon", "You are sending messages to close together");
     
     var message = {
         type: RS.MessageTypes.CUSTOM,
@@ -543,7 +567,7 @@ RS.MessageTypes = {
     REMOTE_KINECT: 3,
     PEER_CONNECT: 4,
     PEER_UPDATE: 5,
-    PEER_DISCONNNECT: 6
+    PEER_DISCONNECT: 6
 }
 
 //EVENT TYPES

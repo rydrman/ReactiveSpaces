@@ -4,6 +4,8 @@ var Client = module.exports = function(socket)
 {
     this.id = -1;
     this.ready = false;
+    this.locked = false;
+    this.sendTimeout = 1000;
     
     this.session = null;
     
@@ -192,6 +194,20 @@ Client.prototype.onData = function(json)
 
 Client.prototype.trySend = function(string)
 {
+    if(this.locked)
+    {
+        var start = new Date().getMilliseconds;
+        while(this.locked)
+        {
+            if(Date().getMilliseconds - start > this.sendTimeout)
+            {
+                console.log("message send timeout");
+                return;
+            }
+        }
+    }
+    
+    this.locked = true;
     try{
         this.socket.write(string + "\0");
     }
@@ -202,6 +218,7 @@ Client.prototype.trySend = function(string)
         if(this.socket.close)
             this.socket.close();
     }
+    this.locked = false;
 }
 
 Client.prototype.onError = function(e)
@@ -209,9 +226,9 @@ Client.prototype.onError = function(e)
     console.log("Exception caught ->" + e);
     console.log("Attempt to close connection...");
     //socket exception.. break it off
-    if(typeof(this.socket.close) == 'function')
+    if(typeof(this.socket.end) == 'function')
     {
-        this.socket.close();
+        this.socket.end();
         console.log("success");
     }
     else

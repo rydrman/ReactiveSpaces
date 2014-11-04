@@ -190,6 +190,7 @@ namespace RSLocalhost
             }
 
             Disconnect();
+            System.Threading.Thread.Sleep(100);
             goto connectionStart;
         }
 
@@ -203,15 +204,17 @@ namespace RSLocalhost
 
         public void Disconnect()
         {
-            if(client != null)
-            {
-                if(stream != null)
-                    stream.Close();
-                client.Close();
 
-                client = null;
+            if (stream != null)
+            {
+                stream.Close();
                 stream = null;
                 streamReady = false;
+            }
+            if(client != null)
+            {
+                client.Close();
+                client = null;
             }
             appInfo = null;
             networker.updateAppInfo(null);
