@@ -195,11 +195,11 @@ RS.MessageRecieved = function(e)
                 var sender = null;
                 for(var i in RS.remotePlayers)
                 {
-                    if(RS.remotePlayers[i].id == data.id)
+                    if(RS.remotePlayers[i].id == message.data.id)
                         sender = RS.remotePlayers[i];
                 }
                 if(sender != null)
-                    RS.fireEvent(RS.EventTypes.messagerecieved, sender, data.userData);
+                    RS.fireEvent(RS.EventTypes.messagerecieved, sender, message.data.userData);
                 break;
             case RS.MessageTypes.KINECT:
                 RS.SkeletonRecieved(message.data);
