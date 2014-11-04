@@ -20,7 +20,8 @@ SocketMessage.prototype.SetFromIncoming = function(json)
     }
     
     this.type = message.type;
-    this.data = (message.data == null) ? null : JSON.parse(message.data);
+    if(message.type != SocketMessage.types.KINECT)
+        this.data = (message.data == null) ? null : JSON.parse(message.data);
     return true;
     
 }
@@ -28,7 +29,7 @@ SocketMessage.prototype.SetFromIncoming = function(json)
 SocketMessage.prototype.getJSON = function()
 {
     var msg = {type:this.type, data:null};
-    if(this.data != null)
+    if(this.data != null && this.type != SocketMessage.types.KINECT)
         msg.data = JSON.stringify(this.data);
     
     return JSON.stringify(msg) + "\0";
