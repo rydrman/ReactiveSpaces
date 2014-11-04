@@ -97,11 +97,13 @@ namespace RSKinect
         public int playerNumber = 0;
         public int stationID = -1;
 
+        public KinectJoint[] joints { get; private set; }
+
         [NonSerialized()]
         private KinectSensor sensor;
 
         //to store joints
-        public KinectJoint[] joints { get; private set; }
+        
 
         public KinectSkeleton() 
         {
@@ -112,12 +114,12 @@ namespace RSKinect
             sensor = null;
 
             joints = new KinectJoint[numberOfJoints];
-            for (int i = 0; i < numberOfJoints; ++i)
-            {
-                joints[i] = new KinectJoint();
+            //for (int i = 0; i < numberOfJoints; ++i)
+            //{
+                //joints[i] = new KinectJoint();
                 //joints[i].tracked = false;
                 //joints[i].jointType = (KinectJoints)i;
-            }
+            //}
         }
 
         public KinectSkeleton( KinectSensor _sensor )
