@@ -11,6 +11,9 @@ using System.Threading;
 using System.Security.Cryptography;
 using System.Web.Script.Serialization;
 using System.IO;
+//using System.IO.Compression;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 using RSKinect;
 
@@ -28,7 +31,7 @@ namespace RSNetworker
         public bool closing = false;
 
         //data to show
-        DateTime lastSkeleton;
+        Stopwatch kinectTimer;
         public StationProfile currentProfile;
         public List<StationProfile> currentPeers;
         AppInfo currentApp = null;
@@ -60,7 +63,8 @@ namespace RSNetworker
 
         public Networker()
         {
-            lastSkeleton = DateTime.Now;
+            kinectTimer = new Stopwatch();
+            kinectTimer.Start();
             //check for saved profile
             currentProfile = new StationProfile();
             if (File.Exists("profile.bin"))
@@ -221,7 +225,7 @@ namespace RSNetworker
                             break;
                         case MessageType.PeerDisconnect:
                             StationProfile oldPeer = jSerializer.Deserialize<StationProfile>(message.data);
-                            updateAddPeer(oldPeer);
+                            removePeer(oldPeer);
                             if (null != _onPeerRemoved)
                                 _onPeerRemoved(oldPeer);
                             break;
@@ -231,7 +235,8 @@ namespace RSNetworker
                             break;
                         case MessageType.Kinect:
                             KinectSkeleton skeleton = new KinectSkeleton();
-                            skeleton = jSerializer.Deserialize<KinectSkeleton>(message.data);
+                            //skeleton = deserializeKinect(message.data);
+                            skeleton = deserializeKinect(message.data);
                             processRemoteKinect(skeleton);
                             break;
                         default:
@@ -430,10 +435,10 @@ namespace RSNetworker
                 return;
 
             //if it hasn't been long enough
-            if (DateTime.Now.Millisecond - lastSkeleton.Millisecond < 500)
+            if (kinectTimer.ElapsedMilliseconds < 500)
                 return;
             else
-                lastSkeleton = DateTime.Now;
+                kinectTimer.Restart();
 
             p1.stationID = this.currentProfile.id;
             p2.stationID = this.currentProfile.id;
@@ -446,6 +451,7 @@ namespace RSNetworker
                 SocketMessage msg = new SocketMessage();
                 msg.type = MessageType.Kinect;
                 msg.data = jSerializer.Serialize(s);
+                //msg.data = serializeKinect(s);
 
                 string data = jSerializer.Serialize(msg);
                 byte[] messageBytes = Encoding.UTF8.GetBytes(data + "\0");
@@ -496,6 +502,33 @@ namespace RSNetworker
                     }
                 }
             }
+        }
+
+        string serializeKinect(KinectSkeleton skeleton)
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            MemoryStream memStream = new MemoryStream();
+            formatter.Serialize(memStream, skeleton);
+
+            byte[] bytes = new byte[memStream.Length];
+            memStream.Read(bytes, 0, bytes.Length);
+
+            return Encoding.UTF8.GetString(bytes);
+            
+            //GZipStream compressor = new GZipStream(compStream, CompressionLevel.Fastest);
+        }
+
+        KinectSkeleton deserializeKinect(string inData)
+        {
+            return jSerializer.Deserialize<KinectSkeleton>(inData);
+
+            BinaryFormatter formatter = new BinaryFormatter();
+            MemoryStream memStream = new MemoryStream();
+
+            byte[] bytes = Encoding.UTF8.GetBytes(inData);
+            memStream.Write(bytes, 0, bytes.Length);
+
+            return (KinectSkeleton)formatter.Deserialize(memStream);
         }
     }
 }
