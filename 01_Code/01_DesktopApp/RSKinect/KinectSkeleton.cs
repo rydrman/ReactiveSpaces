@@ -114,12 +114,11 @@ namespace RSKinect
             sensor = null;
 
             joints = new List<KinectJoint>();
-            //for (int i = 0; i < numberOfJoints; ++i)
-            //{
-                //joints[i] = new KinectJoint();
-                //joints[i].tracked = false;
-                //joints[i].jointType = (KinectJoints)i;
-            //}
+            for (int i = 0; i < numberOfJoints; ++i)
+            {
+                KinectJoint kj = new KinectJoint();
+                joints.Add(kj);
+            }
         }
 
         public KinectSkeleton( KinectSensor _sensor )
