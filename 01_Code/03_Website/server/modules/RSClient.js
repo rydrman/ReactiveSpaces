@@ -228,6 +228,7 @@ Client.prototype.trySend = function(string)
 
 Client.prototype.onError = function(e)
 {
+    this.active = false;
     console.log("Exception caught -> " + e);
     console.log("Attempt to close connection...");
     //socket exception.. break it off
@@ -235,7 +236,7 @@ Client.prototype.onError = function(e)
     {
         this.socket.end();
         this.onDisconnect();
-        console.log("success");
+        //console.log("success");
     }
     else
     {

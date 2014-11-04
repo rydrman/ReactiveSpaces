@@ -221,7 +221,7 @@ namespace RSNetworker
                             break;
                         case MessageType.PeerDisconnect:
                             StationProfile oldPeer = jSerializer.Deserialize<StationProfile>(message.data);
-                            updateAddPeer(oldPeer);
+                            removePeer(oldPeer);
                             if (null != _onPeerRemoved)
                                 _onPeerRemoved(oldPeer);
                             break;
