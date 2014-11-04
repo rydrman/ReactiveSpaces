@@ -11,6 +11,7 @@ window.RS = window.ReactiveSpaces = {version: 0.1};
 //constants etc
 RS.BASEURL = "ws://localhost";
 RS.LOCALPORT = 8080;
+RS.MESSAGE_DELAY = 100;
 
 //app info
 RS.appInfo = {
@@ -23,6 +24,7 @@ RS.appInfo = {
 RS.socketSupported = false;
 RS.socket = null;
 RS.connected = false;
+RS.lastMessage = new Date().getMilliseconds;
 
 //to keep skeletons
 RS.player1;
@@ -297,6 +299,11 @@ RS.Send = function( object )
     
     if(typeof(object) == 'undefined')
         RS.messenger.display(Message.type.WARNING, "Cannot sent undefined message", "Make sure you pass RS.Send a defined variable / object");
+    
+    var now = new Date().getMilliseconds;
+    if(now - RS.lastMessage < RS.MESSAGE_DELAY)
+        return;
+        //RS.messenger.display(Message.type.WARNING, "Message not sent, too soon", "You are sending messages to close together");
     
     var message = {
         type: RS.MessageTypes.CUSTOM,
