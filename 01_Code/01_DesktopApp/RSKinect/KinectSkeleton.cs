@@ -4,14 +4,12 @@ using System.Linq;
 using System.Text;
 //using System.Threading.Tasks;
 using Microsoft.Kinect;
-using System.Runtime.Serialization.Json;
 using System.IO;
-using System.Runtime.Serialization;
 
 namespace RSKinect
 {
     [Serializable()]
-    public class Vector3
+    public class Vector3 : ISerializable
     {
         public float x { get; set; }
         public float y { get; set; }
@@ -42,7 +40,7 @@ namespace RSKinect
     }
 
     [Serializable()]
-    public class KinectJoint
+    public class KinectJoint : ISerializable
     {
         public KinectJoints jointType { get; set; }
         public Vector3 position { get; set; }
@@ -88,7 +86,7 @@ namespace RSKinect
     }
 
     [Serializable()]
-    public class KinectSkeleton
+    public class KinectSkeleton : ISerializable
     {
         public int numberOfJoints = 20;
 
@@ -179,15 +177,6 @@ namespace RSKinect
                 DepthImagePoint point = sensor.CoordinateMapper.MapSkeletonPointToDepthPoint(copyFrom.Position, DepthImageFormat.Resolution320x240Fps30);
                 joints[(int)copyTo].screenPos.Set(point.X * 0.003125f, point.Y * 0.0041667f, (float)Math.Min(copyFrom.Position.Z * 0.2, 1) );
             }
-        }
-
-        public string Serialize()
-        {
-            MemoryStream stream = new MemoryStream();
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(KinectSkeleton));
-            serializer.WriteObject(stream, this);
-
-            return stream.ToString();
         }
     }
 
