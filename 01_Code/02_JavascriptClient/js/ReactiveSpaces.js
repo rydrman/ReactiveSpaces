@@ -30,11 +30,7 @@ RS.player2;
 RS.remotePlayers = [];
 
 //to store event listeners
-RS.listeners = {
-    localskeleton: [],
-    remoteskeleton: [],
-    messagerecieved: []
-};
+RS.listeners = [];
 
 //for error reporting
 RS.messenger = {display:function(t,m,s,ms){
@@ -273,10 +269,13 @@ RS.ActivateMessenger = function()
 
 RS.addEventListener = function(event, callback)
 {
-    if(typeof(RS.listeners[event]) == 'undefined')
+    var eventType = RS.EventTypes[event];
+    if(typeof(eventType) == 'undefined')
         RS.messenger.display(Message.type.WARNING, "Event type not valid for Reactive Spaces", "Make sure you use the RS.EventTypes enumerator");
     
-    RS.listeners[event].push(callback);
+    if(typeof(RS.listeners[eventType]) == 'undefined')
+        RS.listeners[eventType] = [];
+    RS.listeners[eventType].push(callback);
 }
 
 RS.removeEventListener = function(event, callback)

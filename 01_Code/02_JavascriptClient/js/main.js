@@ -93,10 +93,12 @@ function render()
     for(var i in RS.remotePlayers)
     {
         ctx.fillStyle = "#c94d02";
-        if(RS.remotePlayers.ball)
+        if(RS.remotePlayers[i].ball)
         {
             ctx.beginPath();
-            ctx.arc(ball.x, ball.y, 20, 0, Math.PI*2, false);
+            ctx.arc(RS.remotePlayers[i].ball.x,
+                    RS.remotePlayers[i].ball.y,
+                    20, 0, Math.PI*2, false);
             ctx.fill();
         }
     }

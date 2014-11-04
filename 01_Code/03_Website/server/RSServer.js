@@ -5,8 +5,14 @@ var Client = require('./modules/RSClient.js');
 var manager = new ClientManager();
 var server = net.createServer();
 
-server.listen(8080);
-console.log("server listening on port " + server.address().port);
+try{
+    server.listen(8080);
+    console.log("server listening on port " + server.address().port);
+}
+catch(e){
+    console.log("server failed to start -> " + e);
+}
+
 
 server.on('connection', function(socket){
     

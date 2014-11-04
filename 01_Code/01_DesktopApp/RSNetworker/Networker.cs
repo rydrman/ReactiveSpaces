@@ -28,6 +28,7 @@ namespace RSNetworker
         public bool closing = false;
 
         //data to show
+        DateTime lastSkeleton;
         public StationProfile currentProfile;
         public List<StationProfile> currentPeers;
         AppInfo currentApp = null;
@@ -59,6 +60,7 @@ namespace RSNetworker
 
         public Networker()
         {
+            lastSkeleton = DateTime.Now;
             //check for saved profile
             currentProfile = new StationProfile();
             if (File.Exists("profile.bin"))
@@ -424,6 +426,12 @@ namespace RSNetworker
         {
             if (this.currentApp == null)
                 return;
+
+            //if it hasn't been long enough
+            if (DateTime.Now.Millisecond - lastSkeleton.Millisecond < 500)
+                return;
+            else
+                lastSkeleton = DateTime.Now;
 
             p1.stationID = this.currentProfile.id;
             p2.stationID = this.currentProfile.id;
