@@ -292,15 +292,17 @@ namespace RSNetworker
                 }
                 catch { }
             }
-            if (server != null)
+            if (serverStream != null)
             {
-                if (serverStream != null)
-                    serverStream.Close();
-                server.Close();
-
-                server = null;
+                serverStream.Close();
                 serverStream = null;
                 serverReady = false;
+            }
+            if (server != null)
+            {
+                server.Close();
+                serverReady = false;
+                server = null;
             }
             connected = false;
             connectionChanged = true;
