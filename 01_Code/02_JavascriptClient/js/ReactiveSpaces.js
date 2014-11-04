@@ -193,10 +193,10 @@ RS.MessageRecieved = function(e)
                 break;
             case RS.MessageTypes.CUSTOM:
                 var sender = null;
-                for(var i in this.remotePlayers)
+                for(var i in RS.remotePlayers)
                 {
-                    if(this.remotePlayers[i].id == data.id)
-                        sender = this.remotePlayers[i];
+                    if(RS.remotePlayers[i].id == data.id)
+                        sender = RS.remotePlayers[i];
                 }
                 if(sender != null)
                     RS.fireEvent(RS.EventTypes.messagerecieved, sender, data.userData);
