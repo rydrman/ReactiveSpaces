@@ -3,6 +3,7 @@ var SocketMessage = require('./RSSocketMessage.js');
 var Client = module.exports = function(socket)
 {
     this.id = -1;
+    this.active = true;
     this.ready = false;
     this.locked = false;
     this.sendTimeout = 1000;
@@ -118,6 +119,7 @@ Client.prototype.appDisconected = function()
 
 Client.prototype.onDisconnect = function()
 {
+    this.active = false;
     this.appDisconected();
     if(this.onClose != null)
         this.onClose(this);
@@ -125,6 +127,9 @@ Client.prototype.onDisconnect = function()
 
 Client.prototype.onData = function(json)
 {
+    if(!this.active)
+        return;
+    
     if(this.messagePiece != null)
     {
         json = this.messagePiece + json;
@@ -223,12 +228,13 @@ Client.prototype.trySend = function(string)
 
 Client.prototype.onError = function(e)
 {
-    console.log("Exception caught ->" + e);
+    console.log("Exception caught -> " + e);
     console.log("Attempt to close connection...");
     //socket exception.. break it off
     if(typeof(this.socket.end) == 'function')
     {
         this.socket.end();
+        this.onDisconnect();
         console.log("success");
     }
     else

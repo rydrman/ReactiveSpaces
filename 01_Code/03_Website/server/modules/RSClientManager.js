@@ -137,6 +137,16 @@ ClientManager.prototype.removeClient = function( client )
     else
     {
         console.log("Error: Cannot remove client... not found");
+        var out = "";
+        out += client.id;
+        out += "[ ";
+        for(var i in this.clients)
+        {
+            if(i != 0)
+                out += ", ";
+            out += this.clients[i].id;
+        }
+        console.log(out + " ]");
         this.closeAll();
         process.exit();
         
