@@ -147,6 +147,7 @@ namespace RSNetworker
                     break;
                 }
 
+                //only time we actually want this thread to run to completion
                 if (closing) return;
 
                 if (serverStream == null || !connected) break;
@@ -156,12 +157,13 @@ namespace RSNetworker
 
                 String inData = Encoding.UTF8.GetString(bytes);
 
-                if (inData.StartsWith("\0"))
-                {
+                //not sure that this is a real thing
+                //if (inData.StartsWith("\0\0\0"))
+                //{
                     //TODO server shutdown
-                    Disconnect();
-                    return;
-                }
+                    //Disconnect();
+                    //break;
+                //}
 
                 if (missingPiece != null)
                 {
