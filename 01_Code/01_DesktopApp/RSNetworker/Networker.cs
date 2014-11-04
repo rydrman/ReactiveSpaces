@@ -513,7 +513,7 @@ namespace RSNetworker
             byte[] bytes = new byte[memStream.Length];
             memStream.Read(bytes, 0, bytes.Length);
 
-            return Convert.ToBase64String(bytes);
+            return Encoding.UTF8.GetString(bytes);
             
             //GZipStream compressor = new GZipStream(compStream, CompressionLevel.Fastest);
         }
@@ -524,7 +524,7 @@ namespace RSNetworker
             BinaryFormatter formatter = new BinaryFormatter();
             MemoryStream memStream = new MemoryStream();
 
-            byte[] bytes = Convert.FromBase64String(inData);
+            byte[] bytes = Encoding.UTF8.GetBytes(inData);
             memStream.Write(bytes, 0, bytes.Length);
 
             return (KinectSkeleton)formatter.Deserialize(memStream);
