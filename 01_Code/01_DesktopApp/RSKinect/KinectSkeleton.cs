@@ -12,9 +12,9 @@ namespace RSKinect
     [Serializable()]
     public class Vector3
     {
-        public float x { get; set; }
-        public float y { get; set; }
-        public float z { get; set; }
+        public float x;
+        public float y;
+        public float z;
 
         public Vector3()
         {
@@ -43,10 +43,10 @@ namespace RSKinect
     [Serializable()]
     public class KinectJoint
     {
-        public KinectJoints jointType { get; set; }
-        public Vector3 position { get; set; }
-        public Vector3 screenPos { get; set; }
-        public bool tracked { get; set; }
+        public KinectJoints jointType;
+        public Vector3 position;
+        public Vector3 screenPos;
+        public bool tracked;
 
         public KinectJoint()
         {
@@ -91,13 +91,13 @@ namespace RSKinect
     {
         public int numberOfJoints = 20;
 
-        public bool upToDate {get; internal set;}
-        public bool userPresent { get; internal set; }
+        public bool upToDate {get; set;}
+        public bool userPresent { get; set; }
         public int ID {get; private set;}
         public int playerNumber = 0;
         public int stationID = -1;
 
-        public List<KinectJoint> joints { get; private set; }
+        public List<KinectJoint> joints { get; set; }
 
         [NonSerialized()]
         private KinectSensor sensor;
@@ -113,12 +113,12 @@ namespace RSKinect
 
             sensor = null;
 
-            joints = new List<KinectJoint>();
-            for (int i = 0; i < numberOfJoints; ++i)
-            {
-                KinectJoint kj = new KinectJoint();
-                joints.Add(kj);
-            }
+            //joints = new List<KinectJoint>();
+            //for (int i = 0; i < numberOfJoints; ++i)
+            //{
+            //    KinectJoint kj = new KinectJoint();
+            //    joints.Add(kj);
+            //}
         }
 
         public KinectSkeleton( KinectSensor _sensor )
