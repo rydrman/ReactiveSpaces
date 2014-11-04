@@ -235,8 +235,8 @@ namespace RSNetworker
                             break;
                         case MessageType.Kinect:
                             KinectSkeleton skeleton = new KinectSkeleton();
-                            //skeleton = deserializeKinect(message.data);
                             skeleton = deserializeKinect(message.data);
+                            //skeleton = deserializeKinect(message.data);
                             processRemoteKinect(skeleton);
                             break;
                         default:
@@ -450,8 +450,8 @@ namespace RSNetworker
             {
                 SocketMessage msg = new SocketMessage();
                 msg.type = MessageType.Kinect;
-                msg.data = jSerializer.Serialize(s);
-                //msg.data = serializeKinect(s);
+                //msg.data = jSerializer.Serialize(s);
+                msg.data = serializeKinect(s);
 
                 string data = jSerializer.Serialize(msg);
                 byte[] messageBytes = Encoding.UTF8.GetBytes(data + "\0");
@@ -520,14 +520,14 @@ namespace RSNetworker
 
         KinectSkeleton deserializeKinect(string inData)
         {
-            return jSerializer.Deserialize<KinectSkeleton>(inData);
-            //BinaryFormatter formatter = new BinaryFormatter();
-            //MemoryStream memStream = new MemoryStream();
+            //return jSerializer.Deserialize<KinectSkeleton>(inData);
+            BinaryFormatter formatter = new BinaryFormatter();
+            MemoryStream memStream = new MemoryStream();
 
-            //byte[] bytes = Convert.FromBase64String(inData);
-            //memStream.Write(bytes, 0, bytes.Length);
+            byte[] bytes = Convert.FromBase64String(inData);
+            memStream.Write(bytes, 0, bytes.Length);
 
-            //return (KinectSkeleton)formatter.Deserialize(memStream);
+            return (KinectSkeleton)formatter.Deserialize(memStream);
         }
     }
 }

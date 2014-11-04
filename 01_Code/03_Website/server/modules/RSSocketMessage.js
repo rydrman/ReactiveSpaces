@@ -22,13 +22,15 @@ SocketMessage.prototype.SetFromIncoming = function(json)
     this.type = message.type;
     if(message.type != SocketMessage.types.KINECT)
         this.data = (message.data == null) ? null : JSON.parse(message.data);
+    else
+        this.data = message.data;
     return true;
     
 }
 
 SocketMessage.prototype.getJSON = function()
 {
-    var msg = {type:this.type, data:null};
+    var msg = {type:this.type, data:this.data};
     if(this.data != null && this.type != SocketMessage.types.KINECT)
         msg.data = JSON.stringify(this.data);
     
