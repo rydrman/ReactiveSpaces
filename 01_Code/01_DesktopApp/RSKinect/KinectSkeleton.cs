@@ -10,7 +10,7 @@ using System.Runtime.Serialization;
 namespace RSKinect
 {
     [Serializable()]
-    public class Vector3 : ISerializable
+    public class Vector3
     {
         public float x { get; set; }
         public float y { get; set; }
@@ -41,7 +41,7 @@ namespace RSKinect
     }
 
     [Serializable()]
-    public class KinectJoint : ISerializable
+    public class KinectJoint
     {
         public KinectJoints jointType { get; set; }
         public Vector3 position { get; set; }
@@ -87,7 +87,7 @@ namespace RSKinect
     }
 
     [Serializable()]
-    public class KinectSkeleton : ISerializable
+    public class KinectSkeleton
     {
         public int numberOfJoints = 20;
 
