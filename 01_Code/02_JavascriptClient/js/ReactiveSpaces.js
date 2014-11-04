@@ -192,6 +192,8 @@ RS.MessageRecieved = function(e)
                 }
                 break;
             case RS.MessageTypes.CUSTOM:
+                //one more level of abstraction...
+                message.data = JSON.parse(message.data);
                 var sender = null;
                 for(var i in RS.remotePlayers)
                 {
