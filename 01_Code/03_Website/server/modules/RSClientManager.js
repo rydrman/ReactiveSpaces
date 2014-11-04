@@ -137,9 +137,13 @@ ClientManager.prototype.removeClient = function( client )
     else
     {
         console.log("Error: Cannot remove client... not found");
+        this.closeAll();
+        process.exit();
+        
     }
     
     console.log("Clients Remaining: " + this.clients.length);
+    console.log("\n< ! ------------------------------>\n");
 }
 
 ClientManager.prototype.passCustomData = function(client, message)
@@ -175,3 +179,20 @@ ClientManager.prototype.passKinectData = function(client, message)
     }
 }
 
+ClientManager.prototype.closeAll = function()
+{
+    for(var i in this.clients)
+    {
+        this.clients[i].locked = true;
+    }
+    for(var i in this.clients)
+    {
+        try{
+            this.clients[i].socket.end();
+        }
+        catch(e)
+        {
+            console.log("Issue closing client " + this.clients[i].stationProfile.name + " (" + this.clients[i].id + ") -> " + e);
+        }
+    }
+}

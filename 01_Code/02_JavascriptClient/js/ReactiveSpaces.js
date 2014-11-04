@@ -24,6 +24,7 @@ RS.appInfo = {
 RS.socketSupported = false;
 RS.socket = null;
 RS.connected = false;
+//RS.userClosed = false;
 RS.lastMessage = new Date().getMilliseconds;
 
 //to keep skeletons
@@ -80,12 +81,8 @@ RS.Connect = function( appName, appVersion, port )
         return false;
     }
     
-    RS.socket = new WebSocket(RS.BASEURL + ":" + RS.LOCALPORT + "/ReactiveSpaces");
-    
-    RS.socket.onopen = RS.SocketOpened;
-    RS.socket.onclose = RS.SocketClosed;
-    RS.socket.onmessage = RS.MessageRecieved;
-    RS.socket.onerror = RS.SocketError;
+    //RS.userClosed = false;
+    RS.OpenSocket();
     
     //unload event
     var f = window.onbeforeunload;
@@ -95,21 +92,37 @@ RS.Connect = function( appName, appVersion, port )
         RS.Disconnect();
     }
     
+    
     return true;
 } 
+
+RS.OpenSocket = function()
+{
+    if(RS.connected || RS.socket != null)
+        return;
+    RS.socket = new WebSocket(RS.BASEURL + ":" + RS.LOCALPORT + "/ReactiveSpaces");
+    
+    RS.socket.onopen = RS.SocketOpened;
+    RS.socket.onclose = RS.SocketClosed;
+    RS.socket.onmessage = RS.MessageRecieved;
+    RS.socket.onerror = RS.SocketError;
+}
 
 RS.Disconnect = function()
 {
     if(null != RS.socket)
         RS.socket.close();
     RS.connected = false;
+    //RS.userClosed = true;
 }
 
 RS.SocketError = function(err)
 {
-    RS.messenger.display(Message.type.ERROR, "Web Socket Error", "See developer console (F12) for more information.");
+    RS.messenger.display(Message.type.ERROR, "Web Socket Error", "Trying to reconnect...");
     console.log(err);
     RS.connected = false;
+    //try reconnecting
+    //RS.OpenSocket();
 }
 
 RS.SocketOpened = function()
@@ -131,6 +144,9 @@ RS.SocketClosed = function()
     console.log("REACTIVE SPACES: disconnected from " + RS.socket.url);
     RS.socket = null;
     RS.connected = false;
+    
+    //if(!RS.userClosed)
+    //    RS.OpenSocket();
 }
 
 RS.MessageRecieved = function(e)
@@ -551,7 +567,7 @@ RS.MessageTypes = {
     REMOTE_KINECT: 3,
     PEER_CONNECT: 4,
     PEER_UPDATE: 5,
-    PEER_DISCONNNECT: 6
+    PEER_DISCONNECT: 6
 }
 
 //EVENT TYPES

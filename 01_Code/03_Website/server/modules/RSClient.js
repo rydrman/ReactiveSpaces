@@ -226,9 +226,9 @@ Client.prototype.onError = function(e)
     console.log("Exception caught ->" + e);
     console.log("Attempt to close connection...");
     //socket exception.. break it off
-    if(typeof(this.socket.close) == 'function')
+    if(typeof(this.socket.end) == 'function')
     {
-        this.socket.close();
+        this.socket.end();
         console.log("success");
     }
     else
