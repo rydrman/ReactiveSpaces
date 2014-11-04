@@ -136,7 +136,7 @@ ClientManager.prototype.removeClient = function( client )
     }
     else
     {
-        consol.log("Error: Cannot remove client... not found");
+        console.log("Error: Cannot remove client... not found");
     }
     
     console.log("Clients Remaining: " + this.clients.length);

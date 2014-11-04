@@ -190,6 +190,7 @@ namespace RSLocalhost
             }
 
             Disconnect();
+            System.Threading.Thread.Sleep(100);
             goto connectionStart;
         }
 

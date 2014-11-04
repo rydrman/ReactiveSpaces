@@ -34,16 +34,17 @@ function onSkeletonUpdated(skeleton)
     //RS.DrawSkeleton(ctx, skeleton);
 }
 
-function onRemoteSkeletonUpdated(peer, skeleton)
+function onRemoteSkeletonUpdated(player, skeleton)
 {
     //ctx.clearRect(0, 0, canvas.width, canvas.height);
     //RS.DrawSkeleton(ctx, skeleton);
     //debugger;
 }
 
-function onMessageRecieved(peer, data)
+function onMessageRecieved(player, data)
 {
-    console.log("custom message from: " + peer.name);
+    player.ball = data;
+    //console.log("custom message from: " + peer.name);
 }
 
 function update()
@@ -89,6 +90,16 @@ function render()
     }
     
     //draw remote balls
+    for(var i in RS.remotePlayers)
+    {
+        ctx.fillStyle = "#c94d02";
+        if(RS.remotePlayers.ball)
+        {
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, 20, 0, Math.PI*2, false);
+            ctx.fill();
+        }
+    }
     
     //draw local ball
     ctx.fillStyle = "#3cd0ff";

@@ -240,6 +240,7 @@ namespace RSNetworker
             }
 
             Disconnect();
+            System.Threading.Thread.Sleep(100);
             ConnectToServer();
             //reconnect
 
