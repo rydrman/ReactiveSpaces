@@ -1,5 +1,5 @@
-var Vector = function (posX, posY){
+var Vector = function (X, Y){
     
-    this.X = (typeof(posX) == 'undefined') ? 0 : posX;
-    this.Y = (typeof(posY) == 'undefined') ? 0 : posY; 
+    this.X = (typeof(X) == 'undefined') ? 0 : X;
+    this.Y = (typeof(Y) == 'undefined') ? 0 : Y; 
 }

@@ -18,7 +18,8 @@ function update()
     // update code here //
     game.update();
     //////////////////////
-    
+
+   // getMousePosition(Event);
     render();
 }
 
@@ -27,4 +28,9 @@ function render()
     // render code here //
     game.render();
     //////////////////////
+}
+
+function getMousePosition(Event) {
+   game.getMousePosition(Event);
+    
 }
