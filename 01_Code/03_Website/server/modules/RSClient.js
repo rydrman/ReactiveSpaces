@@ -156,6 +156,8 @@ Client.prototype.onData = function(json)
             continue;
         }
         
+        console.log("message recieved -> " + message.type);
+        
         switch(message.type)
         {    
             case SocketMessage.types.APP_INFO:

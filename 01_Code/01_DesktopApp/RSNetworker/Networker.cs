@@ -32,6 +32,8 @@ namespace RSNetworker
 
         //data to show
         Stopwatch kinectTimer;
+        bool socketInUse = false;
+        int socketTimeout = 1000;
         public StationProfile currentProfile;
         public List<StationProfile> currentPeers;
         AppInfo currentApp = null;
@@ -464,20 +466,35 @@ namespace RSNetworker
         bool SendMessage(SocketMessage message)
         {
             string src = jSerializer.Serialize(message);
-            byte[] msg = Encoding.UTF8.GetBytes(src);
+            byte[] msg = Encoding.UTF8.GetBytes(src + "\0");
 
             if (connected)
             {
                 try
                 {
+                    if(this.socketInUse)
+                    {
+                        Stopwatch timeout = new Stopwatch();
+                        timeout.Start();
+                        while(this.socketInUse)
+                        {
+                            if( timeout.ElapsedMilliseconds > socketTimeout )
+                            {
+                                Debug.WriteLine("socket timout...");
+                                return false;
+                            }
+                        }
+                    }
+                    this.socketInUse = true;
                     serverStream.Write(msg, 0, msg.Length);
+                    this.socketInUse = false;
                 }
                 catch (System.IO.IOException e)
                 {
                     //failure writing to stream
                     //or
                     //error writing to socket
-                    Console.Write("Failure writing to server socket. IO Exception.");
+                    Debug.WriteLine("Failure writing to server socket. IO Exception.");
                     Disconnect();
                     return false;
                 }
@@ -486,7 +503,7 @@ namespace RSNetworker
                     //stream is closed
                     //or
                     //failure reading from network
-                    Console.Write("Failure writing to server socket. Obj Disposed Exception.");
+                    Debug.WriteLine("Failure writing to server socket. Obj Disposed Exception.");
                     Disconnect();
                     return false;
                 }

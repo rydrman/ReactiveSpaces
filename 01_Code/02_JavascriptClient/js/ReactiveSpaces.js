@@ -129,7 +129,7 @@ RS.Disconnect = function()
 
 RS.SocketError = function(err)
 {
-    RS.messenger.display(Message.type.ERROR, "Web Socket Error", "Trying to reconnect...");
+    RS.messenger.display(Message.type.ERROR, "Web Socket Error", "Is the desktop app running?");
     console.log(err);
     RS.connected = false;
     //try reconnecting
