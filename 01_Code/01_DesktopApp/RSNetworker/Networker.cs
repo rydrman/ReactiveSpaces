@@ -242,15 +242,15 @@ namespace RSNetworker
                                 _onCustomDataRecieved(message.data);
                             break;
                         case MessageType.AddKinect:
-                            KinectSkeleton newSkeleton = jSerializer.Deserialize<KinectSkeleton>(inData);
+                            KinectSkeleton newSkeleton = jSerializer.Deserialize<KinectSkeleton>(message.data);
                             addRemoteKinect(newSkeleton);
                             break;
                         case MessageType.Kinect:
-                            KinectSkeleton skeleton = jSerializer.Deserialize<KinectSkeleton>(inData);
+                            KinectSkeleton skeleton = jSerializer.Deserialize<KinectSkeleton>(message.data);
                             processRemoteKinect(skeleton);
                             break;
                         case MessageType.RemoveKinect:
-                            KinectSkeleton oldSkeleton = jSerializer.Deserialize<KinectSkeleton>(inData);
+                            KinectSkeleton oldSkeleton = jSerializer.Deserialize<KinectSkeleton>(message.data);
                             addRemoteKinect(oldSkeleton);
                             break;
                         default:
