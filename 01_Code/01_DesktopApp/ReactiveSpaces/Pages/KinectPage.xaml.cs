@@ -88,6 +88,8 @@ namespace ReactiveSpaces
         }
         public void drawRemoteSkeleton(KinectSkeleton skeleton, Color color)//TODO //////////////////
         {
+            //todo
+            return;
             for (int i = 0; i < skeleton.numberOfJoints; ++i)
             {
                 Ellipse jointEllipse = new Ellipse();

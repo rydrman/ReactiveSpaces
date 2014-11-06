@@ -278,6 +278,7 @@ namespace RSLocalhost
 
         public void AddLocalKinect(KinectSkeleton s)
         {
+            networker.addLocalKinect(s);
             WebSocketMessage message = new WebSocketMessage();
             message.type = MessageType.LocalPlayerEnter;
             message.data = jSerializer.Serialize(s);
@@ -317,6 +318,7 @@ namespace RSLocalhost
 
         public void RemoveLocalKinect(KinectSkeleton s)
         {
+            networker.removeLocalKinect(s);
             WebSocketMessage message = new WebSocketMessage();
             message.type = MessageType.LocalPlayerExit;
             message.data = jSerializer.Serialize(s);

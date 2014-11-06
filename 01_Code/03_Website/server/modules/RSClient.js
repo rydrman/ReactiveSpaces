@@ -156,7 +156,7 @@ Client.prototype.onData = function(json)
             continue;
         }
         
-        console.log("message recieved -> " + message.type);
+        //console.log("message recieved -> " + message.type);
         
         switch(message.type)
         {    
