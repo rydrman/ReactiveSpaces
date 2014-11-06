@@ -129,7 +129,7 @@ RS.Disconnect = function()
 
 RS.SocketError = function(err)
 {
-    RS.messenger.display(Message.type.ERROR, "Web Socket Error", "Is the desktop app running?");
+    RS.messenger.display(Message.type.ERROR, "Web Socket Error: Is the desktop app running?", "Check Developper console for more information (F12)");
     console.log(err);
     RS.connected = false;
     //try reconnecting
@@ -148,13 +148,19 @@ RS.SocketOpened = function()
     RS.socket.send(JSON.stringify(msg) + "\0");
     
     console.log("REACTIVE SPACES: connected to " + RS.socket.url);
+    
+    RS.fireEvent(RS.Events.connect);
 }
 
 RS.SocketClosed = function()
 {
-    console.log("REACTIVE SPACES: disconnected from " + RS.socket.url);
     RS.socket = null;
-    RS.connected = false;
+    if(RS.connected)
+    {
+        RS.connected = false;
+        console.log("REACTIVE SPACES: disconnected from " + RS.socket.url);
+        RS.fireEvent(RS.Events.disconnect);
+    }
     
     //if(!RS.userClosed)
     //    RS.OpenSocket();
@@ -642,6 +648,9 @@ RS.MessageTypes = {
 //a simple list of event types
 //dispatched by ReactiveSpaces
 RS.Events = {
+    //connection
+    connect: 'connect',
+    disconnect: 'disconnect',
     //kinect
     localkinect: 'localkinect',
     remotekinect: 'remotekinect',

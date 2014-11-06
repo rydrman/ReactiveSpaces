@@ -311,6 +311,7 @@ namespace RSNetworker
             }
             if (server != null)
             {
+                server.GetStream().Close();
                 server.Close();
                 server = null;
             }

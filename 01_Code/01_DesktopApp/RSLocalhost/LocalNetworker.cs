@@ -218,6 +218,7 @@ namespace RSLocalhost
             }
             if(client != null)
             {
+                client.GetStream().Close();
                 client.Close();
                 client = null;
             }
