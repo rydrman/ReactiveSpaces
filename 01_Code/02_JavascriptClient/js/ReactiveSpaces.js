@@ -290,11 +290,11 @@ RS.RemoteSkeletonRecieved = function(skeleton)
         profile : null,
         skeleton : null
     };
-    for(var i in this.remotePlayers)
+    for(var i in this.remoteStations)
     {
-        if(this.remotePlayers[i].id == skeleton.stationID)
+        if(this.remoteStations[i].id == skeleton.stationID)
         {
-            result.profile = this.remotePlayers[i];
+            result.profile = this.remoteStations[i];
             result.skeleton = result.profile.players[skeleton.playerNumber];
             result.skeleton.Update( skeleton );
             
