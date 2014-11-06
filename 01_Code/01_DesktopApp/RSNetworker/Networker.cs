@@ -416,6 +416,7 @@ namespace RSNetworker
 
             foreach (KinectSkeleton s in currentProfile.players)
             {
+                if (!s.userPresent) continue;
                 SocketMessage message = new SocketMessage();
                 message.type = MessageType.Kinect;
                 message.data = jSerializer.Serialize(s);
