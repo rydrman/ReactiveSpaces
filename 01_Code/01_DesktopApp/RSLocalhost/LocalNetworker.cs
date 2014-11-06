@@ -30,6 +30,7 @@ namespace RSLocalhost
         public bool listeningChanged = false;
 
         Networker networker = null;
+        KinectManager kinectManager = null;
 
         JavaScriptSerializer jSerializer;
 
@@ -38,9 +39,8 @@ namespace RSLocalhost
 
         TcpClient client = null;
         NetworkStream stream = null;
-        bool streamReady = false;
 
-        public LocalNetworker(Networker net)
+        public LocalNetworker(Networker net, KinectManager kinMan)
         {
             jSerializer = new JavaScriptSerializer();
 
@@ -49,7 +49,13 @@ namespace RSLocalhost
             networker._onPeerAdded = addPeer;
             networker._onPeerUpdated = updatePeer;
             networker._onPeerRemoved = removePeer;
+            networker._onRemoteKinectAdded = AddRemoteKinect;
             networker._onRemoteKinectRecieved = UpdateRemoteKinect;
+            networker._onRemoteKinectRemoved = RemoveRemoteKinect;
+
+            kinectManager = kinMan;
+            kinectManager._onPlayerIn = AddLocalKinect;
+            kinectManager._onPlayerOut = RemoveLocalKinect;
 
             listener = new TcpListener(IPAddress.Any, 8080);
 
@@ -71,14 +77,12 @@ namespace RSLocalhost
             listening = true;
             listeningChanged = true;
 
-            streamReady = false;
             try
             {
                 client = listener.AcceptTcpClient();
                 listener.Stop();
                 listening = false;
                 listeningChanged = true;
-                connected = true;
             }
             catch
             {
@@ -87,18 +91,18 @@ namespace RSLocalhost
             }
             stream = client.GetStream();
 
-            while(connected && client != null && client.Connected)
+            while(!closing && client != null && client.Connected)
             {
                 try
                 {
-                    while (connected && stream != null && !stream.DataAvailable) ;
+                    while (!closing && stream != null && !stream.DataAvailable) ;
                 }
                 catch
                 {
                     break;
                 }
 
-                if (!connected || stream == null) break;
+                if (stream == null || closing) break;
 
                 byte[] bytes = new byte[client.Available];
                 stream.Read(bytes, 0, bytes.Length);
@@ -131,8 +135,10 @@ namespace RSLocalhost
                     byte[] responseBytes = Encoding.UTF8.GetBytes( response );
 
                     stream.Write(responseBytes, 0, responseBytes.Length);
-                    streamReady = true;
                     connected = true;
+                    System.Threading.Thread.Sleep(100);
+                    //send current profile
+                    UpdateProfile(networker.currentProfile);
                 }
                 else
                 {
@@ -199,7 +205,7 @@ namespace RSLocalhost
             if (listenThread == null)
                 StartListenerThread();
             else
-                connected = false;
+                Disconnect();
         }
 
         public void Disconnect()
@@ -209,7 +215,6 @@ namespace RSLocalhost
             {
                 stream.Close();
                 stream = null;
-                streamReady = false;
             }
             if(client != null)
             {
@@ -223,27 +228,22 @@ namespace RSLocalhost
             newAppInfo = true;
         }
 
+        public void UpdateProfile(StationProfile profile)
+        {
+            WebSocketMessage message = new WebSocketMessage();
+            message.type = MessageType.StationProfile;
+            message.data = jSerializer.Serialize(profile);
+
+            SendMessage(message);
+        }
+
         public void addPeer(StationProfile peer)
         {
             WebSocketMessage message = new WebSocketMessage();
             message.type = MessageType.PeerConnect;
             message.data = jSerializer.Serialize(peer);
 
-            string msgString = jSerializer.Serialize(message);
-            byte[] bytes = CreateMessage(msgString);
-
-            if(connected && null != stream)
-            {
-                try
-                {
-                    stream.Write(bytes, 0, bytes.Length);
-                }
-                catch(System.IO.IOException e)
-                {
-                    Disconnect();
-                }
-            }
-
+            SendMessage(message);
         }
 
         public void updatePeer(StationProfile peer)
@@ -252,20 +252,7 @@ namespace RSLocalhost
             message.type = MessageType.PeerUpdate;
             message.data = jSerializer.Serialize(peer);
 
-            string msgString = jSerializer.Serialize(message);
-            byte[] bytes = CreateMessage(msgString);
-
-            if (connected && null != stream)
-            {
-                try
-                {
-                    stream.Write(bytes, 0, bytes.Length);
-                }
-                catch (System.IO.IOException e)
-                {
-                    Disconnect();
-                }
-            }
+            SendMessage(message);
         }
 
         public void removePeer(StationProfile peer)
@@ -274,20 +261,7 @@ namespace RSLocalhost
             message.type = MessageType.PeerDisconnect;
             message.data = jSerializer.Serialize(peer);
 
-            string msgString = jSerializer.Serialize(message);
-            byte[] bytes = CreateMessage(msgString);
-
-            if (connected && null != stream)
-            {
-                try
-                {
-                    stream.Write(bytes, 0, bytes.Length);
-                }
-                catch (System.IO.IOException e)
-                {
-                    Disconnect();
-                }
-            }
+            SendMessage(message);
         }
 
         public void RecieveCustomData(string data)
@@ -297,61 +271,76 @@ namespace RSLocalhost
             message.type = MessageType.Custom;
             message.data = data;
 
-            string json = jSerializer.Serialize(message) + "\0";
-            byte[] bytes = CreateMessage(json);
-
-            if (connected && stream != null)
-            {
-                try
-                {
-                    stream.Write(bytes, 0, bytes.Length);
-                }
-                catch (Exception e)//System.IO.IOException e)
-                {
-                    Disconnect();
-                }
-            }
+            SendMessage(message);
         }
 
-        public void UpdateLocalKinect(KinectSkeleton newSkeleton)
+        #region Kinect Updaters
+
+        public void AddLocalKinect(KinectSkeleton s)
         {
-            if (!streamReady || client == null || !client.Connected)
-                return;
-
             WebSocketMessage message = new WebSocketMessage();
-            message.type = MessageType.Kinect;
-            message.data = jSerializer.Serialize(newSkeleton);
+            message.type = MessageType.LocalPlayerEnter;
+            message.data = jSerializer.Serialize(s);
 
-            string src = jSerializer.Serialize(message);
-            byte[] msg = CreateMessage(src + "\0");
+            SendMessage(message);
+        }
 
-            if (connected && null != stream)
+        public void AddRemoteKinect(KinectSkeleton s)
+        {
+            WebSocketMessage message = new WebSocketMessage();
+            message.type = MessageType.RemotePlayerEnter;
+            message.data = jSerializer.Serialize(s);
+
+            SendMessage(message);
+        }
+
+        public void UpdateLocalKinect(KinectSkeleton[] skeletons)
+        {
+            foreach (KinectSkeleton skeleton in skeletons)
             {
-                try
-                {
-                    stream.Write(msg, 0, msg.Length);
-                }
-                catch (System.IO.IOException e)
-                {
-                    Disconnect();
-                }
+                WebSocketMessage message = new WebSocketMessage();
+                message.type = MessageType.Kinect;
+                message.data = jSerializer.Serialize(skeleton);
+
+                SendMessage(message);
             }
-            
         }
 
         public void UpdateRemoteKinect(KinectSkeleton remoteSkeleton)
         {
-            if (!streamReady || client == null || !client.Connected)
-                return;
-
             WebSocketMessage message = new WebSocketMessage();
             message.type = MessageType.RemoteKinect;
             message.data = jSerializer.Serialize(remoteSkeleton);
 
+            SendMessage(message);
+        }
+
+        public void RemoveLocalKinect(KinectSkeleton s)
+        {
+            WebSocketMessage message = new WebSocketMessage();
+            message.type = MessageType.LocalPlayerExit;
+            message.data = jSerializer.Serialize(s);
+
+            SendMessage(message);
+        }
+
+        public void RemoveRemoteKinect(KinectSkeleton s)
+        {
+            WebSocketMessage message = new WebSocketMessage();
+            message.type = MessageType.RemotePlayerExit;
+            message.data = jSerializer.Serialize(s);
+
+            SendMessage(message);
+        }
+
+        #endregion
+
+        private bool SendMessage(WebSocketMessage message)
+        {
             string src = jSerializer.Serialize(message);
             byte[] msg = CreateMessage(src + "\0");
 
-            if (connected && null != stream)
+            if (connected)
             {
                 try
                 {
@@ -359,9 +348,24 @@ namespace RSLocalhost
                 }
                 catch (System.IO.IOException e)
                 {
+                    //failure writing to stream
+                    //or
+                    //error writing to socket
+                    Console.Write("Failure writing to web socket. IO Exception.");
                     Disconnect();
+                    return false;
+                }
+                catch(ObjectDisposedException e)
+                {
+                    //stream is closed
+                    //or
+                    //failure reading from network
+                    Console.Write("Failure writing to web socket. Obj Disposed Exception.");
+                    Disconnect();
+                    return false;
                 }
             }
+            return true;
         }
 
         //takes 4 DeriveBytes as Encoding keys

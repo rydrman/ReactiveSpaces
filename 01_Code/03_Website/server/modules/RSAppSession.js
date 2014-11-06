@@ -68,7 +68,7 @@ AppSession.prototype.removePeer = function( client )
     return true;
 }
 
-AppSession.prototype.passCustomData = function( clientFrom, message )
+AppSession.prototype.passData = function( clientFrom, message )
 {
     var index = -1;
     for(var i in this.peers)
@@ -86,30 +86,7 @@ AppSession.prototype.passCustomData = function( clientFrom, message )
     for(var i in this.peers)
     {
         if(i == index) continue;
-        this.peers[i].sendCustomData( message );
-    }
-    return true;
-}
-
-AppSession.prototype.passKinectData = function( clientFrom, message )
-{
-    var index = -1;
-    for(var i in this.peers)
-    {
-        if(this.peers[i].id == clientFrom.id)
-            index = i;
-    }
-    
-    if(index == -1)
-    {
-        console.log("!! peer not found in this session");
-        return false;
-    }
-    
-    for(var i in this.peers)
-    {
-        if(i == index) continue;
-        this.peers[i].sendKinectData( message );
+        this.peers[i].sendData( message );
     }
     return true;
 }

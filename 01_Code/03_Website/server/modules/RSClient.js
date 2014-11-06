@@ -8,6 +8,8 @@ var Client = module.exports = function(socket)
     this.locked = false;
     this.sendTimeout = 1000;
     
+    this.lostMessages = 0;
+    
     this.session = null;
     
     this.stationProfile = {
@@ -27,6 +29,7 @@ var Client = module.exports = function(socket)
     this.onAppConnected = null;
     this.onAppDisconnected = null;
     this.onCustomData = null;
+    this.passData = null;
     
     var self = this;
     socket.on('end', function(){self.onDisconnect.call(self)});
@@ -95,15 +98,8 @@ Client.prototype.removePeer = function( profile )
     this.trySend(string);
 }
 
-Client.prototype.sendCustomData = function( message )
+Client.prototype.sendData = function( message )
 {
-    var string = message.getJSON();
-    this.trySend(string);
-}
-
-Client.prototype.sendKinectData = function( message )
-{
-    
     var string = message.getJSON();
     this.trySend(string);
 }
@@ -147,9 +143,15 @@ Client.prototype.onData = function(json)
 
         if(!success)
         {
-
-            this.messagePiece = messages[i];
-            //console.log("piece stored"); 
+            if(parseInt(i) == messages.length-1)
+            {
+                this.messagePiece = messages[i];
+            }
+            else
+            {
+                this.lostMessages++;
+                console.log("message lost -> " + this.lostMessages); 
+            }
             
             continue;
         }
@@ -179,13 +181,14 @@ Client.prototype.onData = function(json)
                     userData: message.data
                 }
                 message.data = JSON.stringify(newData);
-                if(this.onCustomData != null)
-                    this.onCustomData(this, message);
-                continue;
+                //continue onto pass data
                 
+            case SocketMessage.types.ADD_KINECT:
             case SocketMessage.types.KINECT:
-                if(this.onKinectData != null)
-                    this.onKinectData(this, message);
+            case SocketMessage.types.REMOVE_KINECT:
+                
+                if(this.passData != null)
+                    this.passData(this, message);
                 continue;
                 
             default:

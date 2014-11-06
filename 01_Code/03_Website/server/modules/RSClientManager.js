@@ -30,12 +30,9 @@ ClientManager.prototype.addClient = function( socket )
     newClient.onAppDisconnected = function(client){
         self.unmatchClient.call(self, client);
     };
-    newClient.onCustomData = function(client, message){
-        self.passCustomData.call(self, client, message);
-    };
-    newClient.onKinectData = function(client, message){
-        self.passKinectData.call(self, client, message);
-    };
+    newClient.passData = function(client, message){
+        self.passData.call(self, client, message);
+    }
     this.clients.push( newClient );
     
     console.log("Client Connected " + newClient.socket.remoteAddress + ":" + newClient.socket.remotePort);
@@ -156,37 +153,20 @@ ClientManager.prototype.removeClient = function( client )
     console.log("\n< ! ------------------------------>\n");
 }
 
-ClientManager.prototype.passCustomData = function(client, message)
+ClientManager.prototype.passData = function(client, message)
 {
     if(client.session == null)
     {
-        //console.log("!! Custom Data but no session??");
         return;
     }
     
-    var result = client.session.passCustomData(client, message);
+    var result = client.session.passData(client, message);
     if(false == result)
     {
         client.session = null;
         this.matchClient(client);
     }
     
-}
-
-ClientManager.prototype.passKinectData = function(client, message)
-{
-    if(client.session == null)
-    {
-        //console.log("!! Custom Data but no session??");
-        return;
-    }
-    
-    var result = client.session.passKinectData(client, message);
-    if(false == result)
-    {
-        client.session = null;
-        this.matchClient(client);
-    }
 }
 
 ClientManager.prototype.closeAll = function()

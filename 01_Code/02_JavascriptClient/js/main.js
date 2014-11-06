@@ -17,28 +17,75 @@ function onLoad()
     ball = {x: Math.random() * canvas.width, y: Math.random() * canvas.height,
            speedX: 50, speedY: 50};
     
-    RS.addEventListener("localskeleton", onSkeletonUpdated);
-    RS.addEventListener("remoteskeleton", onRemoteSkeletonUpdated);
-    RS.addEventListener("messagerecieved", onMessageRecieved);
+    //listeners for everything
+    RS.addEventListener(RS.Events.localkinect, onSkeletonUpdated);
+    RS.addEventListener(RS.Events.remotekinect, onRemoteSkeletonUpdated);
+    //custom
+    RS.addEventListener(RS.Events.message, onMessageRecieved);
+    //station / session
+    RS.addEventListener(RS.Events.stationlocal, onLocalProfile);
+    RS.addEventListener(RS.Events.stationconnect, onRemoteConnect);
+    RS.addEventListener(RS.Events.stationupdate, onRemoteProfile);
+    RS.addEventListener(RS.Events.stationdisconnect, onRemoteDisconnect);
+    //players
+    RS.addEventListener(RS.Events.localplayerenter, localEnter);
+    RS.addEventListener(RS.Events.localplayerexit, localExit);
+    RS.addEventListener(RS.Events.remoteplayerenter, remoteEnter);
+    RS.addEventListener(RS.Events.remoteplayerexit, remoteExit);
     
     RS.ActivateMessenger();
     
     RS.Connect("My App", 1.0);
 }
 
+function onLocalProfile(profile)
+{
+    console.log('local profile recieved');
+    console.log(profile);
+}
+
+function onRemoteConnect(profile)
+{
+    console.log('remote profile connected');
+    console.log(profile);
+}
+
+function onRemoteProfile(profile)
+{
+    console.log('remote profile recieved');
+    console.log(profile);
+}
+
+function onRemoteDisconnect(profile)
+{
+    console.log('remote profile disconnected');
+    console.log(profile);
+}
+
+function localEnter(profile, skeleton)
+{
+    console.log("local entered");
+}
+function localExit(profile, skeleton)
+{
+    console.log("local exited");
+}
+
+function remoteEnter(profile, skeleton)
+{
+    console.log("remote entered");
+}
+function remoteExit(profile, skeleton)
+{
+    console.log("remote exited");
+}
+
 function onSkeletonUpdated(skeleton)
 {
-    //if(!e) e = window.event;
-    
-    //ctx.clearRect(0, 0, canvas.width, canvas.height);
-    //RS.DrawSkeleton(ctx, skeleton);
 }
 
 function onRemoteSkeletonUpdated(player, skeleton)
 {
-    //ctx.clearRect(0, 0, canvas.width, canvas.height);
-    //RS.DrawSkeleton(ctx, skeleton);
-    //debugger;
 }
 
 function onMessageRecieved(player, data)
@@ -110,17 +157,19 @@ function render()
     ctx.fill();
     
     //draw local skeleton
-    if(RS.player1.userPresent)
-        RS.DrawSkeleton(ctx, RS.player1);
-    if(RS.player2.userPresent)
-        RS.DrawSkeleton(ctx, RS.player2);
+    for(var i in RS.players)
+    {
+        if(RS.players[i].userPresent)
+            RS.DrawSkeleton(ctx, RS.players[i]);
+    }
     
     for(var i in RS.remotePlayers)
     {
-        if(RS.remotePlayers[i].player1.userPresent)
-            RS.DrawSkeleton(ctx, RS.remotePlayers[i].player1);
-        if(RS.remotePlayers[i].player2.userPresent)
-            RS.DrawSkeleton(ctx, RS.remotePlayers[i].player2);
+        for(var j in RS.remotePlayers[i].players)
+        {
+            if(RS.remotePlayers[i].players[j].userPresent)
+                RS.DrawSkeleton(ctx, RS.remotePlayers[i].players[j], "#7bccff");
+        }
     }
     
     //////////////////////

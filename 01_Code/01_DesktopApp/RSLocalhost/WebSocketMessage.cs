@@ -14,9 +14,14 @@ namespace RSLocalhost
         Custom,
         Kinect,
         RemoteKinect,
+        StationProfile,
         PeerConnect,
         PeerUpdate,
-        PeerDisconnect
+        PeerDisconnect,
+        LocalPlayerEnter,
+        LocalPlayerExit,
+        RemotePlayerEnter,
+        RemotePlayerExit
     }
 
     class WebSocketMessage

@@ -5,15 +5,23 @@ using System.Text;
 //using System.Threading.Tasks;
 using System.Windows.Media;
 using Microsoft.Kinect;
+using System.Diagnostics;
 
 namespace RSKinect
 {
     public class KinectManager
     {
+        public static int SUPPORTED_PLAYERS = 2;
+
         public bool statusChanged = false;
         public bool connected = false;
         public string status = "";
         public Brush statusBrush = Brushes.Red;
+
+        public delegate void OnPlayerOut(KinectSkeleton player);
+        public delegate void OnPlayerIn(KinectSkeleton player);
+        public OnPlayerIn _onPlayerIn = null;
+        public OnPlayerOut _onPlayerOut = null;
 
         public bool colorStream {get; private set;}
         public bool depthStream { get; private set; }
@@ -29,8 +37,7 @@ namespace RSKinect
         public bool isNewSkeletonFrame;
 
         //actual exposed skeletons
-        public KinectSkeleton playerOne { get; private set; }
-        public KinectSkeleton playerTwo { get; private set; }
+        public KinectSkeleton[] players { get; private set; }
 
         //exposed textures of image streams
         //public Texture2D colorFrame { get; private set; }
@@ -45,8 +52,7 @@ namespace RSKinect
             lastDepthFrame = null;
             lastSkeletons = new Skeleton[6];
 
-            playerOne = null;
-            playerTwo = null;
+            players = new KinectSkeleton[SUPPORTED_PLAYERS];
         }
 
         //attempts to access kinect
@@ -91,10 +97,11 @@ namespace RSKinect
                         statusBrush = Brushes.Red;
                         return false;
                     }
-                    playerOne = new KinectSkeleton( sensor );
-                    playerTwo = new KinectSkeleton( sensor );
-                    playerOne.playerNumber = 1;
-                    playerTwo.playerNumber = 2;
+                    for (int i = 0; i < players.Length; ++i)
+                    {
+                        players[i] = new KinectSkeleton( sensor );
+                        players[i].playerNumber = i;
+                    }
 
                     status = "Connected";
                     statusBrush = Brushes.Green;
@@ -204,46 +211,70 @@ namespace RSKinect
 
         void onSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
+            
             using(SkeletonFrame newFrame = e.OpenSkeletonFrame())
             {
                 if (newFrame == null) return;
 
                 newFrame.CopySkeletonDataTo(lastSkeletons);
-                isNewSkeletonFrame = true;
-                playerOne.upToDate = false;
-                playerTwo.upToDate = false;
 
-                //first pass
-                for (var i = 0; i < 6; ++i)
+                //first set them to out of date
+                foreach (KinectSkeleton s in players)
                 {
-                    if (playerOne.upToDate == false
-                        && lastSkeletons[i].TrackingId == playerOne.ID)
+                    s.upToDate = false;
+                }
+
+                //go through each skeleton
+                foreach (Skeleton skeleton in lastSkeletons)
+                {
+                    //match with existing
+                    foreach (KinectSkeleton s in players)
                     {
-                        playerOne.copyDataFrom(lastSkeletons[i], 1);
-                    }
-                    else if (playerTwo.upToDate == false
-                        && lastSkeletons[i].TrackingId == playerTwo.ID)
-                    {
-                        playerTwo.copyDataFrom(lastSkeletons[i], 2);
+                        //tracked and tracked, update it
+                        if (skeleton.TrackingId == s.ID
+                            && s.userPresent && skeleton.TrackingState == SkeletonTrackingState.Tracked)
+                        {
+                            s.upToDate = true;
+                            s.copyDataFrom(skeleton);
+                            break;
+                        }
+                        //if it's going to untracked, fire event
+                        else if (skeleton.TrackingId == s.ID
+                            && s.userPresent && skeleton.TrackingState != SkeletonTrackingState.Tracked)
+                        {
+                            s.userPresent = false;
+                            s.upToDate = true;
+                            if (_onPlayerOut != null)
+                                _onPlayerOut(s);
+                            break;
+                        }
+                        //if it's going to tracked, fire event
+                        else if (!s.userPresent && skeleton.TrackingState == SkeletonTrackingState.Tracked)
+                        {
+                            s.upToDate = true;
+                            s.copyDataFrom(skeleton);
+                            if (_onPlayerIn != null)
+                                _onPlayerIn(s);
+                            break;
+                        }
                     }
                 }
-                //second pass fo updating
-                for (var i = 0; i < 6; ++i)
+                //once more to check for lost skeletons
+                foreach (KinectSkeleton s in players)
                 {
-                    if (playerOne.upToDate == false
-                        && lastSkeletons[i].TrackingState == SkeletonTrackingState.Tracked
-                        && lastSkeletons[i].TrackingId != playerTwo.ID)
+                    //if it's still up to date we didn't see the ID and
+                    //it's gone out of frame
+                    if (s.userPresent && !s.upToDate)
                     {
-                        playerOne.copyDataFrom(lastSkeletons[i], 1);
-                    }
-                    else if (playerOne.upToDate == false
-                        && lastSkeletons[i].TrackingState == SkeletonTrackingState.Tracked
-                        && lastSkeletons[i].TrackingId != playerOne.ID)
-                    {
-                        playerTwo.copyDataFrom(lastSkeletons[i], 2);
+                        s.userPresent = false;
+                        s.upToDate = false;
+                        if (_onPlayerOut != null)
+                            _onPlayerOut(s);
                     }
                 }
+                isNewSkeletonFrame = true;
             }
+            //Debug.WriteLine(string.Format("{0}, {1}, {2}, {3}, {4}, {5}", lastSkeletons[0].TrackingId, lastSkeletons[1].TrackingId, lastSkeletons[2].TrackingId, lastSkeletons[3].TrackingId, lastSkeletons[4].TrackingId, lastSkeletons[5].TrackingId));
         }
         void onDepthFrameReady(object sender, DepthImageFrameReadyEventArgs e)
         {

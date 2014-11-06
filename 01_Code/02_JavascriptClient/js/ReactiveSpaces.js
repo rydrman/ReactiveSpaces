@@ -12,6 +12,7 @@ window.RS = window.ReactiveSpaces = {version: 0.1};
 RS.BASEURL = "ws://localhost";
 RS.LOCALPORT = 8080;
 RS.MESSAGE_DELAY = 100;
+RS.SUPORTED_PLAYERS = 2;
 
 //app info
 RS.appInfo = {
@@ -27,9 +28,12 @@ RS.connected = false;
 //RS.userClosed = false;
 RS.lastMessage = new Date().getMilliseconds;
 
+//to keep station profiles
+RS.station = null;
+RS.remoteStations = [];
+
 //to keep skeletons
-RS.player1;
-RS.player2;
+RS.players = [];
 RS.remotePlayers = [];
 
 //to store event listeners
@@ -70,9 +74,16 @@ RS.Connect = function( appName, appVersion, port )
     if(typeof(port) != 'undefined') RS.LOCALPORT = port;
 
     //set/reset
-    RS.player1 = new RS.Skeleton();
-    RS.player2 = new RS.Skeleton();
+    RS.players = [];
+    for(var i = 0; i < RS.SUPORTED_PLAYERS; ++i)
+    {
+        RS.players[i] = new RS.Skeleton();
+        RS.players[i].playerNumber = i;
+    }
     RS.remotePlayers = [];
+    
+    RS.station = new RS.StationProfile();
+    RS.remoteStations = [];
     
     //check for support
     if(!RS.socketSupported)
@@ -175,11 +186,19 @@ RS.MessageRecieved = function(e)
         
         switch(message.type)
         {
+                
+            //// LOCAL DATA ////
+            case RS.MessageTypes.STATION_PROFILE:
+                RS.station.Update( message.data );
+                RS.fireEvent(RS.Events.stationlocal, RS.station);
+                break;
+                
+            //// PEER DATA ////
+                
             case RS.MessageTypes.PEER_CONNECT:
-                message.data.player1 = new RS.Skeleton();
-                message.data.player2 = new RS.Skeleton();
-                RS.remotePlayers.push(message.data);
-                RS.fireEvent(RS.EventTypes.playerjoined, message.data);
+                var newStation = new RS.StationProfile();
+                newStation.Update(message.data);
+                RS.fireEvent(RS.Events.stationconnect, newStation);
                 break;
             case RS.MessageTypes.PEER_UPDATE:
                 for(var i in RS.remotePlayers)
@@ -189,7 +208,7 @@ RS.MessageRecieved = function(e)
                         RS.remotePlayers[i].name = message.data.name;
                         RS.remotePlayers[i].location = message.data.location;
                     }
-                    RS.fireEvent(RS.EventTypes.playerupdated, RS.remotePlayers[i]);
+                    RS.fireEvent(RS.Events.stationupdate, RS.remotePlayers[i]);
                     break;
                 }
                 break;
@@ -200,11 +219,14 @@ RS.MessageRecieved = function(e)
                     {
                         var player = RS.remotePlayers[i];
                         RS.remotePlayers.splice(i, 1);
-                        RS.fireEvent(RS.EventTypes.playerleft, player);
+                        RS.fireEvent(RS.Events.stationdisconnect, player);
                         break;
                     }
                 }
                 break;
+                 
+            //// CUSTOM MESSAGES ////
+                
             case RS.MessageTypes.CUSTOM:
                 //one more level of abstraction...
                 message.data = JSON.parse(message.data);
@@ -215,67 +237,68 @@ RS.MessageRecieved = function(e)
                         sender = RS.remotePlayers[i];
                 }
                 if(sender != null)
-                    RS.fireEvent(RS.EventTypes.messagerecieved, sender, message.data.userData);
+                    RS.fireEvent(RS.Events.message, sender, message.data.userData);
                 break;
+                
+            //// KINECT DATA ////
+                
+            case RS.MessageTypes.LOCAL_PLAYER_ENTER:
+                var result = RS.SkeletonRecieved(message.data);
+                RS.fireEvent(RS.Events.localplayerenter, result.profile, result.skeleton);
+                break;
+            case RS.MessageTypes.REMOTE_PLAYER_ENTER:
+                var result = RS.RemoteSkeletonRecieved(message.data);
+                RS.fireEvent(RS.Events.remoteplayerenter, result.profile, result.skeleton);
+                break;
+                
             case RS.MessageTypes.KINECT:
                 RS.SkeletonRecieved(message.data);
                 break;
             case RS.MessageTypes.REMOTE_KINECT:
                 RS.RemoteSkeletonRecieved(message.data);
                 break;
+                
+            case RS.MessageTypes.LOCAL_PLAYER_EXIT:
+                var result = RS.SkeletonRecieved(message.data);
+                RS.fireEvent(RS.Events.localplayerexit, result.profile, result.skeleton);
+                break;
+            case RS.MessageTypes.REMOTE_PLAYER_EXIT:
+                var result = RS.RemoteSkeletonRecieved(message.data);
+                RS.fireEvent(RS.Events.remoteplayerexit, result.profile, result.skeleton);
+                break;
+            
+                
             default:
-                RS.messenger.display(Message.type.WARNING, "Unkown Message Type Recieved");
+                RS.messenger.display(Message.type.WARNING, "Unkown Message Type Recieved -> " + message.type);
         }
     }
 }
 
 RS.SkeletonRecieved = function(skeleton)
 {
-    //remember updated skeleton
-    var updated = null;
+    var result = {};
+    result.profile = RS.station;
+    result.skeleton = RS.players[skeleton.playerNumber];
+    result.skeleton.Update( skeleton );
     
-    //local skeleton updates
-    if(skeleton.playerNumber == 1)
-    {
-        RS.player1.Update( skeleton );
-        updated = RS.player1;
-    }
-    else if(skeleton.playerNumber == 2)
-    {
-        RS.player2.Update( skeleton );
-        updated = RS.player2;
-    }
-    
-    //if nothing happened we're done
-    //TODO should raise warning or error
-    if(null == updated) return;
-    
-    //dispatch event to all listeners
-    RS.fireEvent(RS.EventTypes.localskeleton, updated);
+    return result;
 }
 
 RS.RemoteSkeletonRecieved = function(skeleton)
 {
+    var result = {
+        profile : null,
+        skeleton : null
+    };
     for(var i in this.remotePlayers)
     {
-        var player, updated = null;
         if(this.remotePlayers[i].id == skeleton.stationID)
         {
-            player = this.remotePlayers[i];
-            if(skeleton.playerNumber == 1)
-            {
-                player.player1.Update( skeleton );
-                updated = player.player1;
-            }
-            else if(skeleton.playerNumber == 2)
-            {
-                player.player2.Update( skeleton );
-                updated = player.player2;
-            }
-            if(null == updated) return;
+            result.profile = this.remotePlayers[i];
+            result.skeleton = result.profile.players[skeleton.playerNumber];
+            result.skeleton.Update( skeleton );
             
-            //dispatch event to all listeners
-            RS.fireEvent(RS.EventTypes.remoteskeleton, player, updated);
+            return result
         }
     }
 }
@@ -287,17 +310,17 @@ RS.ActivateMessenger = function()
 
 RS.addEventListener = function(event, callback)
 {
-    var eventType = RS.EventTypes[event];
-    if(typeof(eventType) == 'undefined')
-        RS.messenger.display(Message.type.WARNING, "Event type not valid for Reactive Spaces", "Make sure you use the RS.EventTypes enumerator");
+    if(typeof(RS.Events[event]) == 'undefined')
+        RS.messenger.display(Message.type.WARNING, "Event type '" + event + "' not valid for Reactive Spaces", "Make sure you use the RS.Events enumerator");
     
-    if(typeof(RS.listeners[eventType]) == 'undefined')
-        RS.listeners[eventType] = [];
-    RS.listeners[eventType].push(callback);
+    if(typeof(RS.listeners[event]) == 'undefined')
+        RS.listeners[event] = [];
+    RS.listeners[event].push(callback);
 }
 
 RS.removeEventListener = function(event, callback)
 {
+    //TODO
 }
 
 RS.fireEvent = function(eventType, data, data2)
@@ -334,6 +357,26 @@ RS.Send = function( object )
 //////////////////////////////////////////////////////
 ////                    Types                     ////
 //////////////////////////////////////////////////////
+
+RS.StationProfile = function()
+{
+    this.name = "unset";
+    this.location = "unset";
+    this.id = -1;
+    
+    this.players =[];
+}
+RS.StationProfile.prototype.Update = function( profile )
+{
+    this.name = profile.name;
+    this.location = profile.location;
+    this.id = profile.id;
+}
+RS.StationProfile.prototype.UpdatePlayer = function( player )
+{
+    //todo blending
+    this.players[player.playerNumber] = player;
+}
 
 //SKELETON
 //Describes the Skeleton object that ReactiveSpaces
@@ -565,19 +608,33 @@ RS.MessageTypes = {
     CUSTOM: 1,
     KINECT: 2,
     REMOTE_KINECT: 3,
-    PEER_CONNECT: 4,
-    PEER_UPDATE: 5,
-    PEER_DISCONNECT: 6
+    STATION_PROFILE: 4,
+    PEER_CONNECT: 5,
+    PEER_UPDATE: 6,
+    PEER_DISCONNECT: 7,
+    LOCAL_PLAYER_ENTER: 8,
+    LOCAL_PLAYER_EXIT: 9,
+    REMOTE_PLAYER_ENTER: 10,
+    REMOTE_PLAYER_EXIT: 11,
 }
 
 //EVENT TYPES
 //a simple list of event types
 //dispatched by ReactiveSpaces
-RS.EventTypes = {
-    localskeleton: 0,
-    remoteskeleton: 1,
-    messagerecieved: 2,
-    playerjoined: 3,
-    playerupdated: 4,
-    playerleft: 5
+RS.Events = {
+    //kinect
+    localkinect: 'localkinect',
+    remotekinect: 'remotekinect',
+    //custom
+    message: 'message',
+    //station / session
+    stationlocal: 'stationlocal',
+    stationconnect: 'stationconnect',
+    stationupdate: 'stationupdate',
+    stationdisconnect: 'stationdisconnect',
+    //players
+    localplayerenter: 'localplayerenter',
+    localplayerexit: 'localplayerexit',
+    remoteplayerenter: 'remoteplayerenter',
+    remoteplayerexit: 'remoteplayerexit'
 }

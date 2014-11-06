@@ -48,10 +48,11 @@ namespace ReactiveSpaces
             kinectPage = new KinectPage();
             networkPage = new NetworkPage();
 
-            networker = new Networker();
-            localNet = new LocalNetworker(networker);
-
             kinectManager = new KinectManager();
+
+            networker = new Networker();
+            localNet = new LocalNetworker(networker, kinectManager);
+
             kinectManager.InitializeKinect(false, false, true);
 
             timer = new DispatcherTimer();
@@ -127,20 +128,16 @@ namespace ReactiveSpaces
             //if theres a new frame
             if(kinectManager.isNewSkeletonFrame)
             {
-                //get the skeletons
-                List<KinectSkeleton> skeletons = new List<KinectSkeleton>();
-                skeletons.Add(kinectManager.playerOne);
-                skeletons.Add(kinectManager.playerTwo);
 
                 //draw them in the app
-                kinectPage.drawLocalSkeletons(skeletons);
+                kinectPage.drawLocalSkeletons(kinectManager.players);
                 kinectManager.isNewSkeletonFrame = false;
 
                 //send to json locally
-                localNet.UpdateLocalKinect(skeletons.ElementAt(0));
+                localNet.UpdateLocalKinect(kinectManager.players);
 
                 //send to peers
-                networker.updateLocalKinect(kinectManager.playerOne, kinectManager.playerTwo);    
+                networker.updateLocalKinect(kinectManager.players);    
             }
         }
 

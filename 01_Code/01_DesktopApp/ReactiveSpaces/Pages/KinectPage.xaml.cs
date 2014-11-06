@@ -43,9 +43,9 @@ namespace ReactiveSpaces
             kinectStatus.Foreground = color;
         }
 
-        public void drawLocalSkeletons(List<KinectSkeleton> skeletons)
+        public void drawLocalSkeletons(KinectSkeleton[] skeletons)
         {
-            byte step = (byte)(255 / skeletons.Count);
+            byte step = (byte)(255 / skeletons.Length);
             byte color = 0;
             localCanvas.Children.Clear();
             foreach (KinectSkeleton s in skeletons)
@@ -79,14 +79,14 @@ namespace ReactiveSpaces
                 byte step = (byte)(255 / peers.Count);
                 byte color = 0;
 
-                if(s.player1.userPresent)
-                    drawRemoteSkeleton(s.player1, Color.FromArgb(color, color, color, 255));
-                if(s.player2.userPresent)
-                    drawRemoteSkeleton(s.player2, Color.FromArgb(color, color, color, 255));
+                foreach(KinectSkeleton p in s.players)
+                {
+                    drawRemoteSkeleton(p, Color.FromArgb(color, color, color, 255));
+                }
                 color += step;
             }
         }
-        public void drawRemoteSkeleton(KinectSkeleton skeleton, Color color)
+        public void drawRemoteSkeleton(KinectSkeleton skeleton, Color color)//TODO //////////////////
         {
             for (int i = 0; i < skeleton.numberOfJoints; ++i)
             {

@@ -46,20 +46,24 @@ namespace RSNetworker
         TcpClient server = null;
         Task serverThread = null;
         NetworkStream serverStream = null;
-        bool serverReady = false;
 
         //so that we can skip the ui
         //delegat functions to local networker
         public delegate void onCustomDataRecieved(string data);
-        public onCustomDataRecieved _onCustomDataRecieved = null;
         public delegate void onPeerAdded(StationProfile peer);
-        public onPeerAdded _onPeerAdded = null;
         public delegate void onPeerUpdated(StationProfile peer);
-        public onPeerUpdated _onPeerUpdated = null;
         public delegate void onPeerRemoved(StationProfile peer);
-        public onPeerRemoved _onPeerRemoved = null;
         public delegate void OnRemoteKinectRecieved(KinectSkeleton skeleton);
+        public delegate void OnRemoteKinectAdded(KinectSkeleton skeleton);
+        public delegate void OnRemoteKinectRemoved(KinectSkeleton skeleton);
+
+        public onCustomDataRecieved _onCustomDataRecieved = null;
+        public onPeerAdded _onPeerAdded = null;
+        public onPeerUpdated _onPeerUpdated = null;
+        public onPeerRemoved _onPeerRemoved = null;
         public OnRemoteKinectRecieved _onRemoteKinectRecieved = null;
+        public OnRemoteKinectAdded _onRemoteKinectAdded = null;
+        public OnRemoteKinectRemoved _onRemoteKinectRemoved = null;
 
         public Networker()
         {
@@ -115,7 +119,9 @@ namespace RSNetworker
                 return e.SocketErrorCode;
             }
             serverStream = server.GetStream();
-            serverReady = true;
+            connected = true;
+
+            System.Threading.Thread.Sleep(100);
 
             sendStationProfile();
             if (currentApp != null)
@@ -140,7 +146,7 @@ namespace RSNetworker
             connected = true;
             connectionChanged = true;
 
-            while(connected && server.Connected)
+            while(!closing && connected && server.Connected)
             {
                 try
                 {
@@ -187,7 +193,7 @@ namespace RSNetworker
                     {
                         message = jSerializer.Deserialize<SocketMessage>(data);
                     }
-                    catch(Exception e)
+                    catch
                     {
                         if(missingPiece == null && data == inMessages.Last())
                         {
@@ -208,7 +214,7 @@ namespace RSNetworker
                         case MessageType.StationProfile:
                             //should only ever get assigned an id
                             StationProfile profile = jSerializer.Deserialize<StationProfile>(message.data);
-                            currentProfile.id = profile.id;
+                            currentProfile.SetID( profile.id );
                             stationProfileUpdated = true;
                             break;
                         case MessageType.PeerConnect:
@@ -233,25 +239,33 @@ namespace RSNetworker
                             if (null != _onCustomDataRecieved)
                                 _onCustomDataRecieved(message.data);
                             break;
+                        case MessageType.AddKinect:
+                            KinectSkeleton newSkeleton = jSerializer.Deserialize<KinectSkeleton>(inData);
+                            addRemoteKinect(newSkeleton);
+                            break;
                         case MessageType.Kinect:
-                            KinectSkeleton skeleton = new KinectSkeleton();
-                            //skeleton = deserializeKinect(message.data);
-                            skeleton = deserializeKinect(message.data);
+                            KinectSkeleton skeleton = jSerializer.Deserialize<KinectSkeleton>(inData);
                             processRemoteKinect(skeleton);
                             break;
+                        case MessageType.RemoveKinect:
+                            KinectSkeleton oldSkeleton = jSerializer.Deserialize<KinectSkeleton>(inData);
+                            addRemoteKinect(oldSkeleton);
+                            break;
                         default:
-                            Debugger.Break();
+                            Console.Write("Unknown message type recieved from server.");
                             break;
                     }
                 }
-
-                //serverStream.Write(responseBytes, 0, responseBytes.Length);
             }
-
+            
+            //reconnect
             Disconnect();
+            if (closing)
+            {
+                return;
+            }
             System.Threading.Thread.Sleep(100);
             ConnectToServer();
-            //reconnect
 
             goto handlerStart;
         }
@@ -262,20 +276,7 @@ namespace RSNetworker
             message.type = MessageType.Custom;
             message.data = data;
 
-            string json = jSerializer.Serialize(message) + "\0";
-            byte[] bytes = Encoding.UTF8.GetBytes(json);
-
-            if (serverStream != null && serverStream.CanWrite)
-            {
-                try
-                {
-                    serverStream.Write(bytes, 0, bytes.Length);
-                }
-                catch(System.IO.IOException e)
-                {
-                    Disconnect();
-                }
-            }
+            SendMessage(message);
         }
 
         public void Reconnect()
@@ -305,12 +306,10 @@ namespace RSNetworker
             {
                 serverStream.Close();
                 serverStream = null;
-                serverReady = false;
             }
             if (server != null)
             {
                 server.Close();
-                serverReady = false;
                 server = null;
             }
             connected = false;
@@ -336,28 +335,7 @@ namespace RSNetworker
                 message.data = jSerializer.Serialize(newInfo);
             }
 
-            string json = jSerializer.Serialize(message) + "\0";
-            byte[] msgBytes = Encoding.UTF8.GetBytes(json);
-
-            //tell server
-            if(serverReady)
-            {
-                try
-                {
-                    serverStream.Write(msgBytes, 0, msgBytes.Length);
-                }
-                catch(System.IO.IOException e)
-                {
-                    Disconnect();
-                }
-                
-            }
-            else
-            {
-                //TODO how did we get to this state... 
-                //retry connection?
-                Reconnect();
-            }
+            SendMessage(message);
         }
 
         public void updateStationProfile(StationProfile newProfile)
@@ -365,34 +343,14 @@ namespace RSNetworker
             this.currentProfile = newProfile;
             sendStationProfile();
         }
+
         void sendStationProfile()
         {
             SocketMessage message = new SocketMessage();
             message.type = MessageType.StationProfile;
             message.data = jSerializer.Serialize(currentProfile);
 
-            string json = jSerializer.Serialize(message) + "\0";
-
-            byte[] messageBytes = Encoding.UTF8.GetBytes(json);
-
-            if (serverReady)
-            {
-                try
-                {
-                    serverStream.Write(messageBytes, 0, messageBytes.Length);
-                }
-                catch (System.IO.IOException e)
-                {
-                    Disconnect();
-                }
-
-            }
-            else
-            {
-                //TODO how did we get to this state... 
-                //retry connection?
-                Reconnect();
-            }
+            SendMessage(message);
         }
 
         void updateAddPeer(StationProfile newPeer)
@@ -429,7 +387,18 @@ namespace RSNetworker
             }
         }
 
-        public void updateLocalKinect(KinectSkeleton p1, KinectSkeleton p2)
+        public void addLocalKinect(KinectSkeleton skeleton)
+        {
+            if (this.currentApp == null)
+                return;
+
+            SocketMessage message = new SocketMessage();
+            message.type = MessageType.AddKinect;
+            message.data = jSerializer.Serialize(skeleton);
+
+            SendMessage(message);
+        }
+        public void updateLocalKinect(KinectSkeleton[] players)
         {
             if (this.currentApp == null)
                 return;
@@ -440,62 +409,44 @@ namespace RSNetworker
             else
                 kinectTimer.Restart();
 
-            p1.stationID = this.currentProfile.id;
-            p2.stationID = this.currentProfile.id;
-            this.currentProfile.player1 = p1;
-            this.currentProfile.player2 = p2;
+            this.currentProfile.CopyPlayers(players); 
 
-            KinectSkeleton[] skeletons = { p1, p2 };
-            foreach (KinectSkeleton s in skeletons)
+            foreach (KinectSkeleton s in currentProfile.players)
             {
-                SocketMessage msg = new SocketMessage();
-                msg.type = MessageType.Kinect;
-                msg.data = jSerializer.Serialize(s);
-                //msg.data = serializeKinect(s);
+                SocketMessage message = new SocketMessage();
+                message.type = MessageType.Kinect;
+                message.data = jSerializer.Serialize(s);
 
-                string data = jSerializer.Serialize(msg);
-                byte[] messageBytes = Encoding.UTF8.GetBytes(data + "\0");
-
-                if (serverReady)
-                {
-                    try
-                    {
-                        serverStream.Write(messageBytes, 0, messageBytes.Length);
-                    }
-                    catch (Exception e)
-                    {
-                        Disconnect();
-                    }
-
-                }
-                else
-                {
-                    //TODO how did we get to this state... 
-                    //retry connection?
-                    Reconnect();
-                }
+                SendMessage(message);
             }
         }
+        public void removeLocalKinect(KinectSkeleton skeleton)
+        {
+            if (this.currentApp == null)
+                return;
 
-        void processRemoteKinect(KinectSkeleton remote)
+            SocketMessage message = new SocketMessage();
+            message.type = MessageType.RemoveKinect;
+            message.data = jSerializer.Serialize(skeleton);
+
+            SendMessage(message);
+        }
+
+        void addRemoteKinect(KinectSkeleton remote)
+        {
+            processRemoteKinect(remote, false);
+            if (_onRemoteKinectAdded != null)
+                _onRemoteKinectAdded(remote);
+        }
+        void processRemoteKinect(KinectSkeleton remote, bool fireEvent = true)
         {
             foreach (StationProfile peer in currentPeers)
             {
                 if (peer.id == remote.stationID)
                 {
-                    switch(remote.playerNumber)
-                    {
-                        case 1:
-                            peer.player1 = remote;
-                            break;
-                        case 2:
-                            peer.player2 = remote;
-                            break;
-                        default:
-                            Debugger.Break();
-                            return;
-                    }
-                    if (_onRemoteKinectRecieved != null)
+                    peer.players[remote.playerNumber] = remote;
+
+                    if (fireEvent && _onRemoteKinectRecieved != null)
                     {
                         _onRemoteKinectRecieved(remote);
                         newRemoteKinect = true;
@@ -503,32 +454,44 @@ namespace RSNetworker
                 }
             }
         }
-
-        string serializeKinect(KinectSkeleton skeleton)
+        void removeRemoteKinect(KinectSkeleton remote)
         {
-            BinaryFormatter formatter = new BinaryFormatter();
-            MemoryStream memStream = new MemoryStream();
-            formatter.Serialize(memStream, skeleton);
-
-            byte[] bytes = new byte[memStream.Length];
-            memStream.Read(bytes, 0, bytes.Length);
-
-            return Encoding.UTF8.GetString(bytes);
-            
-            //GZipStream compressor = new GZipStream(compStream, CompressionLevel.Fastest);
+            processRemoteKinect(remote, false);
+            if (_onRemoteKinectRemoved != null)
+                _onRemoteKinectRemoved(remote);
         }
 
-        KinectSkeleton deserializeKinect(string inData)
+        bool SendMessage(SocketMessage message)
         {
-            return jSerializer.Deserialize<KinectSkeleton>(inData);
+            string src = jSerializer.Serialize(message);
+            byte[] msg = Encoding.UTF8.GetBytes(src);
 
-            BinaryFormatter formatter = new BinaryFormatter();
-            MemoryStream memStream = new MemoryStream();
-
-            byte[] bytes = Encoding.UTF8.GetBytes(inData);
-            memStream.Write(bytes, 0, bytes.Length);
-
-            return (KinectSkeleton)formatter.Deserialize(memStream);
+            if (connected)
+            {
+                try
+                {
+                    serverStream.Write(msg, 0, msg.Length);
+                }
+                catch (System.IO.IOException e)
+                {
+                    //failure writing to stream
+                    //or
+                    //error writing to socket
+                    Console.Write("Failure writing to server socket. IO Exception.");
+                    Disconnect();
+                    return false;
+                }
+                catch (ObjectDisposedException e)
+                {
+                    //stream is closed
+                    //or
+                    //failure reading from network
+                    Console.Write("Failure writing to server socket. Obj Disposed Exception.");
+                    Disconnect();
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

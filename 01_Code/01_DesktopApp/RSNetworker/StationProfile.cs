@@ -35,18 +35,37 @@ namespace RSNetworker
         //TODO icon
 
         [NonSerialized()]
-        public KinectSkeleton player1;
-        [NonSerialized()]
-        public KinectSkeleton player2;
+        public KinectSkeleton[] players;
 
         public StationProfile()
         {
-            player1 = new KinectSkeleton();
-            player2 = new KinectSkeleton();
+            players = new KinectSkeleton[KinectManager.SUPPORTED_PLAYERS];
+            for (int i = 0; i < KinectManager.SUPPORTED_PLAYERS; ++i)
+            {
+                players[i] = new KinectSkeleton();
+            }
 
-            name = "Default Station Name";
+                name = "Default Station Name";
             location = "Default Station Location";
             id = -1;
+        }
+
+        public void SetID(int newID)
+        {
+            id = newID;
+            foreach(KinectSkeleton s in players)
+            {
+                s.stationID = newID;
+            }
+        }
+
+        public void CopyPlayers(KinectSkeleton[] newPlayers)
+        {
+            players = newPlayers;
+            foreach(KinectSkeleton s in players)
+            {
+                s.stationID = id;
+            }
         }
 
         public void Set(StationProfile newData)
@@ -55,8 +74,10 @@ namespace RSNetworker
             location = newData.location;
             id = newData.id;
 
-            player1.stationID = id;
-            player2.stationID = id;
+            foreach(KinectSkeleton s in players)
+            {
+                s.stationID = id;
+            }
         }
 
         public byte[] ToBytes()

@@ -139,12 +139,11 @@ namespace RSKinect
             }
         }
 
-        internal void copyDataFrom(Skeleton skeleton, int playerNum = 0)
+        internal void copyDataFrom(Skeleton skeleton)
         {
             ID = skeleton.TrackingId;
-            playerNumber = playerNum;
 
-            userPresent = skeleton.TrackingState == SkeletonTrackingState.Tracked;
+            userPresent = (skeleton.TrackingState == SkeletonTrackingState.Tracked);
 
             applyJoint(KinectJoints.HEAD, skeleton.Joints[JointType.Head]);
 

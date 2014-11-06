@@ -14,7 +14,9 @@ namespace RSNetworker
         PeerUpdate,
         PeerDisconnect,
         Custom,
-        Kinect
+        Kinect,
+        AddKinect,
+        RemoveKinect,
     }
 
     class SocketMessage
