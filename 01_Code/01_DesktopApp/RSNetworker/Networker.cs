@@ -251,7 +251,7 @@ namespace RSNetworker
                             break;
                         case MessageType.RemoveKinect:
                             KinectSkeleton oldSkeleton = jSerializer.Deserialize<KinectSkeleton>(message.data);
-                            addRemoteKinect(oldSkeleton);
+                            removeRemoteKinect(oldSkeleton);
                             break;
                         default:
                             Console.Write("Unknown message type recieved from server.");
