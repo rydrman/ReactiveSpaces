@@ -231,10 +231,10 @@ RS.MessageRecieved = function(e)
                 //one more level of abstraction...
                 message.data = JSON.parse(message.data);
                 var sender = null;
-                for(var i in RS.remotePlayers)
+                for(var i in RS.remoteStations)
                 {
-                    if(RS.remotePlayers[i].id == message.data.id)
-                        sender = RS.remotePlayers[i];
+                    if(RS.remoteStations[i].id == message.data.id)
+                        sender = RS.remoteStations[i];
                 }
                 if(sender != null)
                     RS.fireEvent(RS.Events.message, sender, message.data.userData);
@@ -249,6 +249,7 @@ RS.MessageRecieved = function(e)
             case RS.MessageTypes.REMOTE_PLAYER_ENTER:
                 var result = RS.RemoteSkeletonRecieved(message.data);
                 if(null == result) return;
+                RS.remotePlayers.push(result.skeleton);
                 RS.fireEvent(RS.Events.remoteplayerenter, result.profile, result.skeleton);
                 break;
                 
@@ -266,6 +267,15 @@ RS.MessageRecieved = function(e)
             case RS.MessageTypes.REMOTE_PLAYER_EXIT:
                 var result = RS.RemoteSkeletonRecieved(message.data);
                 if(null == result) return;
+                for(var i in RS.remotePlayers)
+                {
+                    if(RS.remotePlayers[i].stationID == result.skeleton.stationID
+                       && RS.remotePlayers[i].playerNumber == result.skeleton.playerNumber)
+                    {
+                        RS.remotePlayers.splice(i, 1);
+                        break;
+                    }
+                }
                 RS.fireEvent(RS.Events.remoteplayerexit, result.profile, result.skeleton);
                 break;
             
@@ -395,6 +405,7 @@ RS.Skeleton = function()
     this.userPresent = false;
     this.ID = -1;
     this.playerNumber = -1;
+    this.stationID = -1;
     
     this.frameWidth = 320;
     this.frameHeight = 240;
@@ -416,6 +427,7 @@ RS.Skeleton.prototype.Update = function( skeleton )
     this.userPresent = skeleton.userPresent;
     this.ID = skeleton.ID;
     this.playerNumber = skeleton.playerNumber;
+    this.stationID = skeleton.stationID;
     
     if(skeleton.joints == null)
     {

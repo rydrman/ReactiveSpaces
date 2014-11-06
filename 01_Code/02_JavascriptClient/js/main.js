@@ -88,9 +88,9 @@ function onRemoteSkeletonUpdated(player, skeleton)
 {
 }
 
-function onMessageRecieved(player, data)
+function onMessageRecieved(station, data)
 {
-    player.ball = data;
+    station.ball = data;
     //console.log("custom message from: " + peer.name);
 }
 
@@ -129,22 +129,22 @@ function render()
     ctx.fillStyle = "#FFF";
     ctx.font = "20px sans-serif";
     var y = 30;
-    for(var i in RS.remotePlayers)
+    for(var i in RS.remoteStations)
     {
-        ctx.fillText(RS.remotePlayers[i].name + " -> " + RS.remotePlayers[i].location + " -> " + RS.remotePlayers[i].id,
+        ctx.fillText(RS.remoteStations[i].name + " -> " + RS.remoteStations[i].location + " -> " + RS.remoteStations[i].id,
                      10, y);
         y += 30;
     }
     
     //draw remote balls
-    for(var i in RS.remotePlayers)
+    for(var i in RS.remoteStations)
     {
         ctx.fillStyle = "#c94d02";
-        if(RS.remotePlayers[i].ball)
+        if(RS.remoteStations[i].ball)
         {
             ctx.beginPath();
-            ctx.arc(RS.remotePlayers[i].ball.x,
-                    RS.remotePlayers[i].ball.y,
+            ctx.arc(RS.remoteStations[i].ball.x,
+                    RS.remoteStations[i].ball.y,
                     20, 0, Math.PI*2, false);
             ctx.fill();
         }
@@ -163,12 +163,12 @@ function render()
             RS.DrawSkeleton(ctx, RS.players[i]);
     }
     
-    for(var i in RS.remotePlayers)
+    for(var i in RS.remoteStations)
     {
-        for(var j in RS.remotePlayers[i].players)
+        for(var j in RS.remoteStations[i].players)
         {
-            if(RS.remotePlayers[i].players[j].userPresent)
-                RS.DrawSkeleton(ctx, RS.remotePlayers[i].players[j], "#7bccff");
+            if(RS.remoteStations[i].players[j].userPresent)
+                RS.DrawSkeleton(ctx, RS.remoteStations[i].players[j], "#7bccff");
         }
     }
     
