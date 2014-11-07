@@ -21,7 +21,8 @@ namespace RSLocalhost
         LocalPlayerEnter,
         LocalPlayerExit,
         RemotePlayerEnter,
-        RemotePlayerExit
+        RemotePlayerExit,
+        FeatureMissing
     }
 
     class WebSocketMessage

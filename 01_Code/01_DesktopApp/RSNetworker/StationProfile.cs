@@ -9,6 +9,11 @@ using RSKinect;
 
 namespace RSNetworker
 {
+    public enum AppFeatures
+    {
+        Kinect
+    }
+
     [Serializable()]
     public class AppInfo
     {
@@ -16,13 +21,11 @@ namespace RSNetworker
         public float version { get; set; }
         public int maxPeers;
 
-        public AppInfo() { }
+        public List<AppFeatures> features;
 
-        public AppInfo(string _name, float _version, int _peers)
+        public AppInfo() 
         {
-            name = _name;
-            version = _version;
-            maxPeers = _peers;
+            features = new List<AppFeatures>();
         }
     }
 
@@ -32,7 +35,7 @@ namespace RSNetworker
         public string name { get; set; }
         public string location { get; set; }
         public int id { get; set; }
-        //TODO icon
+        public List<AppFeatures> features { get; set; }
 
         [NonSerialized()]
         public KinectSkeleton[] players;
@@ -45,9 +48,11 @@ namespace RSNetworker
                 players[i] = new KinectSkeleton();
             }
 
-                name = "Default Station Name";
+            name = "Default Station Name";
             location = "Default Station Location";
             id = -1;
+
+            features = new List<AppFeatures>();
         }
 
         public void SetID(int newID)

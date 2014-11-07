@@ -58,9 +58,7 @@ Client.prototype.profileRecieved = function( id )
 
     //send to client
     var message = new SocketMessage(SocketMessage.types.STATION_PROFILE, this.stationProfile);
-    var string = message.getJSON();
-
-    this.socket.write(string + "\0");
+    this.trySend(message.json);
 
     this.ready = true;
 }
@@ -69,6 +67,26 @@ Client.prototype.appConnected = function()
 {
     console.log("Client app connected: " + this.appInfo.name + " : " + this.appInfo.version);
     console.log("Client app Max Peers: " + this.appInfo.maxPeers);
+    console.log("Client app features: " + this.appInfo.features.toString());
+                
+    //check features
+    var missing = [];
+    for(var i in this.appInfo.features)
+    {
+        if(this.stationProfile.features.indexOf(this.appInfo.features[i]) == -1)
+        {
+            missing.push(this.appInfo.features[i]);
+        }
+    }
+    if(missing.length > 0)
+    {
+        var message = new SocketMessage();
+        message.type = SocketMessage.types.FEATURE_MISSING;
+        message.data = missing;
+        this.trySend(message.getJSON());
+        console.log("Features Missing, no session matching: " + missing.toString());
+        return;
+    }
     
     if(null != this.onAppConnected)
         this.onAppConnected(this);
@@ -173,6 +191,7 @@ Client.prototype.onData = function(json)
             case SocketMessage.types.STATION_PROFILE:
                 this.stationProfile.name = message.data.name;
                 this.stationProfile.location = message.data.location;
+                this.stationProfile.features = message.data.features;
                 this.profileRecieved();
                 break;
                 
@@ -223,7 +242,7 @@ Client.prototype.trySend = function(string)
     }
     catch(e)
     {
-        console.log("send exceptionCaugt: " + e.message);
+        console.log("send exceptionCaught: " + e.message);
         this.onDisconnect();
         if(this.socket.close)
             this.socket.close();

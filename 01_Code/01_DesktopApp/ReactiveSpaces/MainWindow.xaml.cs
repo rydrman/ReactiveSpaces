@@ -49,11 +49,15 @@ namespace ReactiveSpaces
             networkPage = new NetworkPage();
 
             kinectManager = new KinectManager();
-
-            networker = new Networker();
-            localNet = new LocalNetworker(networker, kinectManager);
-
             kinectManager.InitializeKinect(false, false, true);
+
+            //list of features for networker
+            List<AppFeatures> features = new List<AppFeatures>();
+            if (kinectManager.connected)
+                features.Add(AppFeatures.Kinect);
+
+            networker = new Networker(features);
+            localNet = new LocalNetworker(networker, kinectManager);
 
             timer = new DispatcherTimer();
             timer.Tick += onTimerTick;
@@ -123,6 +127,14 @@ namespace ReactiveSpaces
             if(kinectManager.statusChanged)
             {
                 kinectPage.setKinectStatus(kinectManager.status, kinectManager.statusBrush);
+                if(kinectManager.connected)
+                {
+                    networker.addFeature(AppFeatures.Kinect);
+                }
+                else
+                {
+                    networker.removeFeature(AppFeatures.Kinect);
+                }
                 kinectManager.statusChanged = false;
             }
             //if theres a new frame

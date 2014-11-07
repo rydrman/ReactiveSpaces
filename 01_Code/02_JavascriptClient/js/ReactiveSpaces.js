@@ -59,7 +59,7 @@ if(window.WebSocket)
 ////                  Functions                   ////
 //////////////////////////////////////////////////////
 
-RS.Connect = function( appName, appVersion, port )
+RS.Connect = function( appName, appVersion, features, port )
 {
     
     //check for connection
@@ -71,6 +71,8 @@ RS.Connect = function( appName, appVersion, port )
     //set params if defined
     if(typeof(appName) != 'undefined') RS.appInfo.name = appName;
     if(typeof(appVersion) != 'undefined') RS.appInfo.version = appVersion;
+    if(typeof(features) != 'undefined') RS.appInfo.features = features;
+    if(typeof(RS.appInfo.features) == 'number') RS.appInfo.features = [features];
     if(typeof(port) != 'undefined') RS.LOCALPORT = port;
 
     //set/reset
@@ -158,7 +160,7 @@ RS.SocketClosed = function()
     if(RS.connected)
     {
         RS.connected = false;
-        console.log("REACTIVE SPACES: disconnected from " + RS.socket.url);
+        console.log("REACTIVE SPACES: disconnected from desktop app.");
         RS.fireEvent(RS.Events.disconnect);
     }
     
@@ -192,6 +194,10 @@ RS.MessageRecieved = function(e)
         
         switch(message.type)
         {
+            //// FEATURES ////
+            case RS.MessageTypes.FEATURE_MISSING:
+                RS.fireEvent(RS.Events.featuremissing, message.data);
+                break;
                 
             //// LOCAL DATA ////
             case RS.MessageTypes.STATION_PROFILE:
@@ -388,6 +394,7 @@ RS.StationProfile = function()
     this.location = "unset";
     this.id = -1;
     
+    this.features = [];
     this.players =[];
 }
 RS.StationProfile.prototype.Update = function( profile )
@@ -595,6 +602,12 @@ RS.DrawSkeleton = function(context, skeleton, color)
 ////                 Enumerators                  ////
 //////////////////////////////////////////////////////
 
+//FEATURE LIST
+//enumerator to show what features are supported or required by an app
+RS.Features = {
+    Kinect : 0
+}
+
 //JOINT TYPES
 //enumerator to pick joints from the skeleton object
 RS.JointTypes = {
@@ -642,6 +655,7 @@ RS.MessageTypes = {
     LOCAL_PLAYER_EXIT: 9,
     REMOTE_PLAYER_ENTER: 10,
     REMOTE_PLAYER_EXIT: 11,
+    FEATURE_MISSING: 12
 }
 
 //EVENT TYPES
@@ -657,6 +671,7 @@ RS.Events = {
     //custom
     message: 'message',
     //station / session
+    featuremissing: 'featuremissing',
     stationlocal: 'stationlocal',
     stationconnect: 'stationconnect',
     stationupdate: 'stationupdate',

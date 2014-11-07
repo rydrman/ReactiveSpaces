@@ -17,6 +17,7 @@ namespace RSNetworker
         Kinect,
         AddKinect,
         RemoveKinect,
+        FeatureMissing
     }
 
     class SocketMessage

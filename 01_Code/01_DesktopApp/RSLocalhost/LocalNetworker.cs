@@ -52,6 +52,7 @@ namespace RSLocalhost
             networker._onRemoteKinectAdded = AddRemoteKinect;
             networker._onRemoteKinectRecieved = UpdateRemoteKinect;
             networker._onRemoteKinectRemoved = RemoveRemoteKinect;
+            networker._onFeaturesMissing = missingFeatures;
 
             kinectManager = kinMan;
             kinectManager._onPlayerIn = AddLocalKinect;
@@ -218,8 +219,15 @@ namespace RSLocalhost
             }
             if(client != null)
             {
-                client.GetStream().Close();
-                client.Close();
+                try
+                {
+                    client.GetStream().Close();
+                } catch { }
+                try 
+                { 
+                    client.Close();
+                }
+                catch { }
                 client = null;
             }
             appInfo = null;
@@ -338,6 +346,13 @@ namespace RSLocalhost
 
         #endregion
 
+        public void missingFeatures(List<AppFeatures> missing)
+        {
+            WebSocketMessage message = new WebSocketMessage();
+            message.type = MessageType.FeatureMissing;
+            message.data = jSerializer.Serialize(missing);
+            SendMessage(message);
+        }
         private bool SendMessage(WebSocketMessage message)
         {
             string src = jSerializer.Serialize(message);

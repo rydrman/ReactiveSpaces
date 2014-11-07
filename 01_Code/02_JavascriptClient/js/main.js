@@ -18,6 +18,7 @@ function onLoad()
            speedX: 50, speedY: 50};
     
     //listeners for everything
+    RS.addEventListener(RS.Events.featuremissing, onFeatureMissing);
     RS.addEventListener(RS.Events.localkinect, onSkeletonUpdated);
     RS.addEventListener(RS.Events.remotekinect, onRemoteSkeletonUpdated);
     //custom
@@ -35,7 +36,12 @@ function onLoad()
     
     RS.ActivateMessenger();
     
-    RS.Connect("My App", 1.0);
+    RS.Connect("Test App", 0.5, RS.Features.Kinect);
+}
+
+function onFeatureMissing(features)
+{
+    console.log('cannot join session, feature missing ' + features.toString());
 }
 
 function onLocalProfile(profile)

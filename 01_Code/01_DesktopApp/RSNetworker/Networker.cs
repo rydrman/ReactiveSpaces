@@ -58,6 +58,7 @@ namespace RSNetworker
         public delegate void OnRemoteKinectRecieved(KinectSkeleton skeleton);
         public delegate void OnRemoteKinectAdded(KinectSkeleton skeleton);
         public delegate void OnRemoteKinectRemoved(KinectSkeleton skeleton);
+        public delegate void OnFeaturesMissing(List<AppFeatures> features);
 
         public onCustomDataRecieved _onCustomDataRecieved = null;
         public onPeerAdded _onPeerAdded = null;
@@ -66,8 +67,9 @@ namespace RSNetworker
         public OnRemoteKinectRecieved _onRemoteKinectRecieved = null;
         public OnRemoteKinectAdded _onRemoteKinectAdded = null;
         public OnRemoteKinectRemoved _onRemoteKinectRemoved = null;
+        public OnFeaturesMissing _onFeaturesMissing = null;
 
-        public Networker()
+        public Networker(List<AppFeatures> features)
         {
             kinectTimer = new Stopwatch();
             kinectTimer.Start();
@@ -87,6 +89,7 @@ namespace RSNetworker
                 }
                 catch { }
             }
+            currentProfile.features = features;
             currentPeers = new List<StationProfile>();
 
             jSerializer = new JavaScriptSerializer();
@@ -253,8 +256,13 @@ namespace RSNetworker
                             KinectSkeleton oldSkeleton = jSerializer.Deserialize<KinectSkeleton>(message.data);
                             removeRemoteKinect(oldSkeleton);
                             break;
+                        case MessageType.FeatureMissing:
+                            List<AppFeatures> missing = jSerializer.Deserialize<List<AppFeatures>>(message.data);
+                            if (_onFeaturesMissing != null)
+                                _onFeaturesMissing(missing);
+                            break;
                         default:
-                            Console.Write("Unknown message type recieved from server.");
+                            Debug.WriteLine("Unknown message type recieved from server.");
                             break;
                     }
                 }
@@ -311,8 +319,15 @@ namespace RSNetworker
             }
             if (server != null)
             {
-                server.GetStream().Close();
-                server.Close();
+                try
+                {
+                    server.GetStream().Close();
+                }catch { }
+                try
+                {
+                    server.Close();
+                }
+                catch { }
                 server = null;
             }
             connected = false;
@@ -417,6 +432,7 @@ namespace RSNetworker
             foreach (KinectSkeleton s in currentProfile.players)
             {
                 if (!s.userPresent) continue;
+
                 SocketMessage message = new SocketMessage();
                 message.type = MessageType.Kinect;
                 message.data = jSerializer.Serialize(s);
@@ -463,6 +479,19 @@ namespace RSNetworker
             processRemoteKinect(remote, false);
             if (_onRemoteKinectRemoved != null)
                 _onRemoteKinectRemoved(remote);
+        }
+
+        public void addFeature(AppFeatures feature)
+        {
+            currentProfile.features.Add(feature);
+            stationProfileUpdated = true;
+            sendStationProfile();
+        }
+        public void removeFeature(AppFeatures feature)
+        {
+            currentProfile.features.Remove(feature);
+            stationProfileUpdated = true;
+            sendStationProfile();
         }
 
         bool SendMessage(SocketMessage message)

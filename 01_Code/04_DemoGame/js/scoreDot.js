@@ -1,3 +1,0 @@
-var scoreDot = function(){
-
-}
