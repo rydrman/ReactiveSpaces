@@ -77,6 +77,14 @@ Dot.prototype.checkCollision = function( pos, rad )
     return false;
 }
 
+Dot.prototype.bounce = function(pos)
+{
+    var a = Math.atan2(this.position.y - pos.y, this.position.x - pos.x);
+    var speed = Math.sqrt(Math.pow(this.speed.x, 2) + Math.pow(this.speed.y, 2));
+    this.speed.x = Math.cos(a) * speed;
+    this.speed.y = Math.sin(a) * speed;
+}
+
 Dot.types = {
     MAIN : 0,
     LARGE : 1,

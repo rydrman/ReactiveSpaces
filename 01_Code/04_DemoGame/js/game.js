@@ -1,8 +1,8 @@
 var Game = function()
 {
     //scoring
-    this.score = 0;
-    this.scoreUIPos = new Vector(22,22);
+    this.ui = new UI();
+    this.ui.resize(canvas.width, 50);
     
     //images
     this.mainDotImg = document.getElementById("mainDotImage");
@@ -16,7 +16,8 @@ var Game = function()
     this.largeDots = [];
     this.scoreDots = [];
     this.hands = [];
-    
+    this.scoreCounters = [];
+    this.lastScoreCounterID = 0;
     
     //TIME
     this.initialTime = new Date().getTime();
@@ -79,7 +80,7 @@ Game.prototype.update = function()
     //LARGE DOT
     
     //updating large dots
-    var largeDot;
+    var largeDot, collDot;
     for(var i in this.largeDots)
     {
         largeDot = this.largeDots[i];
@@ -87,10 +88,23 @@ Game.prototype.update = function()
         largeDot.update(deltaTime);
         
         //check to see if it's time to die
-        if(now - largeDot.timeCreated > largeDot.lifeSpan)
+        if(!largeDot.dying && now - largeDot.timeCreated > largeDot.lifeSpan)
         {
             //animate it out
+            largeDot.dying = true;
             TweenLite.to(largeDot, 2, {alpha: 0, radius:0, ease:Linear.EaseIn, onComplete:this.removeLargeDot, onCompleteParams:[largeDot], onCompleteScope:this});
+        }
+
+        //collide with other large dots
+        for(var j = parseInt(i)+1; j < this.largeDots.length; ++j)
+        {
+            collDot = this.largeDots[j];
+            if(largeDot.checkCollision( collDot.position, collDot.radius ))
+            {
+                //get vector
+                largeDot.bounce(collDot.position);
+                collDot.bounce(largeDot.position);
+            }
         }
     }
     
@@ -164,7 +178,8 @@ Game.prototype.update = function()
 
 Game.prototype.render = function()
 {
-    ctx.clearRect(0,0, canvas.width, canvas.height);
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0,0, canvas.width, canvas.height);
     
     
     //LARGE DOT
@@ -189,16 +204,23 @@ Game.prototype.render = function()
     {
         this.hands[i].render( this.canvasMiddle );
     }
+
+    //score counters
+    ctx.font = "24px sans-serif";
+    ctx.textAlign = 'center';
+    for (var i in this.scoreCounters)
+    {
+        ctx.save();
+        ctx.fillStyle = "#FFF";
+        ctx.globalAlpha = this.scoreCounters[i].alpha;
+        ctx.translate(this.scoreCounters[i].position.x, this.scoreCounters[i].position.y);
+        ctx.fillText("+" + this.scoreCounters[i].value, 0, 0);
+        ctx.restore();
+    }
     
-    //UI 
-    ctx.fillStyle = "white";
-    ctx.font = "20px sans-serif";
-    ctx.fillText("Score: " + this.score, 40, 30);
-    ctx.drawImage(this.scoreDotImg, 
-                  this.scoreUIPos.x - this.scoreDotRad, 
-                  this.scoreUIPos.y - this.scoreDotRad, 
-                  this.scoreDotRad * 2, 
-                  this.scoreDotRad * 2);
+    //UI
+    var uiImage = this.ui.getRender(canvas);
+    ctx.drawImage(uiImage, 0, 0);
 }
 
 Game.prototype.removeLargeDot = function( largeDot )
@@ -220,8 +242,33 @@ Game.prototype.removeScoreDot = function( scoreDot )
         if (this.scoreDots[i].id == scoreDot.id)
         {
             this.scoreDots.splice(i, 1);
-            this.score++;
-            //TODO animate +1
+            this.ui.score++;
+            
+            var position = new Vector();
+            position.set(scoreDot.position);
+            var counter = {
+                id: this.lastScoreCounterID++,
+                value: 1,
+                position: position,
+                alpha:1
+            }
+            TweenLite.to(counter, 1.5, { alpha: 0, ease: Linear.EaseOut, onComplete: this.removeScoreCounter, onCompleteParams: [counter], onCompleteScope: this });
+            TweenLite.to(counter.position, 1.5, { y: counter.position.y - 30, ease: Linear.EaseOut});
+            this.scoreCounters.push(counter);
+
+
+            return;
+        }
+    }
+}
+
+Game.prototype.removeScoreCounter = function (scoreCounter)
+{
+    for (var i in this.scoreCounters)
+    {
+        if (this.scoreCounters[i].id == scoreCounter.id)
+        {
+            this.scoreCounters.splice(i, 1);
             return;
         }
     }
