@@ -48,15 +48,24 @@ Hand.prototype.render = function( pointAt )
     ctx.drawImage(this.imgEmpty, 0, 0, this.rad * 2, this.rad * 2);
     
     var perc = this.value / this.maxValue;
-    var filledHeight = this.rad * 2 * perc;
-    
-    ctx.drawImage(this.imgFull, 0, 0, this.imgEmpty.width * perc, this.imgEmpty.height, 0, 0, filledHeight, this.rad * 2);
-    
-    if(this.collectAlpha > 0)
+
+    if (!this.emptying)
     {
-        ctx.globalAlpha = this.collectAlpha;
-        ctx.drawImage(this.imgCollect, 0, 0, this.imgEmpty.width * perc, this.imgCollect.height, 0, 0, filledHeight, this.rad * 2);
+        var filledHeight = this.rad * 2 * perc;
+
+        ctx.drawImage(this.imgFull, 0, 0, this.imgEmpty.width * perc, this.imgEmpty.height, 0, 0, filledHeight, this.rad * 2);
+        if (this.collectAlpha > 0)
+        {
+            ctx.globalAlpha = this.collectAlpha;
+            ctx.drawImage(this.imgCollect, 0, 0, this.imgEmpty.width * perc, this.imgCollect.height, 0, 0, filledHeight, this.rad * 2);
+        }
     }
+    else
+    {
+        ctx.globalAlpha = perc;
+        ctx.drawImage(this.imgFull, 0, 0, this.rad*2, this.rad * 2);
+    }
+    
         
     ctx.restore();
 }

@@ -1,7 +1,8 @@
-
+var lastDotIndex = 0;
 //base dot class and functionality
 var Dot = function( type, rad, img )
 {
+    this.id = lastDotIndex++;
     this.type = null;
     this.img = img;
     this.alpha = 1;

@@ -80,7 +80,7 @@ Game.prototype.update = function()
     
     //updating large dots
     var largeDot;
-    for(var i=0; i < this.largeDots.length; i++)
+    for(var i in this.largeDots)
     {
         largeDot = this.largeDots[i];
         
@@ -91,17 +91,6 @@ Game.prototype.update = function()
         {
             //animate it out
             TweenLite.to(largeDot, 2, {alpha: 0, radius:0, ease:Linear.EaseIn, onComplete:this.removeLargeDot, onCompleteParams:[largeDot], onCompleteScope:this});
-        }
-
-        for(var j=this.scoreDots.length-1; j>=0; j--)
-        {
-            var collision = largeDot.checkCollision(this.scoreDots[j].position, -this.scoreDotRad);
-            if(collision)
-            {
-                TweenLite.to(this.scoreDots[j].position, 1, {x:this.scoreUIPos.x, y:this.scoreUIPos.y, ease:Linear.EaseInOut, 
-                                                             onComplete:this.removeScoreDot, onCompleteParams:[this.scoreDots[j]], onCompleteScope:this});
-                break;
-            }
         }
     }
     
@@ -118,8 +107,33 @@ Game.prototype.update = function()
     }
     
     //updating score dots 
-    for(var i in this.scoreDots){
-       this.scoreDots[i].update(deltaTime);
+    for (var i in this.scoreDots)
+    {
+        if (this.scoreDots[i].collected) continue;
+        this.scoreDots[i].update(deltaTime);
+
+        for (var j in this.largeDots)
+        {
+            var collision = this.largeDots[j].checkCollision(this.scoreDots[i].position, this.scoreDotRad);
+            if (collision)
+            {
+                this.scoreDots[i].collected = true;
+                TweenLite.to(this.scoreDots[i].position, 0.5, {
+                    x: this.largeDots[j].position.x,
+                    y: this.largeDots[j].position.y,
+                    ease: Linear.EaseIn
+                });
+                TweenLite.to(this.scoreDots[i], 0.5, {
+                    alpha: 0,
+                    radius: 0,
+                    ease: Linear.EaseNone,
+                    onComplete: this.removeScoreDot,
+                    onCompleteParams: [this.scoreDots[i]],
+                    onCompleteScope: this
+                });
+                break;
+            }
+        }
     }
     
     //HANDS
@@ -134,7 +148,9 @@ Game.prototype.update = function()
             dot.lifeSpan = 10000;
             dot.timeCreated = now;
             var callback = function(){
-                dot.speed.set( new Vector( 20 + Math.random() * 20, 20 + Math.random() * 20 ) );
+                dot.speed.set(new Vector(20 + Math.random() * 20, 20 + Math.random() * 20));
+                if (Math.random() > 0.5) dot.speed.x *= -1;
+                if (Math.random() > 0.5) dot.speed.y *= -1;
                 dot.position = new Vector(dot.position.x, dot.position.y);
             }
             TweenLite.from(dot, 1, {radius: 0, ease: Linear.EaseOut, onComplete: callback });
@@ -150,15 +166,16 @@ Game.prototype.render = function()
 {
     ctx.clearRect(0,0, canvas.width, canvas.height);
     
-    //SCORE DOT
-     for(var i=0; i <this.scoreDots.length; i++){
-       this.scoreDots[i].render();
-    }
     
     //LARGE DOT
     //rendering large dots
     for(var i=0; i <this.largeDots.length; i++){
        this.largeDots[i].render();
+    }
+
+    //SCORE DOT
+    for (var i = 0; i < this.scoreDots.length; i++) {
+        this.scoreDots[i].render();
     }
     
     //MAIN DOT
@@ -186,21 +203,27 @@ Game.prototype.render = function()
 
 Game.prototype.removeLargeDot = function( largeDot )
 {
-    var index = this.largeDots.indexOf(largeDot);
-    
-    if(index != -1)
-        this.largeDots.splice(index, 1);
+    for (var i in this.largeDots)
+    {
+        if (this.largeDots[i].id == largeDot.id)
+        {
+            this.largeDots.splice(i, 1);
+            return;
+        }
+    }
 }
 
 Game.prototype.removeScoreDot = function( scoreDot )
 {
-    var index = this.scoreDots.indexOf(scoreDot);
-    
-    if(index != -1)
+    for (var i in this.scoreDots)
     {
-        this.scoreDots.splice(index, 1);
-        this.score++;
-        
+        if (this.scoreDots[i].id == scoreDot.id)
+        {
+            this.scoreDots.splice(i, 1);
+            this.score++;
+            //TODO animate +1
+            return;
+        }
     }
 }
 

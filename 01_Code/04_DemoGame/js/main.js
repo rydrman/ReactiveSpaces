@@ -9,6 +9,7 @@ function onLoad()
     canvas.onclick = onMouseClick;
     canvas.onmousemove = onMouseMove;
     ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
     window.requestAnimationFrame(update);
     game = new Game();
 }
