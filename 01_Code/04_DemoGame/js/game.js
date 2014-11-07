@@ -179,23 +179,25 @@ Game.prototype.update = function()
 Game.prototype.render = function()
 {
     ctx.fillStyle = "#000";
-    ctx.fillRect(0,0, canvas.width, canvas.height);
-    
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     //LARGE DOT
     //rendering large dots
-    for(var i=0; i <this.largeDots.length; i++){
+    for(var i=0; i <this.largeDots.length; i++)
+    {
        this.largeDots[i].render();
     }
 
     //SCORE DOT
-    for (var i = 0; i < this.scoreDots.length; i++) {
+    for (var i = 0; i < this.scoreDots.length; i++) 
+    {
         this.scoreDots[i].render();
     }
     
     //MAIN DOT
     //rendering main dots
-    for(var i=0; i <this.mainDots.length; i++){
+    for(var i=0; i <this.mainDots.length; i++)
+    {
        this.mainDots[i].render();
     }
     
@@ -204,7 +206,9 @@ Game.prototype.render = function()
     {
         this.hands[i].render( this.canvasMiddle );
     }
-
+    
+    
+    
     //score counters
     ctx.font = "24px sans-serif";
     ctx.textAlign = 'center';
