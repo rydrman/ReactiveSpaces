@@ -4,6 +4,7 @@ var Dot = function( type, rad, img )
 {
     this.type = null;
     this.img = img;
+    this.alpha = 1;
     this.radius = rad;
     this.maxSpeed = 10;
     this.position = new Vector();
@@ -15,20 +16,24 @@ var Dot = function( type, rad, img )
 
 Dot.prototype.render = function()
 {  
+    ctx.save();
+    ctx.globalAlpha = this.alpha;
     ctx.drawImage(this.img, this.position.x - this.radius, this.position.y-this.radius, this.radius*2, this.radius*2);
+    ctx.restore();
 }
 
-Dot.prototype.update = function()
+Dot.prototype.update = function(deltaTime)
 { 
     this.acceleration.add( this.force );
     this.force.set( new Vector(0, 0) );
     this.speed.add(this.acceleration);
-    this.position.add(this.speed);
-    this.move();
+    this.acceleration.set( new Vector() );
+    this.position.add(this.speed.getMultScalar(deltaTime));
+    this.collideWithBorders();
 }
 
 //main movement functionality
-Dot.prototype.move = function()
+Dot.prototype.collideWithBorders = function()
 {
     
     if(this.position.x-this.radius < 0){
@@ -43,10 +48,6 @@ Dot.prototype.move = function()
     else if(this.position.y+this.radius > canvas.height){
         this.speed.y = -Math.abs(this.speed.y);
     }
-    
-    //move dot
-    this.position.x += this.speed.x;
-    this.position.y += this.speed.y;
 }
 
 Dot.prototype.getDistance = function( pos )

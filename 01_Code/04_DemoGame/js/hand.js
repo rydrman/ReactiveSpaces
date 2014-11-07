@@ -3,7 +3,9 @@ var Hand = function(imgEmpty, imgFull, imgCollect)
     this.position = new Vector();
     this.rad = 50;
     this.value = 0;
+    this.targetValue = 0;
     this.maxValue = 100;
+    this.emptying = false;
     
     this.imgEmpty = imgEmpty;
     this.imgFull = imgFull;
@@ -12,10 +14,19 @@ var Hand = function(imgEmpty, imgFull, imgCollect)
 }
 
 Hand.prototype.update = function(deltaTime)
-{
+{  
+    if(this.emptying)
+    {
+        if(this.value == 0)
+            this.emptying = false;
+        else
+            return false;
+    }
+           
     if(this.value >= this.maxValue)
     {
-        this.value = 0;
+        this.targetValue = 0;
+        this.emptying = true;
         return true;
     }
     return false;
@@ -39,12 +50,12 @@ Hand.prototype.render = function( pointAt )
     var perc = this.value / this.maxValue;
     var filledHeight = this.rad * 2 * perc;
     
-    ctx.drawImage(this.imgFull, 0, 0, filledHeight, this.imgEmpty.height, 0, 0, filledHeight, this.rad * 2);
+    ctx.drawImage(this.imgFull, 0, 0, this.imgEmpty.width * perc, this.imgEmpty.height, 0, 0, filledHeight, this.rad * 2);
     
     if(this.collectAlpha > 0)
     {
         ctx.globalAlpha = this.collectAlpha;
-        ctx.drawImage(this.imgCollect, 0, 0, filledHeight, this.imgCollect.height, 0, 0, filledHeight, this.rad * 2);
+        ctx.drawImage(this.imgCollect, 0, 0, this.imgEmpty.width * perc, this.imgCollect.height, 0, 0, filledHeight, this.rad * 2);
     }
         
     ctx.restore();

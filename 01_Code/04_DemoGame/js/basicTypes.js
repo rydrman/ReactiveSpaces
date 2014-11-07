@@ -16,3 +16,14 @@ Vector.prototype.add = function( vector )
     this.x += vector.x;
     this.y += vector.y;
 }
+
+Vector.prototype.multScalar = function( value )
+{
+    this.x *= value;
+    this.y += value;
+}
+
+Vector.prototype.getMultScalar = function( value )
+{
+    return new Vector(this.x * value, this.y * value);
+}
