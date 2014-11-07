@@ -7,6 +7,9 @@ var Game = function()
     this.mainDotImg = document.getElementById("mainDotImage");
     this.largeDotImg = document.getElementById("largeDotImage");
     this.scoreDotImg = document.getElementById("scoreDotImage");
+    this.handEmptyImg = document.getElementById("handEmptyImage");
+    this.handFullImg = document.getElementById("handFullImage");
+    this.handCollectImg = document.getElementById("handCollectImage");
     
     this.mainDots = [];
     this.largeDots = [];
@@ -28,8 +31,8 @@ var Game = function()
     this.scoreDotInterval = 1000;
     
     //debug mouse as hand
-    this.hands.push( new Hand() );
-    this.canvasMiddle = new Vector(cavnas.width * 0.5, canvas.height * 0.5);
+    this.hands.push( new Hand(this.handEmptyImg, this.handFullImg, this.handCollectImg) );
+    this.canvasMiddle = new Vector(canvas.width * 0.5, canvas.height * 0.5);
 }
 
 Game.prototype.update = function()
@@ -50,7 +53,8 @@ Game.prototype.update = function()
     }    
     
     //updating main dots
-    for(var i=this.mainDots.length-1; i>=0; i--){
+    for(var i=this.mainDots.length-1; i>=0; i--)
+    {
         this.mainDots[i].update();
         for(var j in this.hands)
         {
@@ -58,6 +62,7 @@ Game.prototype.update = function()
             if(collision)
             {
                 this.hands[j].value += 10;
+                TweenLite.fromTo(this.hands[j], 1, {collectAlpha:1.0},{collectAlpha: 0.0, ease:Linear.EaseOut});
                 this.mainDots.splice(i, 1);
                 break;
             }
