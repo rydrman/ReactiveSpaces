@@ -2,6 +2,7 @@ var Game = function()
 {
     //scoring
     this.score = 0;
+    this.scoreUIPos = new Vector(22,22);
     
     //images
     this.mainDotImg = document.getElementById("mainDotImage");
@@ -24,12 +25,13 @@ var Game = function()
     this.lastScoreDot = this.initialTime;
     
     //main dots 
-    this.maxMainDots = 20;
+    this.maxMainDots = 10;
     this.mainDotInterval = 1000;
     
     //score dots
-    this.maxScoreDots = 20;
+    this.maxScoreDots = 10;
     this.scoreDotInterval = 1000;
+    this.scoreDotRad = 10;
     
     //debug mouse as hand
     this.hands.push( new Hand(this.handEmptyImg, this.handFullImg, this.handCollectImg) );
@@ -50,6 +52,7 @@ Game.prototype.update = function()
     if(this.mainDots.length < this.maxMainDots && now-this.lastMainDot > this.mainDotInterval)
     {
         var dot = new Dot(Dot.types.MAIN, 10, this.mainDotImg);
+        dot.position.set(this.getOffScreenStartPos(10));
         dot.speed.set( new Vector( 50 + Math.random() * 50, 50 + Math.random() * 50 ) );
         this.mainDots.push( dot );
         this.lastMainDot = now;
@@ -92,11 +95,11 @@ Game.prototype.update = function()
 
         for(var j=this.scoreDots.length-1; j>=0; j--)
         {
-            var collision = largeDot.checkCollision(this.scoreDots[j].position);
+            var collision = largeDot.checkCollision(this.scoreDots[j].position, -this.scoreDotRad);
             if(collision)
             {
-                this.scoreDots.splice(j, 1);
-                this.score++;
+                TweenLite.to(this.scoreDots[j].position, 1, {x:this.scoreUIPos.x, y:this.scoreUIPos.y, ease:Linear.EaseInOut, 
+                                                             onComplete:this.removeScoreDot, onCompleteParams:[this.scoreDots[j]], onCompleteScope:this});
                 break;
             }
         }
@@ -107,7 +110,8 @@ Game.prototype.update = function()
     //creating score dots
     if(this.scoreDots.length < this.maxScoreDots && now-this.lastScoreDot > this.scoreDotInterval)
     {
-        var dot = new Dot(Dot.types.SCORE, 10, this.scoreDotImg);
+        var dot = new Dot(Dot.types.SCORE, this.scoreDotRad, this.scoreDotImg);
+        dot.position.set(this.getOffScreenStartPos(this.scoreDotRad));
         dot.speed.set( new Vector( 25 + Math.random() * 25, 25 + Math.random() * 25 ) );
         this.scoreDots.push( dot );
         this.lastScoreDot = now;
@@ -172,7 +176,12 @@ Game.prototype.render = function()
     //UI 
     ctx.fillStyle = "white";
     ctx.font = "20px sans-serif";
-    ctx.fillText("Score: " + this.score, 10, 30);
+    ctx.fillText("Score: " + this.score, 40, 30);
+    ctx.drawImage(this.scoreDotImg, 
+                  this.scoreUIPos.x - this.scoreDotRad, 
+                  this.scoreUIPos.y - this.scoreDotRad, 
+                  this.scoreDotRad * 2, 
+                  this.scoreDotRad * 2);
 }
 
 Game.prototype.removeLargeDot = function( largeDot )
@@ -181,6 +190,28 @@ Game.prototype.removeLargeDot = function( largeDot )
     
     if(index != -1)
         this.largeDots.splice(index, 1);
+}
+
+Game.prototype.removeScoreDot = function( scoreDot )
+{
+    var index = this.scoreDots.indexOf(scoreDot);
+    
+    if(index != -1)
+    {
+        this.scoreDots.splice(index, 1);
+        this.score++;
+        
+    }
+}
+
+Game.prototype.getOffScreenStartPos = function( rad )
+{
+    var randX = ( Math.random() < 0.5 ) ? true : false; 
+    
+    var x = ( randX ) ? Math.random() * canvas.width : ( (Math.random() < 0.5 ) ? -rad : canvas.width + rad);
+    var y = ( !randX ) ? Math.random() * canvas.height : ( (Math.random() < 0.5 ) ? -rad : canvas.height + rad);
+    
+    return new Vector(x , y);
 }
 
 Game.prototype.onMouseClick = function( mousePos ) 
