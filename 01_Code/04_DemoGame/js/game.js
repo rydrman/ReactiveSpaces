@@ -29,6 +29,7 @@ var Game = function()
     
     //debug mouse as hand
     this.hands.push( new Hand() );
+    this.canvasMiddle = new Vector(cavnas.width * 0.5, canvas.height * 0.5);
 }
 
 Game.prototype.update = function()
@@ -137,7 +138,7 @@ Game.prototype.render = function()
     //HANDS
     for(var i in this.hands)
     {
-        this.hands[i].render();
+        this.hands[i].render( this.canvasMiddle );
     }
     
     //UI 

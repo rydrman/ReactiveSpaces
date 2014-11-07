@@ -16,10 +16,13 @@ Hand.prototype.update = function(deltaTime)
     return false;
 }
 
-Hand.prototype.render = function()
+Hand.prototype.render = function( pointAt )
 {
+    ctx.save();
+    
     ctx.fillStyle = "#1fc2e6";
     ctx.beginPath();
     ctx.arc(this.position.x, this.position.y, this.rad, 0, Math.PI * 2, false);
     ctx.fill();
+    ctx.restore();
 }
