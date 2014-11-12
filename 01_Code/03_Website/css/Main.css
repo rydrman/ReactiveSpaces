@@ -1,0 +1,39 @@
+html,body{height:100%;width:100%; background-color:#222222;}
+* { margin: 0; padding: 0; }
+
+@font-face {
+    font-family: BaronNeue;
+    src: url("../fonts/BaronNeue.otf");
+}
+
+@font-face {
+    font-family: Century;
+    src: url("../fonts/Century.ttf");
+}
+@font-face {
+    font-family: Make;
+    src: url("../fonts/Make.ttf");
+}
+
+
+
+h3{
+	color:#fdfdfd;
+	font-size:10pt;
+	width:100%;
+	float:left;
+	text-align:center;
+	font-family: Century;
+	font-weight: normal;
+	padding: 2px 0px 2px 0px;
+}
+
+
+#line{
+	width:100%;
+	float:left;
+	text-align: center;
+	font-family:Make;
+	color:#dfdfdf;
+	font-size:50pt;
+}

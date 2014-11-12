@@ -1,0 +1,62 @@
+@media screen and (max-width: 1400px) {
+
+
+}
+@media screen and (max-width: 1200px) {
+	#topnav a{		
+		width:20%;
+		font-size:18pt;
+		margin: 0px 5% 0px 5%;
+
+	}
+	#downloadIcon{		
+		font-size:50pt;
+		
+	}
+	
+}
+
+@media screen and (max-width: 720px) {
+	 #leftWright{
+		width:100%;
+
+
+	}
+	#rightWright{
+		margin-top: 12pt;
+		width:100%;
+
+	}
+	#Contact #leftWright{
+		width:48%;
+
+
+	}
+	#Contact #rightWright{
+		width:48%;
+		margin-top: 0pt;
+
+	}
+	#topnav a{
+		
+		
+		width:20%;
+		font-size:14pt;
+		margin: 0px 2% 0px 2%;
+
+	}
+	.small{
+		display: block;
+	}
+	.big{
+		display: none;
+	}
+	#line{
+		font-size:25pt;
+	}
+	#downloadIcon{		
+		font-size:30pt;
+		
+	}
+}
+
