@@ -7,6 +7,7 @@ var Game = function()
     //images
     this.mainDotImg = document.getElementById("mainDotImage");
     this.largeDotImg = document.getElementById("largeDotImage");
+    this.remoteDotImg = document.getElementById("remoteDotImage");
     this.scoreDotImg = document.getElementById("scoreDotImage");
     this.handEmptyImg = document.getElementById("handEmptyImage");
     this.handFullImg = document.getElementById("handFullImage");
@@ -43,12 +44,20 @@ var Game = function()
     
     //connect to rective saces
     RS.Connect("RS Demo Game", 1.0);
-    RS.addEventListener(RS.Events.message, function(data){game.onDotRecieved.call(game, data)});
+    RS.addEventListener(RS.Events.message, function(station, message){game.onDotRecieved.call(game, station, message)});
 }
 
-Game.prototype.onDotRecieved = function( dot )
+Game.prototype.onDotRecieved = function( station, dot )
 {
-    console.log( dot );
+    var remoteDot = new Dot(Dot.types.REMOTE, 50, this.remoteDotImg);
+    remoteDot.lifespan = 10000;
+    remoteDot.position = new Vector(dot.position.x, dot.position.y);
+    remoteDot.timeCreated = new Date().getTime();
+    remoteDot.speed.set(new Vector(20 + Math.random() * 20, 20 + Math.random() * 20));
+    if (Math.random() > 0.5) remoteDot.speed.x *= -1;
+    if (Math.random() > 0.5) remoteDot.speed.y *= -1;
+    TweenLite.from( remoteDot, 0.5, {radius: 0, ease:Linear.EaseIn});
+    this.remoteDots.push( remoteDot );
 }
 
 Game.prototype.update = function()
@@ -188,6 +197,21 @@ Game.prototype.update = function()
         }
          
     }
+    
+    //REMOTE DOT
+    for(var i in this.remoteDots)
+    {
+        var remoteDot = this.remoteDots[i];
+        remoteDot.update(deltaTime);
+        
+        //remove
+        if(!remoteDot.dying && now - remoteDot.timeCreated > remoteDot.lifeSpan)
+        {
+            //animate it out
+            remoteDot.dying = true;
+            TweenLite.to(remoteDot, 2, {alpha: 0, radius:0, ease:Linear.EaseIn, onComplete:this.removeRemoteDot, onCompleteParams:[remoteDot], onCompleteScope:this});
+        }
+    }
 
 }
 
@@ -214,6 +238,12 @@ Game.prototype.render = function()
     for(var i=0; i <this.mainDots.length; i++)
     {
        this.mainDots[i].render();
+    }
+    
+    //REMOTE DOT
+    for(var i in this.remoteDots)
+    {
+        this.remoteDots[i].render();
     }
     
     //HANDS
@@ -249,6 +279,18 @@ Game.prototype.removeLargeDot = function( largeDot )
         if (this.largeDots[i].id == largeDot.id)
         {
             this.largeDots.splice(i, 1);
+            return;
+        }
+    }
+}
+
+Game.prototype.removeRemoteDot = function( remoteDot )
+{
+    for (var i in this.remoteDots)
+    {
+        if (this.remoteDots[i].id == remoteDot.id)
+        {
+            this.remoteDots.splice(i, 1);
             return;
         }
     }

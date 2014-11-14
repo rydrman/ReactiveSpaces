@@ -88,5 +88,6 @@ Dot.prototype.bounce = function(pos)
 Dot.types = {
     MAIN : 0,
     LARGE : 1,
-    SCORE : 2
+    SCORE : 2,
+    REMOTE : 3
 }
