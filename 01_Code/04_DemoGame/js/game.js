@@ -50,7 +50,7 @@ var Game = function()
 Game.prototype.onDotRecieved = function( station, dot )
 {
     var remoteDot = new Dot(Dot.types.REMOTE, 50, this.remoteDotImg);
-    remoteDot.lifespan = 10000;
+    remoteDot.lifeSpan = 10000;
     remoteDot.position = new Vector(dot.position.x, dot.position.y);
     remoteDot.timeCreated = new Date().getTime();
     remoteDot.speed.set(new Vector(20 + Math.random() * 20, 20 + Math.random() * 20));
@@ -210,6 +210,9 @@ Game.prototype.update = function()
             //animate it out
             remoteDot.dying = true;
             TweenLite.to(remoteDot, 2, {alpha: 0, radius:0, ease:Linear.EaseIn, onComplete:this.removeRemoteDot, onCompleteParams:[remoteDot], onCompleteScope:this});
+            
+            //TODO collide with large dots
+            //TODO suck in score dots
         }
     }
 
