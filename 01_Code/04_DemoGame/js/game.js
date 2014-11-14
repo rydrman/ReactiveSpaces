@@ -184,7 +184,7 @@ Game.prototype.update = function()
             this.largeDots.push( dot );
             
             //also ad this dot to the remote people
-            RS.Send( dot );
+            RS.Send( {position: dot.position} );
         }
          
     }
