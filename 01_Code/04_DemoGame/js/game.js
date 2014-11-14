@@ -34,9 +34,21 @@ var Game = function()
     this.scoreDotInterval = 1000;
     this.scoreDotRad = 10;
     
+    //remote dots
+    this.remoteDots = [];
+    
     //debug mouse as hand
     this.hands.push( new Hand(this.handEmptyImg, this.handFullImg, this.handCollectImg) );
     this.canvasMiddle = new Vector(canvas.width * 0.5, canvas.height * 0.5);
+    
+    //connect to rective saces
+    RS.Connect("RS Demo Game", 1.0);
+    RS.addEventListener(RS.Events.message, function(data){game.onDotRecieved.call(game, data)});
+}
+
+Game.prototype.onDotRecieved = function( dot )
+{
+    console.log( dot );
 }
 
 Game.prototype.update = function()
@@ -170,6 +182,9 @@ Game.prototype.update = function()
             TweenLite.from(dot, 1, {radius: 0, ease: Linear.EaseOut, onComplete: callback });
             TweenLite.to(this.hands[i], 1, {value: 0, ease: Linear.EaseOut, onComplete: callback });
             this.largeDots.push( dot );
+            
+            //also ad this dot to the remote people
+            RS.Send( dot );
         }
          
     }
