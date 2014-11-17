@@ -77,10 +77,18 @@ namespace RSLocalhost
             listener.Start();
             listening = true;
             listeningChanged = true;
+            client = null;
 
             try
             {
-                client = listener.AcceptTcpClient();
+                while (client == null && !closing)
+                {
+                    System.Threading.Thread.Sleep(100);
+                    if (listener.Pending())
+                    {
+                        client = listener.AcceptTcpClient();
+                    }
+                }
                 listener.Stop();
                 listening = false;
                 listeningChanged = true;
@@ -90,6 +98,7 @@ namespace RSLocalhost
                 if (closing) return;
                 goto connectionStart;
             }
+            if (closing) return;
             stream = client.GetStream();
 
             while(!closing && client != null && client.Connected)
