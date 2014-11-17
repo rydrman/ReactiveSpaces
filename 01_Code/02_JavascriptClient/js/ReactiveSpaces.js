@@ -8,6 +8,8 @@ window.RS = window.ReactiveSpaces = {version: 0.1};
 ////           Constants and Variables            ////
 //////////////////////////////////////////////////////
 
+//region
+
 //constants etc
 RS.BASEURL = "ws://localhost";
 RS.LOCALPORT = 8080;
@@ -17,7 +19,7 @@ RS.SUPORTED_PLAYERS = 2;
 //app info
 RS.appInfo = {
     name: "Default App Name",
-    version: "1.0.0.0",
+    version: 0,
     maxPeers: 4
 }
 
@@ -40,13 +42,24 @@ RS.remotePlayers = [];
 RS.listeners = [];
 
 //for error reporting
+//gets over written when messenger is included
 RS.messenger = {display:function(t,m,s,ms){
     console.log( "RS: " + m + " -> " +s);
 }};
+Message = {};
+Message.type = {
+    "MESSAGE" : 0,
+    "WARNING" : 1,
+    "ERROR" : 2
+}
+
+//endregion
 
 //////////////////////////////////////////////////////
 ////                 Setup Logic                  ////
 //////////////////////////////////////////////////////
+
+//region
 
 //check for web socket
 if(window.MozWebSocket) window.WebSocket = window.MozWebSocket;
@@ -55,9 +68,13 @@ if(window.WebkitWebSocket) window.WebSocket = window.WebkitWebSocket;
 if(window.WebSocket)
     RS.socketSupported = true;
 
+//endregion
+
 //////////////////////////////////////////////////////
 ////                  Functions                   ////
 //////////////////////////////////////////////////////
+
+//region
 
 RS.Connect = function( appName, appVersion, features, port )
 {
@@ -266,10 +283,12 @@ RS.MessageRecieved = function(e)
                 break;
                 
             case RS.MessageTypes.KINECT:
-                RS.SkeletonRecieved(message.data);
+                var updated = RS.SkeletonRecieved(message.data);
+                RS.fireEvent(RS.Events.localkinect, updated);
                 break;
             case RS.MessageTypes.REMOTE_KINECT:
                 RS.RemoteSkeletonRecieved(message.data);
+                RS.fireEvent(RS.Events.remotekinect, updated);
                 break;
                 
             case RS.MessageTypes.LOCAL_PLAYER_EXIT:
@@ -384,9 +403,13 @@ RS.Send = function( object )
     RS.socket.send(string + "\0");
 }
 
+//endregion
+
 //////////////////////////////////////////////////////
 ////                    Types                     ////
 //////////////////////////////////////////////////////
+
+//region
 
 RS.StationProfile = function()
 {
@@ -402,6 +425,7 @@ RS.StationProfile.prototype.Update = function( profile )
     this.name = profile.name;
     this.location = profile.location;
     this.id = profile.id;
+    this.features = profile.features;
 }
 RS.StationProfile.prototype.UpdatePlayer = function( player )
 {
@@ -427,7 +451,7 @@ RS.Skeleton = function()
     this.joints = [];
     for(var i in RS.JointTypes)
     {
-        this.joints.push( new RS.SkeletonJoint() );
+        this.joints.push( new RS.SkeletonJoint( this ) );
     }
 }
 //SKELETON::UPDATE
@@ -459,10 +483,12 @@ RS.Skeleton.prototype.Update = function( skeleton )
 
 //SKELETONJOINT
 //describes a skeleton joint object
-RS.SkeletonJoint = function()
+RS.SkeletonJoint = function( skeleton )
 {
     //denotes weather joint is currently being tracked or not
     this.tracked = false;
+    //a reference to the parent skeleton
+    this.skeleton = skeleton;
     //position of joint in meters as calculated by kinect
     this.positionMeters = new RS.Vector3();
     //position of joint relative to the kinect camera image
@@ -520,6 +546,8 @@ RS.Vector3.prototype.SetFromVector = function( vector )
     this.y = (typeof(vector.y) == 'undefined') ? 0 : vector.y;
     this.z = (typeof(vector.z) == 'undefined') ? 0 : vector.z;
 }
+
+//endregion
 
 //////////////////////////////////////////////////////
 ////              Utility Functions               ////

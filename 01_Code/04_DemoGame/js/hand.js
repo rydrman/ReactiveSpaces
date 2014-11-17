@@ -1,5 +1,6 @@
 var Hand = function(imgEmpty, imgFull, imgCollect)
 {
+    this.joint = null;
     this.position = new Vector();
     this.rad = 50;
     this.value = 0;
@@ -15,6 +16,11 @@ var Hand = function(imgEmpty, imgFull, imgCollect)
 
 Hand.prototype.update = function(deltaTime)
 {  
+    if(this.joint != null)
+    {
+        this.position.x = this.joint.positionScreen.x * canvas.width;
+        this.position.y = this.joint.positionScreen.y * canvas.height;
+    }
     if(this.emptying)
     {
         if(this.value == 0)

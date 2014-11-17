@@ -483,6 +483,8 @@ namespace RSNetworker
 
         public void addFeature(AppFeatures feature)
         {
+            if (currentProfile.features.Contains(feature)) return;
+
             currentProfile.features.Add(feature);
             stationProfileUpdated = true;
             sendStationProfile();

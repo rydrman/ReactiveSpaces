@@ -1,5 +1,8 @@
 var Game = function()
 {
+    
+    this.useMouse = false;
+    
     //scoring
     this.ui = new UI();
     this.ui.resize(canvas.width, 50);
@@ -38,13 +41,48 @@ var Game = function()
     //remote dots
     this.remoteDots = [];
     
-    //debug mouse as hand
-    this.hands.push( new Hand(this.handEmptyImg, this.handFullImg, this.handCollectImg) );
     this.canvasMiddle = new Vector(canvas.width * 0.5, canvas.height * 0.5);
     
-    //connect to rective saces
-    RS.Connect("RS Demo Game", 1.0);
     RS.addEventListener(RS.Events.message, function(station, message){game.onDotRecieved.call(game, station, message)});
+    RS.addEventListener(RS.Events.localplayerenter, function(station, skeleton){game.onPlayerEnter.call(game, station, skeleton)});
+    RS.addEventListener(RS.Events.localplayerexit, function(station, skeleton){game.onPlayerExit.call(game, station, skeleton)});
+    RS.addEventListener(RS.Events.stationlocal, function(station){game.onStationLocal.call(game, station)});
+    
+    this.tryConnect();
+}
+
+Game.prototype.tryConnect = function()
+{
+    //connect to rective spaces
+    RS.Connect("RS Demo Game", 1.0);
+}
+       
+Game.prototype.onStationLocal = function(station)
+{
+    //mouse as hand if no kinect
+    if(station.features.indexOf(RS.Features.Kinect) == -1)
+    {
+        this.useMouse = true;
+        this.hands.push( new Hand(this.handEmptyImg, this.handFullImg, this.handCollectImg) );
+    }
+    else
+        this.hands = [];
+}
+
+Game.prototype.onPlayerEnter = function(station, skeleton)
+{
+    var handL = new Hand(this.handEmptyImg, this.handFullImg, this.handCollectImg);
+    handL.joint = skeleton.joints[RS.JointTypes.HAND_LEFT];
+    
+    var handR = new Hand(this.handEmptyImg, this.handFullImg, this.handCollectImg);
+    handR.joint = skeleton.joints[RS.JointTypes.HAND_RIGHT];
+    
+    this.hands.push(handL);
+    this.hands.push(handR);
+}
+
+Game.prototype.onPlayerExit = function(station, skeleton)
+{
 }
 
 Game.prototype.onDotRecieved = function( station, dot )
@@ -63,6 +101,9 @@ Game.prototype.onDotRecieved = function( station, dot )
 Game.prototype.update = function()
 {
 
+    if(!RS.connected)
+        this.tryConnect();
+    
     //getting framerate
     var now = new Date().getTime();
     this.ellapsedTime = now - this.initialTime;
@@ -87,7 +128,7 @@ Game.prototype.update = function()
         for(var j in this.hands)
         {
             if(this.hands[j].emptying) continue;
-            var collision = this.mainDots[i].checkCollision(this.hands[0].position, this.hands[0].rad);
+            var collision = this.mainDots[i].checkCollision(this.hands[j].position, this.hands[j].rad);
             if(collision)
             {
                 this.hands[j].targetValue += 25;
@@ -172,9 +213,17 @@ Game.prototype.update = function()
     }
     
     //HANDS
-    for(var i in this.hands)
+    for(var i = this.hands.length - 1; i >= 0; i--)
     {
-        
+        //check for removed
+        if(this.hands[i].joint != null)
+        {
+            if(!this.hands[i].joint.skeleton.userPresent)
+            {
+                this.hands.splice(i, 1);
+                continue;
+            }
+        }
         var newLargeDot = this.hands[i].update(deltaTime);
         if(newLargeDot)
         {
@@ -350,11 +399,12 @@ Game.prototype.getOffScreenStartPos = function( rad )
 
 Game.prototype.onMouseClick = function( mousePos ) 
 {      
-    
+    if(!this.useMouse) return;
 }
 
 Game.prototype.onMouseMove = function( mousePos )
 {
-    //debug one hand
+    if(!this.useMouse) return;
+    
     this.hands[0].position.set( mousePos );
 }
