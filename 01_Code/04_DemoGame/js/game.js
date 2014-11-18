@@ -36,7 +36,8 @@ var Game = function()
     //score dots
     this.maxScoreDots = 10;
     this.scoreDotInterval = 1000;
-    this.scoreDotRad = 10;
+    this.scoreDotRad = 20;
+    this.ScoreDotsRotation = 0;
     
     //remote dots
     this.remoteDots = [];
@@ -114,7 +115,7 @@ Game.prototype.update = function()
     //adding main dots
     if(this.mainDots.length < this.maxMainDots && now-this.lastMainDot > this.mainDotInterval)
     {
-        var dot = new Dot(Dot.types.MAIN, 10, this.mainDotImg);
+        var dot = new Dot(Dot.types.MAIN, 20, this.mainDotImg);
         dot.position.set(this.getOffScreenStartPos(10));
         dot.speed.set( new Vector( 50 + Math.random() * 50, 50 + Math.random() * 50 ) );
         this.mainDots.push( dot );
@@ -185,9 +186,11 @@ Game.prototype.update = function()
     //updating score dots 
     for (var i in this.scoreDots)
     {
+        TweenLite.to(this.scoreDots[i], 1, { rotation: "360" } );
+        
         if (this.scoreDots[i].collected) continue;
         this.scoreDots[i].update(deltaTime);
-
+        
         for (var j in this.largeDots)
         {
             var collision = this.largeDots[j].checkCollision(this.scoreDots[i].position, this.scoreDotRad);

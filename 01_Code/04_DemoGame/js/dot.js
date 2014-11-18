@@ -31,6 +31,7 @@ Dot.prototype.update = function(deltaTime)
     this.acceleration.set( new Vector() );
     this.position.add(this.speed.getMultScalar(deltaTime));
     this.collideWithBorders();
+    
 }
 
 //main movement functionality
