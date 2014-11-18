@@ -1,7 +1,7 @@
 var Game = function()
 {
     
-    this.useMouse = false;
+    this.useMouse = true;
     
     //scoring
     this.ui = new UI();
@@ -44,6 +44,10 @@ var Game = function()
     
     this.canvasMiddle = new Vector(canvas.width * 0.5, canvas.height * 0.5);
     
+    //setup mouse hand
+    this.useMouse = true;
+    this.hands.push( new Hand(this.handEmptyImg, this.handFullImg, this.handCollectImg) );
+    
     RS.addEventListener(RS.Events.message, function(station, message){game.onDotRecieved.call(game, station, message)});
     RS.addEventListener(RS.Events.localplayerenter, function(station, skeleton){game.onPlayerEnter.call(game, station, skeleton)});
     RS.addEventListener(RS.Events.localplayerexit, function(station, skeleton){game.onPlayerExit.call(game, station, skeleton)});
@@ -63,11 +67,15 @@ Game.prototype.onStationLocal = function(station)
     //mouse as hand if no kinect
     if(station.features.indexOf(RS.Features.Kinect) == -1)
     {
-        this.useMouse = true;
-        this.hands.push( new Hand(this.handEmptyImg, this.handFullImg, this.handCollectImg) );
+        //keep using mouse
+        return;
     }
     else
+    {
+        //stop using mouse and reset hands
+        this.useMouse = false;
         this.hands = [];
+    }
 }
 
 Game.prototype.onPlayerEnter = function(station, skeleton)
