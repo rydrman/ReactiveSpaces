@@ -78,6 +78,10 @@ if(window.WebSocket)
 
 RS.Connect = function( appName, appVersion, features, port )
 {
+    if(!RS.socketSupported)
+    {
+        RS.messenger.display(Message.type.ERROR, "Web Sockets are not supported by your browser.", "Please upgrade to a newer web browser.");
+    }
     
     //check for connection
     if(RS.connected)
@@ -130,7 +134,14 @@ RS.OpenSocket = function()
 {
     if(RS.connected || RS.socket != null)
         return;
-    RS.socket = new WebSocket(RS.BASEURL + ":" + RS.LOCALPORT + "/ReactiveSpaces");
+    
+    try{
+        RS.socket = new WebSocket(RS.BASEURL + ":" + RS.LOCALPORT + "/ReactiveSpaces");
+    }
+    catch(e)
+    {
+        RS.messenger.display(Message.type.ERROR, "Web Socket Error: Is the desktop app running?", "Check Developper console for more information (F12)");
+    }
     
     RS.socket.onopen = RS.SocketOpened;
     RS.socket.onclose = RS.SocketClosed;
