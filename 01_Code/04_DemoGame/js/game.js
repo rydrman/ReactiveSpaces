@@ -187,6 +187,7 @@ Game.prototype.update = function()
         var dot = new Dot(Dot.types.SCORE, this.scoreDotRad, this.scoreDotImg);
         dot.position.set(this.getOffScreenStartPos(this.scoreDotRad));
         dot.speed.set( new Vector( 25 + Math.random() * 25, 25 + Math.random() * 25 ) );
+        dot.angularSpeed = Math.PI + Math.random() * Math.PI;
         this.scoreDots.push( dot );
         this.lastScoreDot = now;
     }
@@ -194,8 +195,6 @@ Game.prototype.update = function()
     //updating score dots 
     for (var i in this.scoreDots)
     {
-        TweenLite.to(this.scoreDots[i], 1, { rotation: "360" } );
-        
         if (this.scoreDots[i].collected) continue;
         this.scoreDots[i].update(deltaTime);
         

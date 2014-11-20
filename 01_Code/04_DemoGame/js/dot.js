@@ -9,6 +9,8 @@ var Dot = function( type, rad, img )
     this.radius = rad;
     this.maxSpeed = 10;
     this.position = new Vector();
+    this.rotation = 0;
+    this.angularSpeed = 0;
     this.speed = new Vector();
     this.acceleration = new Vector();
     this.friction = 0.99;
@@ -19,7 +21,9 @@ Dot.prototype.render = function()
 {  
     ctx.save();
     ctx.globalAlpha = this.alpha;
-    ctx.drawImage(this.img, this.position.x - this.radius, this.position.y-this.radius, this.radius*2, this.radius*2);
+    ctx.translate(this.position.x, this.position.y);
+    ctx.rotate(this.rotation);
+    ctx.drawImage(this.img, -this.radius, -this.radius, this.radius*2, this.radius*2);
     ctx.restore();
 }
 
@@ -31,7 +35,7 @@ Dot.prototype.update = function(deltaTime)
     this.acceleration.set( new Vector() );
     this.position.add(this.speed.getMultScalar(deltaTime));
     this.collideWithBorders();
-    
+    this.rotation += this.angularSpeed * deltaTime;
 }
 
 //main movement functionality
