@@ -328,13 +328,12 @@ RS.MessageRecieved = function(e)
             case RS.MessageTypes.REMOTE_PLAYER_EXIT:
                 var result = RS.RemoteSkeletonRecieved(message.data);
                 if(null == result) return;
-                for(var i in RS.remotePlayers)
+                for(var i = RS.remotePlayers.length -1; i >= 0; --i)
                 {
                     if(RS.remotePlayers[i].stationID == result.skeleton.stationID
                        && RS.remotePlayers[i].playerNumber == result.skeleton.playerNumber)
                     {
                         RS.remotePlayers.splice(i, 1);
-                        break;
                     }
                 }
                 RS.fireEvent(RS.Events.remoteplayerexit, result.profile, result.skeleton);
@@ -373,10 +372,10 @@ RS.RemoteSkeletonRecieved = function(skeleton)
             {
                 result.profile.players[skeleton.playerNumber] = new RS.Skeleton();
                 result.skeleton = result.profile.players[skeleton.playerNumber];
-                result.skeleton.Update( skeleton );
-                RS.remotePlayers.push(result.skeleton);
-                RS.fireEvent(RS.Events.remoteplayerenter, result.skeleton);
-                return result;
+                //result.skeleton.Update( skeleton );
+                //RS.remotePlayers.push(result.skeleton);
+                //RS.fireEvent(RS.Events.remoteplayerenter, result.skeleton);
+                //return result;
             }
             
             result.skeleton.Update( skeleton );
