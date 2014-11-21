@@ -152,7 +152,7 @@ Game.prototype.update = function()
                 
                 distSqd = delta.LengthSqd();
                 perc =  1 - ((50 * 50) / distSqd);
-                if(perc < 1)
+                if(perc > 0)
                 {
                     //push dot
                     deltaSpeed.SetFromVector( joint.velocity );
