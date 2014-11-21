@@ -187,11 +187,6 @@ namespace ReactiveSpaces
             networker.Reconnect();
         }
 
-        public void RecieveMessage(string msg)
-        {
-            generalPage.messageOutput.Text = msg;
-        }
-
         public void RecieveKinect(List<StationProfile> peers)
         {
             kinectPage.drawRemoteSkeletons(peers);

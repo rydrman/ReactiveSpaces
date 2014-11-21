@@ -33,14 +33,6 @@ namespace ReactiveSpaces
             InitializeComponent();
         }
 
-        private void onSendButtonClicK(object sender, RoutedEventArgs e)
-        {
-            if (_onSendButton != null)
-            {
-                _onSendButton(System.Environment.MachineName + ": " + messageOutput.Text);
-            }
-        }
-
 
         public void updateListenState(bool listening)
         {
