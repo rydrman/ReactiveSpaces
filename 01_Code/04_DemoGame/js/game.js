@@ -165,13 +165,15 @@ Game.prototype.update = function()
                 delta.SubVector( RS.remotePlayers[j].joints[k].positionSmoothed );
                 
                 distSqd = delta.LengthSqd();
-                perc =  (50 * 50) / distSqd;
+                perc =  1 - ((50 * 50) / distSqd);
                 if(perc < 1)
                 {
                     //push dot
                     deltaSpeed.SetFromVector( joint.velocity );
+                    deltaSpeed.x *= canvas.width;
+                    deltaSpeed.y *= canvas.height;
                     deltaSpeed.SubVector( this.mainDots[i].speed );
-                    deltaSpeed.MultiplyScalar( perc * this.mainDots[i].maxSpeed );
+                    deltaSpeed.MultiplyScalar( perc );
                     this.mainDots[i].acceleration.add( deltaSpeed );
                 }
             }
