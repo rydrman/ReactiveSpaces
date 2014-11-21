@@ -565,9 +565,9 @@ RS.SkeletonJoint.prototype.SetFromJoint = function( joint )
 RS.SkeletonJoint.prototype.BlendUpdate = function( deltaTimeS )
 {
     var delta = new RS.Vector3(
-        this.positionScreen.x - this.positionSmoothed.x * 2.5 * deltaTimeS,
-        this.positionScreen.y - this.positionSmoothed.y * 2.5 * deltaTimeS,
-        this.positionScreen.z - this.positionSmoothed.z * 2.5 * deltaTimeS
+        (this.positionScreen.x - this.positionSmoothed.x) * 2.5 * deltaTimeS,
+        (this.positionScreen.y - this.positionSmoothed.y) * 2.5 * deltaTimeS,
+        (this.positionScreen.z - this.positionSmoothed.z) * 2.5 * deltaTimeS
     );
     
     this.positionSmoothed.x += delta.x;
