@@ -34,7 +34,6 @@
         <TextBlock Text="Max Players" Grid.Row="3" Margin="0 0 10 0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
         <TextBox Name="maxPlayers" Width="200" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False"/>
         
-        <Button Name="sendButton" Grid.Row="4" Grid.Column="1" Click="onSendButtonClicK" Content="Send"/>
-        <TextBox Name="messageOutput" Text="waiting..." Grid.Row="4" Grid.Column="0"/>
+       
     </Grid>
 </Page>
