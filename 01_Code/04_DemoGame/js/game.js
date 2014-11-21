@@ -155,14 +155,14 @@ Game.prototype.update = function()
             delta = new RS.Vector3(),
             deltaSpeed = new RS.Vector3(),
             perc, distSqd;
-        for(var i in RS.remotePlayers)
+        for(var j in RS.remotePlayers)
         {
-            if(!RS.remotePlayers[i].userPresent) continue;
-            for(var j in RS.remotePlayers[i].joints)
+            if(!RS.remotePlayers[j].userPresent) continue;
+            for(var k in RS.remotePlayers[k].joints)
             {
-                joint = RS.remotePlayers[i].joints[j];
+                joint = RS.remotePlayers[j].joints[k];
                 delta.SetFromVector( this.mainDots[i].position );
-                delta.SubVector( RS.remotePlayers[i].joints[i].positionSmoothed );
+                delta.SubVector( RS.remotePlayers[j].joints[k].positionSmoothed );
                 
                 distSqd = delta.LengthSqd();
                 perc =  (50 * 50) / distSqd;
@@ -172,7 +172,7 @@ Game.prototype.update = function()
                     deltaSpeed.SetFromVector( joint.velocity );
                     deltaSpeed.SubVector( this.mainDots[i].speed );
                     deltaSpeed.MultiplyScalar( perc );
-                    this.mainDots.acceleration.add( deltaSpeed );
+                    this.mainDots[i].acceleration.add( deltaSpeed );
                 }
             }
         }
