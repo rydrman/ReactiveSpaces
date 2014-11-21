@@ -140,6 +140,7 @@ Game.prototype.update = function()
         var joint, 
             delta = new RS.Vector3(),
             deltaSpeed = new RS.Vector3(),
+            canvasPos,
             perc, distSqd;
         for(var j in RS.remotePlayers)
         {
@@ -147,8 +148,12 @@ Game.prototype.update = function()
             for(var k in RS.remotePlayers[j].joints)
             {
                 joint = RS.remotePlayers[j].joints[k];
+                canvasPos.x =  RS.remotePlayers[j].joints[k].positionSmoothed.x * canvas.width;
+                canvasPos.y =  RS.remotePlayers[j].joints[k].positionSmoothed.y * canvas.height;
+                
                 delta.SetFromVector( this.mainDots[i].position );
-                delta.SubVector( RS.remotePlayers[j].joints[k].positionSmoothed );
+                delta.SubVector( canvasPos );
+                delta.z = 0;
                 
                 distSqd = delta.LengthSqd();
                 perc =  1 - ((50 * 50) / distSqd);
