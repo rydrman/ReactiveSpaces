@@ -165,7 +165,7 @@ Game.prototype.update = function()
                 delta.SubVector( RS.remotePlayers[i].joints[i].positionSmoothed );
                 
                 distSqd = delta.LengthSqd();
-                pecr =  (50 * 50) / distSqd;
+                perc =  (50 * 50) / distSqd;
                 if(perc < 1)
                 {
                     //push dot
