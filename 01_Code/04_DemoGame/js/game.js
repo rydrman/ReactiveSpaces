@@ -156,7 +156,7 @@ Game.prototype.update = function()
                 delta.z = 0;
                 
                 distSqd = delta.LengthSqd();
-                perc =  1 - ((50 * 50) / distSqd);
+                perc =  1 - (distSqd / (50 * 50));
                 if(perc > 0)
                 {
                     //push dot
