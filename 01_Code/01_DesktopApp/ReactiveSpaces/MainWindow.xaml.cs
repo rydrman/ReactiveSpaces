@@ -114,6 +114,7 @@ namespace ReactiveSpaces
             {
                 foreach (KinectSkeleton s in kinectManager.players)
                 {
+                    if (s == null) continue;
                     s.stationID = networker.currentProfile.id;
                 }
                 networkPage.updateStationProfile(networker.currentProfile);
