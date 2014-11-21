@@ -136,20 +136,6 @@ Game.prototype.update = function()
     {
         this.mainDots[i].update(deltaTime);
         
-        //collide with hands
-        for(var j in this.hands)
-        {
-            if(this.hands[j].emptying) continue;
-            var collision = this.mainDots[i].checkCollision(this.hands[j].position, this.hands[j].rad);
-            if(collision)
-            {
-                this.hands[j].targetValue += 25;
-                TweenLite.fromTo(this.hands[j], 1, {collectAlpha:1.0}, {collectAlpha: 0.0, value:this.hands[j].targetValue, ease:Linear.EaseOut});
-                this.mainDots.splice(i, 1);
-                break;
-            }
-        }
-        
         //pushed by joints
         var joint, 
             delta = new RS.Vector3(),
@@ -176,6 +162,20 @@ Game.prototype.update = function()
                     deltaSpeed.MultiplyScalar( perc );
                     this.mainDots[i].acceleration.add( deltaSpeed );
                 }
+            }
+        }
+        
+        //collide with hands
+        for(var j in this.hands)
+        {
+            if(this.hands[j].emptying) continue;
+            var collision = this.mainDots[i].checkCollision(this.hands[j].position, this.hands[j].rad);
+            if(collision)
+            {
+                this.hands[j].targetValue += 25;
+                TweenLite.fromTo(this.hands[j], 1, {collectAlpha:1.0}, {collectAlpha: 0.0, value:this.hands[j].targetValue, ease:Linear.EaseOut});
+                this.mainDots.splice(i, 1);
+                break;
             }
         }
     }   
