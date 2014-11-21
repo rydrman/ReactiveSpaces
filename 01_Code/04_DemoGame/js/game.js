@@ -126,6 +126,7 @@ Game.prototype.update = function()
         var dot = new Dot(Dot.types.MAIN, 20, this.mainDotImg);
         dot.position.set(this.getOffScreenStartPos(10));
         dot.speed.set( new Vector( 50 + Math.random() * 50, 50 + Math.random() * 50 ) );
+        dot.friction = 0.99;
         this.mainDots.push( dot );
         this.lastMainDot = now;
     }    

@@ -7,13 +7,13 @@ var Dot = function( type, rad, img )
     this.img = img;
     this.alpha = 1;
     this.radius = rad;
-    this.maxSpeed = 10;
+    this.maxSpeed = 100;
     this.position = new Vector();
     this.rotation = 0;
     this.angularSpeed = 0;
     this.speed = new Vector();
     this.acceleration = new Vector();
-    this.friction = 0.99;
+    this.friction = 1;
     this.force = new Vector();
 }
 

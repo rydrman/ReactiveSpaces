@@ -20,7 +20,7 @@ Vector.prototype.add = function( vector )
 Vector.prototype.multScalar = function( value )
 {
     this.x *= value;
-    this.y += value;
+    this.y *= value;
 }
 
 Vector.prototype.getMultScalar = function( value )
