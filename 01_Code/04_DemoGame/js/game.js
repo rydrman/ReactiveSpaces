@@ -171,7 +171,7 @@ Game.prototype.update = function()
                     //push dot
                     deltaSpeed.SetFromVector( joint.velocity );
                     deltaSpeed.SubVector( this.mainDots[i].speed );
-                    deltaSpeed.MultiplyScalar( perc );
+                    deltaSpeed.MultiplyScalar( perc * this.mainDots[i].maxSpeed );
                     this.mainDots[i].acceleration.add( deltaSpeed );
                 }
             }
