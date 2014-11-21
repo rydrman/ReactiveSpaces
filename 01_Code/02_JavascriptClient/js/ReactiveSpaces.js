@@ -10,11 +10,12 @@ window.RS = window.ReactiveSpaces = {version: 0.1};
 
 //region
 
-//constants etc
+//constants and settings etc
 RS.BASEURL = "ws://localhost";
 RS.LOCALPORT = 8080;
 RS.MESSAGE_DELAY = 100;
 RS.SUPORTED_PLAYERS = 2;
+RS.MOVEMENT_BLENDING = true;
 
 //app info
 RS.appInfo = {
@@ -37,6 +38,7 @@ RS.remoteStations = [];
 //to keep skeletons
 RS.players = [];
 RS.remotePlayers = [];
+RS.lastBlendUpdate = new Date().getTime();
 
 //to store event listeners
 RS.listeners = [];
@@ -126,7 +128,6 @@ RS.Connect = function( appName, appVersion, features, port )
         RS.Disconnect();
     }
     
-    
     return true;
 } 
 
@@ -179,7 +180,25 @@ RS.SocketOpened = function()
     
     console.log("REACTIVE SPACES: connected to " + RS.socket.url);
     
+    if(RS.MOVEMENT_BLENDING)
+        window.requestAnimationFrame(RS.BlendUpdate);
+    
     RS.fireEvent(RS.Events.connect);
+}
+
+RS.BlendUpdate = function()
+{
+    if(RS.connected)
+        window.requestAnimationFrame(RS.BlendUpdate);
+    
+    var now = new Date().getTime();
+    var deltaTimeS = (now - RS.lastBlendUpdate) * 0.001;
+    RS.lastBlendUpdate = now;
+    
+    for(var i in RS.players)
+        RS.players[i].BlendUpdate( deltaTimeS );
+    for(var i in RS.remotePlayers)
+        RS.remotePlayers[i].BlendUpdate( deltaTimeS );
 }
 
 RS.SocketClosed = function()
@@ -492,6 +511,13 @@ RS.Skeleton.prototype.Update = function( skeleton )
     }
 }
 
+RS.Skeleton.prototype.BlendUpdate = function( deltaTimeS )
+{
+    if(this.joints == null) return;
+    for(var i in this.joints)
+        this.joints[i].BlendUpdate( deltaTimeS );
+}
+
 //SKELETONJOINT
 //describes a skeleton joint object
 RS.SkeletonJoint = function( skeleton )
@@ -506,6 +532,8 @@ RS.SkeletonJoint = function( skeleton )
     //0-1 in width and height
     //0-1 in z from 0 to 5 meters in depth
     this.positionScreen = new RS.Vector3();
+    //screen position but smooth transition (might be behind)
+    this.positionSmoothed = new RS.Vector3();
 }
 //SKELTONJOINT::SETFROMJOINT
 //copies data of the given joint into this one
@@ -523,6 +551,14 @@ RS.SkeletonJoint.prototype.SetFromJoint = function( joint )
         this.positionMeters.SetFromVector( joint.position );
         this.positionScreen.SetFromVector( joint.screenPos );
     }
+}
+
+//called by reactive spaces to update the smoothed screenPosition
+RS.SkeletonJoint.prototype.BlendUpdate = function( deltaTimeS )
+{
+    this.positionSmoothed.x += (this.positionScreen.x - this.positionSmoothed.x) * 2.5 * deltaTimeS;
+    this.positionSmoothed.y += (this.positionScreen.y - this.positionSmoothed.y) * 2.5 * deltaTimeS;
+    this.positionSmoothed.z += (this.positionScreen.z - this.positionSmoothed.z) * 2.5 * deltaTimeS;
 }
 
 //VECTOR3
@@ -565,13 +601,17 @@ RS.Vector3.prototype.SetFromVector = function( vector )
 //////////////////////////////////////////////////////
 
 //DRAW SKELETON
-//draws the given skeleton on the given 2d context
+//draws the given skeleton on the given 2d context 
+//maps screen position to the bounds of the canvas
 //context: valid 2d drawing context for an html 5 canvas
 //skeleton: valid skeleton object from ReactiveSpaces
 //color (optional): string canvas color identifier, default is "#FFF"
-RS.DrawSkeleton = function(context, skeleton, color)
+//blend (optional): sets weather of not to use the blended skeleton
+//                  RS.MOVEMENT_BLEND must be set to true (default is false)
+RS.DrawSkeleton = function(context, skeleton, color, blend)
 {
     var ctx = context;
+    var positionType = blend ? 'positionSmoothed' : 'positionScreen';
     
     color = (typeof(color) == 'undefined') ? "#FFF" : color;
     
@@ -579,52 +619,52 @@ RS.DrawSkeleton = function(context, skeleton, color)
     ctx.strokeStyle = color;
     ctx.beginPath();
     //arms
-    ctx.moveTo(skeleton.joints[RS.JointTypes.HAND_LEFT].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.HAND_LEFT].positionScreen.y * ctx.canvas.height);
-    ctx.lineTo(skeleton.joints[RS.JointTypes.WRIST_LEFT].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.WRIST_LEFT].positionScreen.y * ctx.canvas.height);
-    ctx.lineTo(skeleton.joints[RS.JointTypes.ELBOW_LEFT].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.ELBOW_LEFT].positionScreen.y * ctx.canvas.height);
-    ctx.lineTo(skeleton.joints[RS.JointTypes.SHOULDER_LEFT].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.SHOULDER_LEFT].positionScreen.y * ctx.canvas.height);
-    ctx.lineTo(skeleton.joints[RS.JointTypes.SHOULDER_CENTER].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.SHOULDER_CENTER].positionScreen.y * ctx.canvas.height);
-    ctx.lineTo(skeleton.joints[RS.JointTypes.SHOULDER_RIGHT].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.SHOULDER_RIGHT].positionScreen.y * ctx.canvas.height);
-    ctx.lineTo(skeleton.joints[RS.JointTypes.ELBOW_RIGHT].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.ELBOW_RIGHT].positionScreen.y * ctx.canvas.height);
-    ctx.lineTo(skeleton.joints[RS.JointTypes.WRIST_RIGHT].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.WRIST_RIGHT].positionScreen.y * ctx.canvas.height);
-    ctx.lineTo(skeleton.joints[RS.JointTypes.HAND_RIGHT].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.HAND_RIGHT].positionScreen.y * ctx.canvas.height);
+    ctx.moveTo(skeleton.joints[RS.JointTypes.HAND_LEFT][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.HAND_LEFT][positionType].y * ctx.canvas.height);
+    ctx.lineTo(skeleton.joints[RS.JointTypes.WRIST_LEFT][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.WRIST_LEFT][positionType].y * ctx.canvas.height);
+    ctx.lineTo(skeleton.joints[RS.JointTypes.ELBOW_LEFT][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.ELBOW_LEFT][positionType].y * ctx.canvas.height);
+    ctx.lineTo(skeleton.joints[RS.JointTypes.SHOULDER_LEFT][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.SHOULDER_LEFT][positionType].y * ctx.canvas.height);
+    ctx.lineTo(skeleton.joints[RS.JointTypes.SHOULDER_CENTER][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.SHOULDER_CENTER][positionType].y * ctx.canvas.height);
+    ctx.lineTo(skeleton.joints[RS.JointTypes.SHOULDER_RIGHT][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.SHOULDER_RIGHT][positionType].y * ctx.canvas.height);
+    ctx.lineTo(skeleton.joints[RS.JointTypes.ELBOW_RIGHT][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.ELBOW_RIGHT][positionType].y * ctx.canvas.height);
+    ctx.lineTo(skeleton.joints[RS.JointTypes.WRIST_RIGHT][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.WRIST_RIGHT][positionType].y * ctx.canvas.height);
+    ctx.lineTo(skeleton.joints[RS.JointTypes.HAND_RIGHT][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.HAND_RIGHT][positionType].y * ctx.canvas.height);
     //body and left leg
-    ctx.moveTo(skeleton.joints[RS.JointTypes.HEAD].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.HEAD].positionScreen.y * ctx.canvas.height);
-    ctx.lineTo(skeleton.joints[RS.JointTypes.SHOULDER_CENTER].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.SHOULDER_CENTER].positionScreen.y * ctx.canvas.height);
-    ctx.lineTo(skeleton.joints[RS.JointTypes.SPINE].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.SPINE].positionScreen.y * ctx.canvas.height);
-    ctx.lineTo(skeleton.joints[RS.JointTypes.HIP_CENTER].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.HIP_CENTER].positionScreen.y * ctx.canvas.height);
-    ctx.lineTo(skeleton.joints[RS.JointTypes.HIP_LEFT].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.HIP_LEFT].positionScreen.y * ctx.canvas.height);
-    ctx.lineTo(skeleton.joints[RS.JointTypes.KNEE_LEFT].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.KNEE_LEFT].positionScreen.y * ctx.canvas.height);
-    ctx.lineTo(skeleton.joints[RS.JointTypes.ANKLE_LEFT].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.ANKLE_LEFT].positionScreen.y * ctx.canvas.height);
-    ctx.lineTo(skeleton.joints[RS.JointTypes.FOOT_LEFT].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.FOOT_LEFT].positionScreen.y * ctx.canvas.height);
+    ctx.moveTo(skeleton.joints[RS.JointTypes.HEAD][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.HEAD][positionType].y * ctx.canvas.height);
+    ctx.lineTo(skeleton.joints[RS.JointTypes.SHOULDER_CENTER][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.SHOULDER_CENTER][positionType].y * ctx.canvas.height);
+    ctx.lineTo(skeleton.joints[RS.JointTypes.SPINE][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.SPINE][positionType].y * ctx.canvas.height);
+    ctx.lineTo(skeleton.joints[RS.JointTypes.HIP_CENTER][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.HIP_CENTER][positionType].y * ctx.canvas.height);
+    ctx.lineTo(skeleton.joints[RS.JointTypes.HIP_LEFT][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.HIP_LEFT][positionType].y * ctx.canvas.height);
+    ctx.lineTo(skeleton.joints[RS.JointTypes.KNEE_LEFT][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.KNEE_LEFT][positionType].y * ctx.canvas.height);
+    ctx.lineTo(skeleton.joints[RS.JointTypes.ANKLE_LEFT][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.ANKLE_LEFT][positionType].y * ctx.canvas.height);
+    ctx.lineTo(skeleton.joints[RS.JointTypes.FOOT_LEFT][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.FOOT_LEFT][positionType].y * ctx.canvas.height);
     //right leg
-    ctx.moveTo(skeleton.joints[RS.JointTypes.HIP_CENTER].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.HIP_CENTER].positionScreen.y * ctx.canvas.height);
-    ctx.lineTo(skeleton.joints[RS.JointTypes.HIP_RIGHT].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.HIP_RIGHT].positionScreen.y * ctx.canvas.height);
-    ctx.lineTo(skeleton.joints[RS.JointTypes.KNEE_RIGHT].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.KNEE_RIGHT].positionScreen.y * ctx.canvas.height);
-    ctx.lineTo(skeleton.joints[RS.JointTypes.ANKLE_RIGHT].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.ANKLE_RIGHT].positionScreen.y * ctx.canvas.height);
-    ctx.lineTo(skeleton.joints[RS.JointTypes.FOOT_RIGHT].positionScreen.x * ctx.canvas.width, 
-               skeleton.joints[RS.JointTypes.FOOT_RIGHT].positionScreen.y * ctx.canvas.height);
+    ctx.moveTo(skeleton.joints[RS.JointTypes.HIP_CENTER][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.HIP_CENTER][positionType].y * ctx.canvas.height);
+    ctx.lineTo(skeleton.joints[RS.JointTypes.HIP_RIGHT][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.HIP_RIGHT][positionType].y * ctx.canvas.height);
+    ctx.lineTo(skeleton.joints[RS.JointTypes.KNEE_RIGHT][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.KNEE_RIGHT][positionType].y * ctx.canvas.height);
+    ctx.lineTo(skeleton.joints[RS.JointTypes.ANKLE_RIGHT][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.ANKLE_RIGHT][positionType].y * ctx.canvas.height);
+    ctx.lineTo(skeleton.joints[RS.JointTypes.FOOT_RIGHT][positionType].x * ctx.canvas.width, 
+               skeleton.joints[RS.JointTypes.FOOT_RIGHT][positionType].y * ctx.canvas.height);
     ctx.stroke();
 
     //then joints
@@ -632,7 +672,7 @@ RS.DrawSkeleton = function(context, skeleton, color)
     for(var i in skeleton.joints)
     {
         ctx.beginPath();
-        ctx.arc(skeleton.joints[i].positionScreen.x * ctx.canvas.width, skeleton.joints[i].positionScreen.y * ctx.canvas.height, 5, 0, Math.PI * 2, false);
+        ctx.arc(skeleton.joints[i][positionType].x * ctx.canvas.width, skeleton.joints[i][positionType].y * ctx.canvas.height, 5, 0, Math.PI * 2, false);
         ctx.fill();
     }
 }

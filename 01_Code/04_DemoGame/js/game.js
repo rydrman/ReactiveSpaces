@@ -214,7 +214,29 @@ Game.prototype.update = function()
                     radius: 0,
                     ease: Linear.EaseNone,
                     onComplete: this.removeScoreDot,
-                    onCompleteParams: [this.scoreDots[i]],
+                    onCompleteParams: [this.scoreDots[i], true],
+                    onCompleteScope: this
+                });
+                break;
+            }
+        }
+        for (var j in this.remoteDots)
+        {
+            var collision = this.remoteDots[j].checkCollision(this.remoteDots[i].position, this.scoreDotRad);
+            if (collision)
+            {
+                this.scoreDots[i].collected = true;
+                TweenLite.to(this.scoreDots[i].position, 0.5, {
+                    x: this.remoteDots[j].position.x,
+                    y: this.remoteDots[j].position.y,
+                    ease: Linear.EaseIn
+                });
+                TweenLite.to(this.scoreDots[i], 0.5, {
+                    alpha: 0,
+                    radius: 0,
+                    ease: Linear.EaseNone,
+                    onComplete: this.removeScoreDot,
+                    onCompleteParams: [this.scoreDots[i], false],
                     onCompleteScope: this
                 });
                 break;
@@ -282,6 +304,12 @@ Game.prototype.render = function()
     ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
+    //draw remote skeletons
+    for(var i in RS.remotePlayers)
+    {
+        RS.drawSkelton(ctx, RS.remotePlayers[i], "rgba(255, 255, 255, 0.2)", true);
+    }
+    
     //LARGE DOT
     //rendering large dots
     for(var i=0; i <this.largeDots.length; i++)
@@ -322,10 +350,10 @@ Game.prototype.render = function()
     for (var i in this.scoreCounters)
     {
         ctx.save();
-        ctx.fillStyle = "#FFF";
+        ctx.fillStyle = this.scoreCounters[i].color;
         ctx.globalAlpha = this.scoreCounters[i].alpha;
         ctx.translate(this.scoreCounters[i].position.x, this.scoreCounters[i].position.y);
-        ctx.fillText("+" + this.scoreCounters[i].value, 0, 0);
+        ctx.fillText(this.scoreCounters[i].value, 0, 0);
         ctx.restore();
     }
     
@@ -358,27 +386,37 @@ Game.prototype.removeRemoteDot = function( remoteDot )
     }
 }
 
-Game.prototype.removeScoreDot = function( scoreDot )
+Game.prototype.removeScoreDot = function( scoreDot, getScore )
 {
     for (var i in this.scoreDots)
     {
         if (this.scoreDots[i].id == scoreDot.id)
         {
             this.scoreDots.splice(i, 1);
-            this.ui.score++;
             
             var position = new Vector();
-            position.set(scoreDot.position);
-            var counter = {
-                id: this.lastScoreCounterID++,
-                value: 1,
-                position: position,
-                alpha:1
+                position.set(scoreDot.position);
+                var counter = {
+                    id: this.lastScoreCounterID++,
+                    value: "+1",
+                    position: position,
+                    color: "#FFF",
+                    alpha:1
+                }
+            
+            if(getScore)
+            {
+                this.ui.score++;
             }
+            else
+            {
+                counter.value = "x";
+                counter.color = "#ff3434";
+            }
+
             TweenLite.to(counter, 1.5, { alpha: 0, ease: Linear.EaseOut, onComplete: this.removeScoreCounter, onCompleteParams: [counter], onCompleteScope: this });
             TweenLite.to(counter.position, 1.5, { y: counter.position.y - 30, ease: Linear.EaseOut});
             this.scoreCounters.push(counter);
-
 
             return;
         }

@@ -18,8 +18,8 @@ Hand.prototype.update = function(deltaTime)
 {  
     if(this.joint != null)
     {
-        this.position.x = this.joint.positionScreen.x * canvas.width;
-        this.position.y = this.joint.positionScreen.y * canvas.height;
+        this.position.x = this.joint.positionSmoothed.x * canvas.width;
+        this.position.y = this.joint.positionSmoothed.y * canvas.height;
     }
     if(this.emptying)
     {

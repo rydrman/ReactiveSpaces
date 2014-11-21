@@ -29,6 +29,8 @@ namespace RSLocalhost
         public bool listening = false;
         public bool listeningChanged = false;
 
+        Stopwatch kinectTimer;
+
         Networker networker = null;
         KinectManager kinectManager = null;
 
@@ -59,6 +61,9 @@ namespace RSLocalhost
             kinectManager._onPlayerOut = RemoveLocalKinect;
 
             listener = new TcpListener(IPAddress.Any, 8080);
+
+            kinectTimer = new Stopwatch();
+            kinectTimer.Start();
 
             StartListenerThread();
         }
@@ -315,6 +320,12 @@ namespace RSLocalhost
 
         public void UpdateLocalKinect(KinectSkeleton[] skeletons)
         {
+            //if it hasn't been long enough
+            if (kinectTimer.ElapsedMilliseconds < 50)
+                return;
+            else
+                kinectTimer.Restart();
+
             foreach (KinectSkeleton skeleton in skeletons)
             {
                 WebSocketMessage message = new WebSocketMessage();
