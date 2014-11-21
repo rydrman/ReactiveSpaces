@@ -222,7 +222,7 @@ Game.prototype.update = function()
         }
         for (var j in this.remoteDots)
         {
-            var collision = this.remoteDots[j].checkCollision(this.remoteDots[i].position, this.scoreDotRad);
+            var collision = this.remoteDots[j].checkCollision(this.scoreDots[i].position, this.scoreDotRad);
             if (collision)
             {
                 this.scoreDots[i].collected = true;

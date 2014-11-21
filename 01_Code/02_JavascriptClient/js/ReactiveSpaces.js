@@ -278,7 +278,7 @@ RS.MessageRecieved = function(e)
                     {
                         var station = RS.remoteStations[i];
                         RS.remoteStations.splice(i, 1);
-                        RS.fireEvent(RS.Events.stationdisconnect, player);
+                        RS.fireEvent(RS.Events.stationdisconnect, station);
                         break;
                     }
                 }
