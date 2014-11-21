@@ -140,7 +140,7 @@ Game.prototype.update = function()
         var joint, 
             delta = new RS.Vector3(),
             deltaSpeed = new RS.Vector3(),
-            canvasPos,
+            canvasPos = new RS.Vector3(),
             perc, distSqd;
         for(var j in RS.remotePlayers)
         {
