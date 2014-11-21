@@ -369,13 +369,16 @@ RS.RemoteSkeletonRecieved = function(skeleton)
         {
             result.profile = this.remoteStations[i];
             result.skeleton = result.profile.players[skeleton.playerNumber];
-            if(typeof(result.skeleton) == 'undefined')
+            if(typeof(result.skeleton) == 'undefined' || result.userPresent == false)
             {
                 result.profile.players[skeleton.playerNumber] = new RS.Skeleton();
                 result.skeleton = result.profile.players[skeleton.playerNumber];
+                result.skeleton.Update( skeleton );
+                RS.fireEvent(RS.Events.remoteplayerenter, result.skeleton);
+                return result;
             }
-            result.skeleton.Update( skeleton );
             
+            result.skeleton.Update( skeleton );
             return result
         }
     }
