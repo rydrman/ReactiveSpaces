@@ -43,20 +43,27 @@ Dot.prototype.update = function(deltaTime)
 //main movement functionality
 Dot.prototype.collideWithBorders = function()
 {
-    
-    if(this.position.x-this.radius < 0){
-        this.speed.x += Math.abs(this.speed.x);
+    //LEFT
+    if(this.position.x-this.radius < 0)
+    {
+        this.speed.x = Math.abs(this.speed.x);
         if(this.speed.x == 0) this.acceleration.x += this.maxSpeed * 0.05;
     }
-    else if(this.position.x+this.radius > canvas.width){
+    //RIGHT
+    else if(this.position.x+this.radius > canvas.width)
+    {
         this.speed.x = -Math.abs(this.speed.x);
         if(this.speed.x == 0) this.acceleration.x -= this.maxSpeed * 0.05;
     }
-    if(this.position.y-this.radius < 0){
+    //TOP
+    if(this.position.y-this.radius < 0)
+    {
         this.speed.y = Math.abs(this.speed.y);
         if(this.speed.y == 0) this.acceleration.y += this.maxSpeed * 0.05;
     }
-    else if(this.position.y+this.radius > canvas.height){
+    //BOTTOM
+    else if(this.position.y+this.radius > canvas.height)
+    {
         this.speed.y = -Math.abs(this.speed.y);
         if(this.speed.y == 0) this.acceleration.y -= this.maxSpeed * 0.05;
     }
