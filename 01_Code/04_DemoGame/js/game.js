@@ -158,7 +158,7 @@ Game.prototype.update = function()
         for(var j in RS.remotePlayers)
         {
             if(!RS.remotePlayers[j].userPresent) continue;
-            for(var k in RS.remotePlayers[k].joints)
+            for(var k in RS.remotePlayers[j].joints)
             {
                 joint = RS.remotePlayers[j].joints[k];
                 delta.SetFromVector( this.mainDots[i].position );
