@@ -369,7 +369,7 @@ RS.RemoteSkeletonRecieved = function(skeleton)
         {
             result.profile = this.remoteStations[i];
             result.skeleton = result.profile.players[skeleton.playerNumber];
-            if(typeof(result.skeleton) == 'undefined' || result.userPresent == false)
+            if(typeof(result.skeleton) == 'undefined' || result.skeleton.userPresent == false)
             {
                 result.profile.players[skeleton.playerNumber] = new RS.Skeleton();
                 result.skeleton = result.profile.players[skeleton.playerNumber];

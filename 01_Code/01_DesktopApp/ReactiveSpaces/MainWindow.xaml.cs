@@ -112,6 +112,10 @@ namespace ReactiveSpaces
             //station profile
             if(networker.stationProfileUpdated)
             {
+                foreach (KinectSkeleton s in kinectManager.players)
+                {
+                    s.stationID = networker.currentProfile.id;
+                }
                 networkPage.updateStationProfile(networker.currentProfile);
                 networker.stationProfileUpdated = false;
             }
