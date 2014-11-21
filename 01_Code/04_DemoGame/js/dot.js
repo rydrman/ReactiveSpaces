@@ -50,7 +50,7 @@ Dot.prototype.collideWithBorders = function()
     }
     else if(this.position.x+this.radius > canvas.width){
         this.speed.x = -Math.abs(this.speed.x);
-        if(this.speed.x == 0) this.acceleration.x 0-= this.maxSpeed * 0.05;
+        if(this.speed.x == 0) this.acceleration.x -= this.maxSpeed * 0.05;
     }
     if(this.position.y-this.radius < 0){
         this.speed.y = Math.abs(this.speed.y);
