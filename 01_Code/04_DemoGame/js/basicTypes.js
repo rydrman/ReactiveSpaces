@@ -12,7 +12,6 @@ Vector.prototype.set = function( pos )
 
 Vector.prototype.add = function( vector )
 {
-    if( !(vector instanceof Vector)) return; 
     this.x += vector.x;
     this.y += vector.y;
 }
