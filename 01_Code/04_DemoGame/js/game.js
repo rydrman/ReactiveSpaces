@@ -307,7 +307,7 @@ Game.prototype.render = function()
     //draw remote skeletons
     for(var i in RS.remotePlayers)
     {
-        RS.drawSkelton(ctx, RS.remotePlayers[i], "rgba(255, 255, 255, 0.2)", true);
+        RS.drawSkeleton(ctx, RS.remotePlayers[i], "rgba(255, 255, 255, 0.2)", true);
     }
     
     //LARGE DOT

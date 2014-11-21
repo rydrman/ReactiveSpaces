@@ -1,8 +1,8 @@
 var SocketMessage = require('./RSSocketMessage.js');
 
-var Client = module.exports = function(socket)
+var Client = module.exports = function(socket, id)
 {
-    this.id = -1;
+    this.id = id;
     this.active = true;
     this.ready = false;
     this.locked = false;
@@ -15,7 +15,7 @@ var Client = module.exports = function(socket)
     this.stationProfile = {
         name: "unset",
         location: "unset",
-        id: -1
+        id: id
     };
     this.appInfo = null;
     
@@ -58,8 +58,10 @@ Client.prototype.profileRecieved = function( id )
 
     //send to client
     var message = new SocketMessage(SocketMessage.types.STATION_PROFILE, this.stationProfile);
-    this.trySend(message.json);
+    var result = this.trySend(message.getJSON());
 
+    if(!result) console.log("issue sending new station profile to client " + this.id);
+    
     this.ready = true;
 }
 
@@ -231,7 +233,7 @@ Client.prototype.trySend = function(string)
             if(Date().getMilliseconds - start > this.sendTimeout)
             {
                 console.log("message send timeout");
-                return;
+                return false;
             }
         }
     }
@@ -246,8 +248,11 @@ Client.prototype.trySend = function(string)
         this.onDisconnect();
         if(this.socket.close)
             this.socket.close();
+        this.locked = false;
+        return false;
     }
     this.locked = false;
+    return true;
 }
 
 Client.prototype.onError = function(e)

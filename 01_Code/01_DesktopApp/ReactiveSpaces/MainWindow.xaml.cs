@@ -188,7 +188,7 @@ namespace ReactiveSpaces
 
         public void onReconnect()
         {
-            localNet.Disconnect();
+            //localNet.Disconnect();
             networker.Reconnect();
         }
 

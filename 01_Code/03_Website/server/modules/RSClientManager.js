@@ -11,10 +11,7 @@ var ClientManager = module.exports = function()
 
 ClientManager.prototype.addClient = function( socket )
 {
-    var newClient = new Client( socket );
-    
-    //give it an ID
-    newClient.id = this.nextID++;
+    var newClient = new Client( socket, this.nextID++ );
     
     //set callbacks
     var self = this;

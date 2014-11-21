@@ -104,7 +104,7 @@ namespace ReactiveSpaces
                 Canvas.SetLeft(jointEllipse, skeleton.joints[i].screenPos.x * 320);
                 Canvas.SetTop(jointEllipse, skeleton.joints[i].screenPos.y * 240);
 
-                localCanvas.Children.Add(jointEllipse);
+                remoteCanvas.Children.Add(jointEllipse);
             }
         }
     }
