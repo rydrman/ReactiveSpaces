@@ -27,3 +27,30 @@ Vector.prototype.getMultScalar = function( value )
 {
     return new Vector(this.x * value, this.y * value);
 }
+
+Vector.prototype.normalize = function( len )
+{
+    len = (typeof(len) == 'undefined') ? this.length() : len;
+    this.x /= len;
+    this.y /= len;
+}
+
+Vector.prototype.length = function( value )
+{
+    return Math.sqrt( this.lengthSqd() );
+}
+
+Vector.prototype.lengthSqd = function( value )
+{
+    return this.x * this.x + this.y * this.y;
+}
+
+Vector.prototype.limit = function( max )
+{
+    var len = this.length();
+    if(len > max)
+    {
+        this.normalize( len );
+        this.multScalar( max );
+    }
+}

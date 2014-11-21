@@ -537,6 +537,9 @@ RS.SkeletonJoint = function( skeleton )
     this.positionScreen = new RS.Vector3();
     //screen position but smooth transition (might be behind)
     this.positionSmoothed = new RS.Vector3();
+    //velocity is joint movement from frame to frame
+    //only calculated when blending is on
+    this.velocity = new RS.Vector3();
 }
 //SKELTONJOINT::SETFROMJOINT
 //copies data of the given joint into this one
@@ -556,12 +559,22 @@ RS.SkeletonJoint.prototype.SetFromJoint = function( joint )
     }
 }
 
+//SKELTOINJOINT::BLENDUPDATE
 //called by reactive spaces to update the smoothed screenPosition
+//also updates joint velocities
 RS.SkeletonJoint.prototype.BlendUpdate = function( deltaTimeS )
 {
-    this.positionSmoothed.x += (this.positionScreen.x - this.positionSmoothed.x) * 2.5 * deltaTimeS;
-    this.positionSmoothed.y += (this.positionScreen.y - this.positionSmoothed.y) * 2.5 * deltaTimeS;
-    this.positionSmoothed.z += (this.positionScreen.z - this.positionSmoothed.z) * 2.5 * deltaTimeS;
+    var delta = new RS.Vector3(
+        this.positionScreen.x - this.positionSmoothed.x * 2.5 * deltaTimeS,
+        this.positionScreen.y - this.positionSmoothed.y * 2.5 * deltaTimeS,
+        this.positionScreen.z - this.positionSmoothed.z * 2.5 * deltaTimeS
+    );
+    
+    this.positionSmoothed.x += delta.x;
+    this.positionSmoothed.y += delta.y;
+    this.positionSmoothed.z += delta.z;
+    
+    this.velocity.SetFromVector( delta );
 }
 
 //VECTOR3
@@ -595,6 +608,45 @@ RS.Vector3.prototype.SetFromVector = function( vector )
     this.x = (typeof(vector.x) == 'undefined') ? 0 : vector.x;
     this.y = (typeof(vector.y) == 'undefined') ? 0 : vector.y;
     this.z = (typeof(vector.z) == 'undefined') ? 0 : vector.z;
+}
+
+RS.Vector3.prototype.AddVector = function( vector )
+{
+    this.x += vector.x;
+    this.y += vector.y;
+    this.z += vector.z;
+}
+
+RS.Vector3.prototype.SubVector = function( vector )
+{
+    this.x -= vector.x;
+    this.y -= vector.y;
+    this.z -= vector.z;
+}
+
+RS.Vector3.prototype.MultiplyScalar = function( scalar )
+{
+    this.x *= scalar;
+    this.y *= scalar;
+    this.z *= scalar;
+}
+
+RS.Vector3.prototype.Normalize = function()
+{
+    var len = this.Length();
+    this.x /= len;
+    this.y /= len;
+    this.z /= len;
+}
+
+RS.Vector3.prototype.Length = function()
+{
+    return Math.sqrt(this.LengthSqd());
+}
+
+RS.Vector3.prototype.LengthSqd = function()
+{
+    return (this.x * this.x) + (this.y * this.y) + (this.z * this.z)
 }
 
 //endregion

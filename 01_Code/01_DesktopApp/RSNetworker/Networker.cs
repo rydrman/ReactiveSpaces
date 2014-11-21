@@ -422,7 +422,7 @@ namespace RSNetworker
                 return;
 
             //if it hasn't been long enough
-            if (kinectTimer.ElapsedMilliseconds < 250)
+            if (kinectTimer.ElapsedMilliseconds < 100)
                 return;
             else
                 kinectTimer.Restart();

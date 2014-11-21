@@ -134,6 +134,8 @@ Game.prototype.update = function()
     for(var i = this.mainDots.length - 1; i >= 0; i--)
     {
         this.mainDots[i].update(deltaTime);
+        
+        //collide with hands
         for(var j in this.hands)
         {
             if(this.hands[j].emptying) continue;
@@ -144,6 +146,33 @@ Game.prototype.update = function()
                 TweenLite.fromTo(this.hands[j], 1, {collectAlpha:1.0}, {collectAlpha: 0.0, value:this.hands[j].targetValue, ease:Linear.EaseOut});
                 this.mainDots.splice(i, 1);
                 break;
+            }
+        }
+        
+        //pushed by joints
+        var joint, 
+            delta = new RS.Vector3(),
+            deltaSpeed = new RS.Vector3(),
+            perc, distSqd;
+        for(var i in RS.remotePlayers)
+        {
+            if(!RS.remotePlayers[i].userPresent) continue;
+            for(var j in RS.remotePlayers[i].joints)
+            {
+                joint = RS.remotePlayers[i].joints[j];
+                delta.SetFromVector( this.mainDots[i].position );
+                delta.SubVector( RS.remotePlayers[i].joints[i].positionSmoothed );
+                
+                distSqd = delta.LengthSqd();
+                pecr = distSqd / (50 * 50);
+                if(perc < 1)
+                {
+                    //push dot
+                    deltaSpeed.SetFromVector( joint.velocity );
+                    deltaSpeed.SubVector( this.mainDots[i].speed );
+                    deltaSpeed.MultiplyScalar( perc );
+                    this.mainDots.acceleration.add( deltaSpeed );
+                }
             }
         }
     }   
