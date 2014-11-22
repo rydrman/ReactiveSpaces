@@ -402,6 +402,15 @@ namespace RSLocalhost
                     Disconnect();
                     return false;
                 }
+                catch (System.NullReferenceException e)
+                {
+                    //stream is closed
+                    //or
+                    //failure reading from network
+                    Console.Write("Failure writing to web socket. Null Ref Exception.");
+                    Disconnect();
+                    return false;
+                }
             }
             return true;
         }

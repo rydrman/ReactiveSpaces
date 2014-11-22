@@ -36,10 +36,19 @@ var Client = module.exports = function(socket, id)
     socket.on('error', function(e){self.onError.call(self, e)});
     socket.on('data', function(data){self.onData.call(self, data)});
     
+    socket.setKeepAlive(true, 2000);
+    
+    //this.lifeCheck = setInterval(function(){self.checkSocketState.call(self)}, 3000);
+    
     //var message = new SocketMessage( SocketMessage.Types.MESSAGE, "hi" );
     
     //socket.write(JSON.stringify(message));
 };
+
+//Client.prototype.checkSocketState = function()
+//{
+//    
+//}
 
 Client.prototype.profileRecieved = function( id )
 {

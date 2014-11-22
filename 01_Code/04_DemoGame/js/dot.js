@@ -7,7 +7,7 @@ var Dot = function( type, rad, img )
     this.img = img;
     this.alpha = 1;
     this.radius = rad;
-    this.maxSpeed = 100;
+    this.maxSpeed = 0.25;
     this.minSpeed = 0;
     this.position = new Vector();
     this.rotation = 0;
@@ -18,13 +18,25 @@ var Dot = function( type, rad, img )
     this.force = new Vector();
 }
 
+Dot.prototype.scaleAll = function( scale )
+{
+    return;
+    this.radius *= scale;
+    this.maxSpeed *= scale;
+    this.minSpeed *= scale;
+    this.position.multScalar(scale);
+    this.speed.multScalar(scale);
+    this.acceleration.multScalar(scale);
+    this.force.multScalar(scale);
+}
+
 Dot.prototype.render = function()
 {  
     ctx.save();
     ctx.globalAlpha = this.alpha;
-    ctx.translate(this.position.x, this.position.y);
+    ctx.translate(this.position.x * canvas.width, this.position.y * canvas.width);
     ctx.rotate(this.rotation);
-    ctx.drawImage(this.img, -this.radius, -this.radius, this.radius*2, this.radius*2);
+    ctx.drawImage(this.img, -this.radius * canvas.width, -this.radius * canvas.width, this.radius*canvas.width*2, this.radius*canvas.width*2);
     ctx.restore();
 }
 
@@ -51,7 +63,7 @@ Dot.prototype.collideWithBorders = function()
         if(this.speed.x == 0) this.acceleration.x += this.maxSpeed * 0.05;
     }
     //RIGHT
-    else if(this.position.x+this.radius > canvas.width)
+    else if(this.position.x+this.radius > 1)
     {
         this.speed.x = -Math.abs(this.speed.x);
         if(this.speed.x == 0) this.acceleration.x -= this.maxSpeed * 0.05;
@@ -63,7 +75,7 @@ Dot.prototype.collideWithBorders = function()
         if(this.speed.y == 0) this.acceleration.y += this.maxSpeed * 0.05;
     }
     //BOTTOM
-    else if(this.position.y+this.radius > canvas.height)
+    else if(this.position.y+this.radius > 9/16)
     {
         this.speed.y = -Math.abs(this.speed.y);
         if(this.speed.y == 0) this.acceleration.y -= this.maxSpeed * 0.05;

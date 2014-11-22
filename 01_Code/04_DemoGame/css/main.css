@@ -1,19 +1,21 @@
 html, body{
     width:100%;
     height:100%;
-    border:none;
-    
+    border:0px;
+    padding:0px;
+    margin:0px;
+    overflow: hidden;
 }
 
-h1{
+#canvas-floater{
     width:100%;
-    text-align:center;
-    font:30px sans-serif;
+    height:100%;
+    background-color: #000;
 }
 
 #canvas{
-    margin-left:calc(50% - 400px);
+    position: relative;
     width:800px;
     height:600px;
-    background-color:#000;
+    background-color:#222;
 }

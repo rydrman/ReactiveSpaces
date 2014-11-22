@@ -7,6 +7,7 @@ var Game = function()
     this.ui = new UI();
     this.ui.resize(canvas.width, 50);
     
+    
     //images
     this.mainDotImg = document.getElementById("mainDotImage");
     this.largeDotImg = document.getElementById("largeDotImage");
@@ -25,6 +26,9 @@ var Game = function()
     
     //TIME
     this.initialTime = new Date().getTime();
+    this.roundStart = new Date().getTime();
+    this.roundLength = 60000;
+    this.inRound = false;
     this.lastFrame = this.initialTime;
     this.lastMainDot = this.initialTime;
     this.lastScoreDot = this.initialTime;
@@ -36,30 +40,48 @@ var Game = function()
     //score dots
     this.maxScoreDots = 10;
     this.scoreDotInterval = 1000;
-    this.scoreDotRad = 20;
+    this.scoreDotRad = 0.02;
     this.ScoreDotsRotation = 0;
+    
+    this.largeRad = 50;
     
     //remote dots
     this.remoteDots = [];
     
-    this.canvasMiddle = new Vector(canvas.width * 0.5, canvas.height * 0.5);
+    this.canvasMiddle = new Vector(0.5, 0.5 * ( 9/16 ));
     
     //setup mouse hand
     this.useMouse = true;
     this.hands.push( new Hand(this.handEmptyImg, this.handFullImg, this.handCollectImg) );
     
-    RS.addEventListener(RS.Events.message, function(station, message){game.onDotRecieved.call(game, station, message)});
+    RS.addEventListener(RS.Events.message, function(station, message){game.onMsgRecieved.call(game, station, message)});
     RS.addEventListener(RS.Events.localplayerenter, function(station, skeleton){game.onPlayerEnter.call(game, station, skeleton)});
     RS.addEventListener(RS.Events.localplayerexit, function(station, skeleton){game.onPlayerExit.call(game, station, skeleton)});
     RS.addEventListener(RS.Events.stationlocal, function(station){game.onStationLocal.call(game, station)});
+    RS.addEventListener(RS.Events.stationconnect, function(station){game.onStationLocal.call(game, station)});
     
     this.tryConnect();
+    this.startRound();
+}
+
+Game.prototype.startRound = function()
+{
+    this.roundStart = new Date().getTime();
+    this.inRound = true;
+    this.mainDots = [];
+    this.scoreDots = [];
+    this.remoteDots = [];
+    this.largeDots = [];
+    this.ui.score = 0;
+    this.roundStart = new Date().getTime();
+    for(var i in this.hands)
+        this.hands[i].value = 0;
 }
 
 Game.prototype.tryConnect = function()
 {
     //connect to rective spaces
-    RS.Connect("RS Demo Game", 1.0);
+    RS.Connect("RS Demo Game", 1.1);
 }
        
 Game.prototype.onStationLocal = function(station)
@@ -78,6 +100,13 @@ Game.prototype.onStationLocal = function(station)
     }
 }
 
+Game.prototype.onStationRemote = function(station)
+{
+    station.score = 0;
+    //broadcast my current score
+    RS.Send( {score: this.ui.score} );
+}
+
 Game.prototype.onPlayerEnter = function(station, skeleton)
 {
     var handL = new Hand(this.handEmptyImg, this.handFullImg, this.handCollectImg);
@@ -94,17 +123,24 @@ Game.prototype.onPlayerExit = function(station, skeleton)
 {
 }
 
-Game.prototype.onDotRecieved = function( station, dot )
+Game.prototype.onMsgRecieved = function( station, msg )
 {
-    var remoteDot = new Dot(Dot.types.REMOTE, 50, this.remoteDotImg);
-    remoteDot.lifeSpan = 10000;
-    remoteDot.position = new Vector(dot.position.x, dot.position.y);
-    remoteDot.timeCreated = new Date().getTime();
-    remoteDot.speed.set(new Vector(20 + Math.random() * 20, 20 + Math.random() * 20));
-    if (Math.random() > 0.5) remoteDot.speed.x *= -1;
-    if (Math.random() > 0.5) remoteDot.speed.y *= -1;
-    TweenLite.from( remoteDot, 0.5, {radius: 0, ease:Linear.EaseIn});
-    this.remoteDots.push( remoteDot );
+    if(msg.position)
+    {
+        var remoteDot = new Dot(Dot.types.REMOTE, 0.05, this.remoteDotImg);
+        remoteDot.lifeSpan = 10000;
+        remoteDot.position = new Vector(dot.position.x, dot.position.y);
+        remoteDot.timeCreated = new Date().getTime();
+        remoteDot.speed.set(new Vector(0.02 + Math.random() * 0.02, 0.02 + Math.random() * 0.02));
+        if (Math.random() > 0.5) remoteDot.speed.x *= -1;
+        if (Math.random() > 0.5) remoteDot.speed.y *= -1;
+        TweenLite.from( remoteDot, 0.5, {radius: 0, ease:Linear.EaseIn});
+        this.remoteDots.push( remoteDot );
+    }
+    if(msg.score)
+    {
+        station.score = msg.score;
+    }
 }
 
 Game.prototype.update = function()
@@ -119,16 +155,22 @@ Game.prototype.update = function()
     var deltaTime = (now - this.lastFrame) * 0.001; 
     this.lastFrame = now;
     
+    //get time left
+    var ellapsedRound = now - this.roundStart;
+    var timeLeft = this.roundLength - ellapsedRound; 
+    if(timeLeft <= 0) this.startRound();
+    this.ui.timeLeft = timeLeft;
+    
     //MAIN DOT
     //adding main dots
     if(this.mainDots.length < this.maxMainDots && now-this.lastMainDot > this.mainDotInterval)
     {
-        var dot = new Dot(Dot.types.MAIN, 20, this.mainDotImg);
-        dot.position.set(this.getOffScreenStartPos(10));
-        dot.speed.set( new Vector( 50 + Math.random() * 50, 50 + Math.random() * 50 ) );
+        var dot = new Dot(Dot.types.MAIN, 0.02, this.mainDotImg);
+        dot.position.set(this.getOffScreenStartPos(0.02));
+        dot.speed.set( new Vector( 0.15 + Math.random() * 0.15, 0.15 + Math.random() * 0.15 ) );
         dot.friction = 0.99;
-        dot.minSpeed = 10;
-        dot.maxSpeed = 200;
+        dot.minSpeed = 0.05;
+        dot.maxSpeed = 0.5;
         this.mainDots.push( dot );
         this.lastMainDot = now;
     }    
@@ -163,8 +205,6 @@ Game.prototype.update = function()
                 {
                     //push dot
                     deltaSpeed.SetFromVector( joint.velocity );
-                    deltaSpeed.x *= canvas.width;
-                    deltaSpeed.y *= canvas.height;
                     deltaSpeed.SubVector( this.mainDots[i].speed );
                     deltaSpeed.MultiplyScalar( perc );
                     this.mainDots[i].acceleration.add( deltaSpeed );
@@ -225,7 +265,7 @@ Game.prototype.update = function()
     {
         var dot = new Dot(Dot.types.SCORE, this.scoreDotRad, this.scoreDotImg);
         dot.position.set(this.getOffScreenStartPos(this.scoreDotRad));
-        dot.speed.set( new Vector( 25 + Math.random() * 25, 25 + Math.random() * 25 ) );
+        dot.speed.set( new Vector( 0.07 + Math.random() * 0.07, 0.07 + Math.random() * 0.07 ) );
         dot.angularSpeed = Math.PI + Math.random() * Math.PI;
         this.scoreDots.push( dot );
         this.lastScoreDot = now;
@@ -298,12 +338,12 @@ Game.prototype.update = function()
         var newLargeDot = this.hands[i].update(deltaTime);
         if(newLargeDot)
         {
-            var dot = new Dot(Dot.types.LARGE, 50, this.largeDotImg);
+            var dot = new Dot(Dot.types.LARGE, 0.05, this.largeDotImg);
             dot.position = this.hands[i].position;
             dot.lifeSpan = 10000;
             dot.timeCreated = now;
             var callback = function(){
-                dot.speed.set(new Vector(20 + Math.random() * 20, 20 + Math.random() * 20));
+                dot.speed.set(new Vector(0.05 + Math.random() * 0.05, 0.05 + Math.random() * 0.05));
                 if (Math.random() > 0.5) dot.speed.x *= -1;
                 if (Math.random() > 0.5) dot.speed.y *= -1;
                 dot.position = new Vector(dot.position.x, dot.position.y);
@@ -340,7 +380,7 @@ Game.prototype.update = function()
 
 Game.prototype.render = function()
 {
-    ctx.fillStyle = "#000";
+    ctx.fillStyle = "#151518";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     //draw remote skeletons
@@ -391,7 +431,8 @@ Game.prototype.render = function()
         ctx.save();
         ctx.fillStyle = this.scoreCounters[i].color;
         ctx.globalAlpha = this.scoreCounters[i].alpha;
-        ctx.translate(this.scoreCounters[i].position.x, this.scoreCounters[i].position.y);
+        ctx.translate(this.scoreCounters[i].position.x * canvas.width, 
+                      this.scoreCounters[i].position.y * canvas.width);
         ctx.fillText(this.scoreCounters[i].value, 0, 0);
         ctx.restore();
     }
@@ -454,7 +495,7 @@ Game.prototype.removeScoreDot = function( scoreDot, getScore )
             }
 
             TweenLite.to(counter, 1.5, { alpha: 0, ease: Linear.EaseOut, onComplete: this.removeScoreCounter, onCompleteParams: [counter], onCompleteScope: this });
-            TweenLite.to(counter.position, 1.5, { y: counter.position.y - 30, ease: Linear.EaseOut});
+            TweenLite.to(counter.position, 1.5, { y: counter.position.y - 0.1, ease: Linear.EaseOut});
             this.scoreCounters.push(counter);
 
             return;
@@ -478,8 +519,8 @@ Game.prototype.getOffScreenStartPos = function( rad )
 {
     var randX = ( Math.random() < 0.5 ) ? true : false; 
     
-    var x = ( randX ) ? Math.random() * canvas.width : ( (Math.random() < 0.5 ) ? -rad : canvas.width + rad);
-    var y = ( !randX ) ? Math.random() * canvas.height : ( (Math.random() < 0.5 ) ? -rad : canvas.height + rad);
+    var x = ( randX ) ? Math.random() : ( (Math.random() < 0.5 ) ? -rad : 1 + rad);
+    var y = ( !randX ) ? Math.random() : ( (Math.random() < 0.5 ) ? -rad : 1 + rad);
     
     return new Vector(x , y);
 }
@@ -493,5 +534,49 @@ Game.prototype.onMouseMove = function( mousePos )
 {
     if(!this.useMouse) return;
     
-    this.hands[0].position.set( mousePos );
+    var percPos = new Vector( mousePos.x / canvas.width,
+                              mousePos.y / canvas.width );
+    
+    this.hands[0].position.set( percPos );
+}
+
+Game.prototype.onResize = function(oldW, oldH, newW, newH)
+{
+    var ratioW = newW / oldW;
+    var ratioH = newH / oldH;
+    var ratio = (ratioW + ratioH) * 0.5;
+    
+    //this.canvasMiddle.x = newW * 0.5;
+    //this.canvasMiddle.y = newH * 0.5;
+    
+    this.largeRad *= ratio;
+    this.smallRad *= ratio;
+    
+    this.ui.resize(newW, newH * 0.05);
+    
+    //LARGE DOT
+    //rendering large dots
+    for(var i=0; i <this.largeDots.length; i++)
+    {
+       this.largeDots[i].scaleAll( ratio );
+    }
+
+    //SCORE DOT
+    for (var i = 0; i < this.scoreDots.length; i++) 
+    {
+        this.scoreDots[i].scaleAll( ratio );
+    }
+    
+    //MAIN DOT
+    //rendering main dots
+    for(var i=0; i <this.mainDots.length; i++)
+    {
+       this.mainDots[i].scaleAll( ratio );
+    }
+    
+    //REMOTE DOT
+    for(var i in this.remoteDots)
+    {
+        this.remoteDots[i].scaleAll( ratio );
+    }
 }
