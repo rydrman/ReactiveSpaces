@@ -128,6 +128,7 @@ Game.prototype.update = function()
         dot.speed.set( new Vector( 50 + Math.random() * 50, 50 + Math.random() * 50 ) );
         dot.friction = 0.99;
         dot.minSpeed = 10;
+        dot.maxSpeed = 200;
         this.mainDots.push( dot );
         this.lastMainDot = now;
     }    
