@@ -8,6 +8,7 @@ var Dot = function( type, rad, img )
     this.alpha = 1;
     this.radius = rad;
     this.maxSpeed = 100;
+    this.minSpeed = 0;
     this.position = new Vector();
     this.rotation = 0;
     this.angularSpeed = 0;
@@ -32,7 +33,7 @@ Dot.prototype.update = function(deltaTime)
     this.acceleration.add( this.force );
     this.force.set( new Vector(0, 0) );
     this.speed.add(this.acceleration);
-    this.speed.limit(this.maxSpeed);
+    this.speed.limit(this.maxSpeed, this.minSpeed);
     this.acceleration.set( new Vector() );
     this.speed.multScalar( this.friction );
     this.position.add(this.speed.getMultScalar(deltaTime));

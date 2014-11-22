@@ -44,12 +44,27 @@ Vector.prototype.lengthSqd = function( value )
     return this.x * this.x + this.y * this.y;
 }
 
-Vector.prototype.limit = function( max )
+Vector.prototype.limit = function( max, min )
 {
     var len = this.length();
     if(len > max)
     {
         this.normalize( len );
         this.multScalar( max );
+    }
+}
+
+Vector.prototype.limit = function( max, min )
+{
+    var len = this.length();
+    if(len > max)
+    {
+        this.normalize( len );
+        this.multScalar( max );
+    }
+    else if(len < min)
+    {
+        this.normalize( len );
+        this.multScalar( min );
     }
 }
