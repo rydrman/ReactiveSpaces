@@ -464,6 +464,13 @@ namespace RSNetworker
             {
                 if (peer.id == remote.stationID)
                 {
+                    //check to see if this is the first time we are seeing it and fire 
+                    //added event. This takes care of skeletons that existed before connecting
+                    if(peer.players[remote.playerNumber] == null || peer.players[remote.playerNumber].userPresent == false)
+                    {
+                        if (_onRemoteKinectAdded != null)
+                            _onRemoteKinectAdded(remote);
+                    }
                     peer.players[remote.playerNumber] = remote;
 
                     if (fireEvent && _onRemoteKinectRecieved != null)
