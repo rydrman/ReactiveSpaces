@@ -10,10 +10,13 @@ function onLoad()
     canvas.onmousemove = onMouseMove;
     ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = true;
-    window.requestAnimationFrame(update);
     game = new Game();
     window.onresize = onResize;
     onResize();
+    
+    //do this last
+    window.requestAnimationFrame(update);
+    
 }
 
 function update()
@@ -47,6 +50,8 @@ function onMouseClick(e) {
 
 function onMouseMove(e)
 {
+    if(!game) return;
+    
     if(!e) e = window.Event;
     
     var mousePos = getMousePos(e);
@@ -98,6 +103,7 @@ function onResize(e)
     canvas.style.left =  ( l + "px" );
     canvas.style.top =  ( t + "px" );
     
-    game.onResize(oldW, oldH, w, h);
+    if(game)
+        game.onResize(oldW, oldH, w, h);
     
 }

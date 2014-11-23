@@ -38,41 +38,46 @@ Hand.prototype.update = function(deltaTime)
     return false;
 }
 
-Hand.prototype.render = function( pointAt )
+Hand.prototype.render = function( cntx, pointAt )
 {
-    ctx.save();
+    cntx.save();
     
-    ctx.translate(this.position.x * canvas.width, this.position.y * canvas.width);
+    cntx.translate(this.position.x * cntx.canvas.width, this.position.y * cntx.canvas.width);
     
     //rotate towards center
     var a = Math.atan2( pointAt.y - this.position.y, pointAt.x - this.position.x );
-    ctx.rotate(a);
+    cntx.rotate(a);
     
-    ctx.translate(-this.rad * canvas.width, -this.rad* canvas.width);
+    cntx.translate(-this.rad * cntx.canvas.width, -this.rad* cntx.canvas.width);
     
     //draw empty
-    ctx.drawImage(this.imgEmpty, 0, 0, this.rad * 2 * canvas.width, this.rad * 2 * canvas.width);
+    cntx.drawImage(this.imgEmpty, 0, 0, this.rad * 2 * cntx.canvas.width, this.rad * 2 * cntx.canvas.width);
     
     var perc = this.value / this.maxValue;
 
     if (!this.emptying)
     {
-        var filledHeight = this.rad * 2 * canvas.width * perc;
+        var filledHeight = this.rad * 2 * cntx.canvas.width * perc;
 
-        ctx.drawImage(this.imgFull, 0, 0, this.imgEmpty.width * perc, this.imgEmpty.height, 0, 0, filledHeight, this.rad * 2 * canvas.width);
+        cntx.drawImage(this.imgFull, 0, 0, 
+                       this.imgEmpty.width * perc, this.imgEmpty.height, 
+                       0, 0, filledHeight, this.rad * 2 * cntx.canvas.width
+                      );
         if (this.collectAlpha > 0)
         {
-            ctx.globalAlpha = this.collectAlpha;
-            ctx.drawImage(this.imgCollect, 0, 0, this.imgCollect.width * perc, this.imgCollect.height, 0, 0, filledHeight, this.rad * 2 * canvas.w
+            cntx.globalAlpha = this.collectAlpha;
+            cntx.drawImage(this.imgCollect, 
+                           0, 0, this.imgCollect.width * perc, this.imgCollect.height, 
+                           0, 0, filledHeight, this.rad * 2 * cntx.canvas.w
                          );
         }
     }
     else
     {
-        ctx.globalAlpha = perc;
-        ctx.drawImage(this.imgFull, 0, 0, this.rad*2 * canvas.width, this.rad * 2 * canvas.width);
+        cntx.globalAlpha = perc;
+        cntx.drawImage(this.imgFull, 0, 0, this.rad*2 * cntx.canvas.width, this.rad * 2 * cntx.canvas.width);
     }
     
         
-    ctx.restore();
+    cntx.restore();
 }

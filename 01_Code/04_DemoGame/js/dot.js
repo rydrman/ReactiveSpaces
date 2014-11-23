@@ -30,14 +30,14 @@ Dot.prototype.scaleAll = function( scale )
     this.force.multScalar(scale);
 }
 
-Dot.prototype.render = function()
+Dot.prototype.render = function(cntx)
 {  
-    ctx.save();
-    ctx.globalAlpha = this.alpha;
-    ctx.translate(this.position.x * canvas.width, this.position.y * canvas.width);
-    ctx.rotate(this.rotation);
-    ctx.drawImage(this.img, -this.radius * canvas.width, -this.radius * canvas.width, this.radius*canvas.width*2, this.radius*canvas.width*2);
-    ctx.restore();
+    cntx.save();
+    cntx.globalAlpha = this.alpha;
+    cntx.translate(this.position.x * cntx.canvas.width, this.position.y * cntx.canvas.width);
+    cntx.rotate(this.rotation);
+    cntx.drawImage(this.img, -this.radius * cntx.canvas.width, -this.radius * cntx.canvas.width, this.radius*cntx.canvas.width*2, this.radius*cntx.canvas.width*2);
+    cntx.restore();
 }
 
 Dot.prototype.update = function(deltaTime)

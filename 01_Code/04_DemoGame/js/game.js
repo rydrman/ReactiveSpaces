@@ -3,9 +3,12 @@ var Game = function()
     
     this.useMouse = true;
     
+    //for drawing 
+    this.bufferCanvas = document.createElement('canvas');
+    this.bufferCtx = this.bufferCanvas.getContext('2d');
+    
     //scoring
     this.ui = new UI();
-    this.ui.resize(canvas.width, 50);
     
     
     //images
@@ -27,7 +30,9 @@ var Game = function()
     //TIME
     this.initialTime = new Date().getTime();
     this.roundStart = new Date().getTime();
-    this.roundLength = 60000;
+    this.lobbyStart = new Date().getTime();
+    this.roundLength = 5000;
+    this.lobbyLength = 5000;
     this.inRound = false;
     this.lastFrame = this.initialTime;
     this.lastMainDot = this.initialTime;
@@ -58,7 +63,7 @@ var Game = function()
     RS.addEventListener(RS.Events.localplayerenter, function(station, skeleton){game.onPlayerEnter.call(game, station, skeleton)});
     RS.addEventListener(RS.Events.localplayerexit, function(station, skeleton){game.onPlayerExit.call(game, station, skeleton)});
     RS.addEventListener(RS.Events.stationlocal, function(station){game.onStationLocal.call(game, station)});
-    RS.addEventListener(RS.Events.stationconnect, function(station){game.onStationLocal.call(game, station)});
+    RS.addEventListener(RS.Events.stationconnect, function(station){game.onStationRemote.call(game, station)});
     
     this.tryConnect();
     this.startRound();
@@ -74,6 +79,20 @@ Game.prototype.startRound = function()
     this.largeDots = [];
     this.ui.score = 0;
     this.roundStart = new Date().getTime();
+    this.inRound = true;
+    this.ui.inRound = true;
+    for(var i in this.hands)
+        this.hands[i].value = 0;
+    
+    this.ui.closeMenu();
+}
+
+Game.prototype.endRound = function()
+{
+    this.ui.openMenu();
+    this.lobbyStart = new Date().getTime();
+    this.inRound = false;
+    this.ui.inRound = false;
     for(var i in this.hands)
         this.hands[i].value = 0;
 }
@@ -129,7 +148,7 @@ Game.prototype.onMsgRecieved = function( station, msg )
     {
         var remoteDot = new Dot(Dot.types.REMOTE, 0.05, this.remoteDotImg);
         remoteDot.lifeSpan = 10000;
-        remoteDot.position = new Vector(dot.position.x, dot.position.y);
+        remoteDot.position = new Vector(remoteDot.position.x, remoteDot.position.y);
         remoteDot.timeCreated = new Date().getTime();
         remoteDot.speed.set(new Vector(0.02 + Math.random() * 0.02, 0.02 + Math.random() * 0.02));
         if (Math.random() > 0.5) remoteDot.speed.x *= -1;
@@ -156,10 +175,24 @@ Game.prototype.update = function()
     this.lastFrame = now;
     
     //get time left
-    var ellapsedRound = now - this.roundStart;
-    var timeLeft = this.roundLength - ellapsedRound; 
-    if(timeLeft <= 0) this.startRound();
-    this.ui.timeLeft = timeLeft;
+    if(this.inRound)
+    {
+        var ellapsedRound = now - this.roundStart;
+        var timeLeft = this.roundLength - ellapsedRound; 
+        this.ui.timeLeft = timeLeft;
+        if(timeLeft <= 0)
+            this.endRound();
+    }
+    else
+    {
+        var ellapsedLobby = now - this.lobbyStart;
+        var timeLeft = this.lobbyLength - ellapsedLobby; 
+        this.ui.lobbyTimeLeft = timeLeft;
+        if(timeLeft <= 0)
+            this.startRound();
+    }
+        
+    
     
     //MAIN DOT
     //adding main dots
@@ -174,12 +207,12 @@ Game.prototype.update = function()
         this.mainDots.push( dot );
         this.lastMainDot = now;
     }    
-    
+
     //updating main dots
     for(var i = this.mainDots.length - 1; i >= 0; i--)
     {
         this.mainDots[i].update(deltaTime);
-        
+
         //pushed by joints
         var joint, 
             delta = new RS.Vector3(),
@@ -192,13 +225,13 @@ Game.prototype.update = function()
             for(var k in RS.remotePlayers[j].joints)
             {
                 joint = RS.remotePlayers[j].joints[k];
-                canvasPos.x =  RS.remotePlayers[j].joints[k].positionSmoothed.x * canvas.width;
-                canvasPos.y =  RS.remotePlayers[j].joints[k].positionSmoothed.y * canvas.height;
-                
+                canvasPos.x =  RS.remotePlayers[j].joints[k].positionSmoothed.x * this.bufferCanvas.width;
+                canvasPos.y =  RS.remotePlayers[j].joints[k].positionSmoothed.y * this.bufferCanvas.height;
+
                 delta.SetFromVector( this.mainDots[i].position );
                 delta.SubVector( canvasPos );
                 delta.z = 0;
-                
+
                 distSqd = delta.LengthSqd();
                 perc =  1 - (distSqd / (50 * 50));
                 if(perc > 0)
@@ -211,7 +244,7 @@ Game.prototype.update = function()
                 }
             }
         }
-        
+
         //collide with hands
         for(var j in this.hands)
         {
@@ -228,15 +261,15 @@ Game.prototype.update = function()
     }   
 
     //LARGE DOT
-    
+
     //updating large dots
     var largeDot, collDot;
     for(var i in this.largeDots)
     {
         largeDot = this.largeDots[i];
-        
+
         largeDot.update(deltaTime);
-        
+
         //check to see if it's time to die
         if(!largeDot.dying && now - largeDot.timeCreated > largeDot.lifeSpan)
         {
@@ -257,9 +290,9 @@ Game.prototype.update = function()
             }
         }
     }
-    
+
     //SCORE DOT
-    
+
     //creating score dots
     if(this.scoreDots.length < this.maxScoreDots && now-this.lastScoreDot > this.scoreDotInterval)
     {
@@ -270,13 +303,13 @@ Game.prototype.update = function()
         this.scoreDots.push( dot );
         this.lastScoreDot = now;
     }
-    
+
     //updating score dots 
     for (var i in this.scoreDots)
     {
         if (this.scoreDots[i].collected) continue;
         this.scoreDots[i].update(deltaTime);
-        
+
         for (var j in this.largeDots)
         {
             var collision = this.largeDots[j].checkCollision(this.scoreDots[i].position, this.scoreDotRad);
@@ -322,7 +355,7 @@ Game.prototype.update = function()
             }
         }
     }
-    
+
     //HANDS
     for(var i = this.hands.length - 1; i >= 0; i--)
     {
@@ -335,6 +368,10 @@ Game.prototype.update = function()
                 continue;
             }
         }
+        //check for menu
+        if(this.hands[i].position.x > 0.95 && this.hands[i].position.y < 0.1)
+            this.ui.openMenu(true);
+        
         var newLargeDot = this.hands[i].update(deltaTime);
         if(newLargeDot)
         {
@@ -351,26 +388,26 @@ Game.prototype.update = function()
             TweenLite.from(dot, 1, {radius: 0, ease: Linear.EaseOut, onComplete: callback });
             TweenLite.to(this.hands[i], 1, {value: 0, ease: Linear.EaseOut, onComplete: callback });
             this.largeDots.push( dot );
-            
+
             //also ad this dot to the remote people
             RS.Send( {position: dot.position} );
         }
-         
+
     }
-    
+
     //REMOTE DOT
     for(var i in this.remoteDots)
     {
         var remoteDot = this.remoteDots[i];
         remoteDot.update(deltaTime);
-        
+
         //remove
         if(!remoteDot.dying && now - remoteDot.timeCreated > remoteDot.lifeSpan)
         {
             //animate it out
             remoteDot.dying = true;
             TweenLite.to(remoteDot, 2, {alpha: 0, radius:0, ease:Linear.EaseIn, onComplete:this.removeRemoteDot, onCompleteParams:[remoteDot], onCompleteScope:this});
-            
+
             //TODO collide with large dots
             //TODO suck in score dots
         }
@@ -380,66 +417,71 @@ Game.prototype.update = function()
 
 Game.prototype.render = function()
 {
-    ctx.fillStyle = "#151518";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
+    this.bufferCtx.setTransform(1, 0, 0, 1, 0, 0);
+    this.bufferCtx.save();
+    this.bufferCtx.fillStyle = "#151518";
+    this.bufferCtx.fillRect(0, 0, this.bufferCanvas.width, this.bufferCanvas.height);
+
     //draw remote skeletons
     for(var i in RS.remotePlayers)
     {
-        RS.DrawSkeleton(ctx, RS.remotePlayers[i], "rgba(255, 255, 255, 0.2)", true);
+        RS.DrawSkeleton(this.bufferCtx, RS.remotePlayers[i], "rgba(255, 255, 255, 0.2)", true);
     }
-    
+
     //LARGE DOT
     //rendering large dots
     for(var i=0; i <this.largeDots.length; i++)
     {
-       this.largeDots[i].render();
+       this.largeDots[i].render(this.bufferCtx);
     }
 
     //SCORE DOT
     for (var i = 0; i < this.scoreDots.length; i++) 
     {
-        this.scoreDots[i].render();
+        this.scoreDots[i].render(this.bufferCtx);
     }
-    
+
     //MAIN DOT
     //rendering main dots
     for(var i=0; i <this.mainDots.length; i++)
     {
-       this.mainDots[i].render();
+       this.mainDots[i].render(this.bufferCtx);
     }
-    
+
     //REMOTE DOT
     for(var i in this.remoteDots)
     {
-        this.remoteDots[i].render();
+        this.remoteDots[i].render(this.bufferCtx);
     }
-    
+
     //HANDS
     for(var i in this.hands)
     {
-        this.hands[i].render( this.canvasMiddle );
+        this.hands[i].render(this.bufferCtx,  this.canvasMiddle );
     }
-    
-    
-    
+
     //score counters
-    ctx.font = "24px sans-serif";
-    ctx.textAlign = 'center';
+    this.bufferCtx.font = "24px sans-serif";
+    this.bufferCtx.textAlign = 'center';
     for (var i in this.scoreCounters)
     {
-        ctx.save();
-        ctx.fillStyle = this.scoreCounters[i].color;
-        ctx.globalAlpha = this.scoreCounters[i].alpha;
-        ctx.translate(this.scoreCounters[i].position.x * canvas.width, 
-                      this.scoreCounters[i].position.y * canvas.width);
-        ctx.fillText(this.scoreCounters[i].value, 0, 0);
-        ctx.restore();
+        this.bufferCtx.save();
+        this.bufferCtx.fillStyle = this.scoreCounters[i].color;
+        this.bufferCtx.globalAlpha = this.scoreCounters[i].alpha;
+        this.bufferCtx.translate(this.scoreCounters[i].position.x * this.bufferCanvaswidth, 
+                      this.scoreCounters[i].position.y * this.bufferCanvaswidth);
+        this.bufferCtx.fillText(this.scoreCounters[i].value, 0, 0);
+        this.bufferCtx.restore();
     }
     
+    this.bufferCtx.restore();
+    
+    this.uiImage = this.ui.getRender(this.bufferCanvas);
+    
     //UI
-    var uiImage = this.ui.getRender(canvas);
-    ctx.drawImage(uiImage, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(this.bufferCanvas, 0, 0, this.bufferCanvas.width, this.bufferCanvas.height);
+    ctx.drawImage(this.uiImage, 0, 0);
 }
 
 Game.prototype.removeLargeDot = function( largeDot )
@@ -534,8 +576,8 @@ Game.prototype.onMouseMove = function( mousePos )
 {
     if(!this.useMouse) return;
     
-    var percPos = new Vector( mousePos.x / canvas.width,
-                              mousePos.y / canvas.width );
+    var percPos = new Vector( mousePos.x / this.bufferCanvaswidth,
+                              mousePos.y / this.bufferCanvaswidth );
     
     this.hands[0].position.set( percPos );
 }
@@ -546,13 +588,13 @@ Game.prototype.onResize = function(oldW, oldH, newW, newH)
     var ratioH = newH / oldH;
     var ratio = (ratioW + ratioH) * 0.5;
     
-    //this.canvasMiddle.x = newW * 0.5;
-    //this.canvasMiddle.y = newH * 0.5;
+    this.bufferCanvas.width = newW;
+    this.bufferCanvas.height = newH;
     
     this.largeRad *= ratio;
     this.smallRad *= ratio;
     
-    this.ui.resize(newW, newH * 0.05);
+    this.ui.resize(newW, newH);
     
     //LARGE DOT
     //rendering large dots
