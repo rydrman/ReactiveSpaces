@@ -55,11 +55,11 @@ UI.prototype.getRender = function(cvs)
         {
             this.drawProfile(cvs, 
                              this.mainCanvas.width - (this.menuOpenAmount * this.mainCanvas.width * 0.33), 
-                             this.mainCanvas.height * 0.15 + this.mainCanvas.height * 0.4 * i,
-                             RS.remoteStations[i])
+                             this.mainCanvas.height * 0.15 + this.mainCanvas.height * 0.28 * i,
+                             RS.remoteStations[i]);
             this.mainCtx.drawImage(this.profileCanvas,
                                    this.mainCanvas.width - (this.menuOpenAmount * this.mainCanvas.width * 0.33), 
-                                   this.mainCanvas.height * 0.15 + this.mainCanvas.height * 0.4 * i);
+                                   this.mainCanvas.height * 0.15 + this.mainCanvas.height * 0.28 * i);
         }
     }
 
