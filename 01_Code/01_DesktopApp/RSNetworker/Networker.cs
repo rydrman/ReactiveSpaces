@@ -336,24 +336,25 @@ namespace RSNetworker
 
         public void updateAppInfo(AppInfo newInfo)
         {
-            currentApp = newInfo;
-
-            SocketMessage message = new SocketMessage();
-
-            if(null == newInfo)
+            if (currentApp != null || newInfo == null)
             {
-                //the app was closed
+                //the app was closed or we are switching apps
+                SocketMessage message = new SocketMessage();
                 message.type = MessageType.AppInfo;
                 message.data = null;
-            }
-            else
-            {
-                //the app was connected
-                message.type = MessageType.AppInfo;
-                message.data = jSerializer.Serialize(newInfo);
+                SendMessage(message);
             }
 
-            SendMessage(message);
+            if(null != newInfo)
+            {
+                //the app was connected
+                SocketMessage message = new SocketMessage();
+                message.type = MessageType.AppInfo;
+                message.data = jSerializer.Serialize(newInfo);
+                SendMessage(message);
+            }
+
+            currentApp = newInfo;
         }
 
         public void updateStationProfile(StationProfile newProfile)
