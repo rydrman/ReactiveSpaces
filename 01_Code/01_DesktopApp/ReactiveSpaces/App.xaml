@@ -4,22 +4,32 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <Style TargetType="ToggleButton" x:Key="tabButton">
-            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="#999"/>
+            <Setter Property="BorderBrush" Value="#14ccc1"/>
             <Setter Property="Width" Value="100"/>
             <Setter Property="Height" Value="40"/>
             <Setter Property="Margin" Value="10 0 10 0"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#DDD"/>
+                    <Setter Property="Background" Value="#ff00d5"/>
                 </Trigger>
                 <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="#20bcef"/>
+                    <!--<Setter Property="Background" Value="#ff00d5"/>-->
                 </Trigger>
                 <Trigger Property="IsChecked" Value="True">
-                    <Setter Property="Background" Value="#20bcef"/>
+                    <Setter Property="Background" Value="#14ccc1"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -28,15 +38,19 @@
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
+            <Setter Property="Foreground" Value="#ebebeb"/>
             <Setter Property="Background" Value="Transparent"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#DDD"/>
                 </Trigger>
                 <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="#20bcef"/>
+                    <Setter Property="Background" Value="#14ccc1"/>
                 </Trigger>
             </Style.Triggers>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="textStyle">
+            <Setter Property="Foreground" Value="#ebebeb"/>
         </Style>
     </Application.Resources>
 </Application>

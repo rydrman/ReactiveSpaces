@@ -48,22 +48,30 @@ namespace ReactiveSpaces
             byte step = (byte)(255 / skeletons.Length);
             byte color = 0;
             localCanvas.Children.Clear();
+
+            SolidColorBrush jointBrush = new SolidColorBrush();
+
+            //jointBrush.Color = Color.FromArgb(color, color, color, 255);
+            //jointBrush.Color = Colors.Black;
+            jointBrush = (SolidColorBrush)(new BrushConverter().ConvertFrom("#14ccc1")); //green
+
             foreach (KinectSkeleton s in skeletons)
             {
                 for (int i = 0; i < s.numberOfJoints; ++i)
                 {
-                    Ellipse jointEllipse = new Ellipse();
-                    SolidColorBrush jointBrush = new SolidColorBrush();
+                    if (s.joints[i].screenPos.x > 1 || s.joints[i].screenPos.x < 0
+                    || s.joints[i].screenPos.y > 1 || s.joints[i].screenPos.y < 0)
+                        continue;
 
-                    jointBrush.Color = Color.FromArgb(color, color, color, 255);
-                    jointBrush.Color = Colors.Black;
+                    Ellipse jointEllipse = new Ellipse();
+                    
                     jointEllipse.Fill = jointBrush;
 
                     jointEllipse.Width = 5;
                     jointEllipse.Height = 5;
 
-                    Canvas.SetLeft(jointEllipse, s.joints[i].screenPos.x * 320);
-                    Canvas.SetTop(jointEllipse, s.joints[i].screenPos.y * 240);
+                    Canvas.SetLeft(jointEllipse, s.joints[i].screenPos.x * localCanvas.Width);
+                    Canvas.SetTop(jointEllipse, s.joints[i].screenPos.y * localCanvas.Height);
 
                     localCanvas.Children.Add(jointEllipse);
                 }
@@ -87,22 +95,29 @@ namespace ReactiveSpaces
                 color += step;
             }
         }
-        public void drawRemoteSkeleton(KinectSkeleton skeleton, Color color)//TODO //////////////////
+        public void drawRemoteSkeleton(KinectSkeleton skeleton, Color color)
         {
+            SolidColorBrush jointBrush = new SolidColorBrush();
+
+            //jointBrush.Color = color;
+            //jointBrush.Color = Colors.Black;
+            jointBrush = (SolidColorBrush)(new BrushConverter().ConvertFrom("#14ccc1"));//green
+
             for (int i = 0; i < skeleton.numberOfJoints; ++i)
             {
-                Ellipse jointEllipse = new Ellipse();
-                SolidColorBrush jointBrush = new SolidColorBrush();
+                if (skeleton.joints[i].screenPos.x > 1 || skeleton.joints[i].screenPos.x < 0
+                    || skeleton.joints[i].screenPos.y > 1 || skeleton.joints[i].screenPos.y < 0)
+                    continue;
 
-                jointBrush.Color = color;
-                jointBrush.Color = Colors.Black;
+                Ellipse jointEllipse = new Ellipse();
+     
                 jointEllipse.Fill = jointBrush;
 
                 jointEllipse.Width = 5;
                 jointEllipse.Height = 5;
 
-                Canvas.SetLeft(jointEllipse, skeleton.joints[i].screenPos.x * 320);
-                Canvas.SetTop(jointEllipse, skeleton.joints[i].screenPos.y * 240);
+                Canvas.SetLeft(jointEllipse, skeleton.joints[i].screenPos.x * remoteCanvas.Width);
+                Canvas.SetTop(jointEllipse, skeleton.joints[i].screenPos.y * remoteCanvas.Height);
 
                 remoteCanvas.Children.Add(jointEllipse);
             }

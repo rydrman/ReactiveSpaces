@@ -44,11 +44,11 @@ namespace ReactiveSpaces
             if(connected)
             {
                 serverStatus.Text = "Connected";
-                serverStatus.Foreground = Brushes.Green;
+                serverStatus.Foreground = (SolidColorBrush)(new BrushConverter().ConvertFrom("#14ccc1")); //green
                 return;
             }
             serverStatus.Text = "Disconnected";
-            serverStatus.Foreground = Brushes.Red;
+            serverStatus.Foreground = (SolidColorBrush)(new BrushConverter().ConvertFrom("#ff00d5"));//pink/red
         }
 
         private void onConnectClick(object sender, RoutedEventArgs e)

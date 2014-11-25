@@ -7,33 +7,50 @@
       d:DesignHeight="400" d:DesignWidth="640"
 	Title="General">
 
-    <Grid Background="White">
+    <Grid Background="#3d4142">
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
+            <RowDefinition Height="80"/>
             <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="40"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="155"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <!-- current profile-->
-        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center">
-            <TextBlock Text="App Connection: " Grid.Row="0" VerticalAlignment="Center" FontSize="18"/>
-            <TextBlock Name="listenStatus" Text="Not Listening" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" FontSize="18" Foreground="Red"/>
-            <TextBlock Text=" | " Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" FontSize="18" Foreground="Gray"/>
-            <TextBlock Name="appStatus" Text="Disconnected" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" FontSize="18" Foreground="Red"/>
+        <TextBlock Text="App Connection: " Grid.Row="0" VerticalAlignment="Center" FontSize="18" 
+                       Style="{StaticResource textStyle}" Padding="15 0 0 0"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="15 0 0 0">
+            <TextBlock Name="listenStatus" Text="Not Listening"  VerticalAlignment="Center" FontSize="40" Foreground="#FFFF00D5" />
+            <TextBlock Text=" | " VerticalAlignment="Center" FontSize="40" Foreground="Gray"/>
+            <TextBlock Name="appStatus" Text="Disconnected" VerticalAlignment="Center" FontSize="40" Foreground="#FFFF00D5"/>
         </StackPanel>
-        <TextBlock Text="Name:" Grid.Row="1" Margin="0 0 10 0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-        <TextBox Name="appName" Width="200" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False"/>
-        <TextBlock Text="Version:" Grid.Row="2" Margin="0 0 10 0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-        <TextBox Name="appVersion" Width="200" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False"/>
-        <TextBlock Text="Max Players" Grid.Row="3" Margin="0 0 10 0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-        <TextBox Name="maxPlayers" Width="200" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False"/>
+        <!-- current profile-->
         
-       
+        <TextBlock Text="Name:" Grid.Row="2" Margin="0,7,10,7" VerticalAlignment="Center" HorizontalAlignment="Right" Style="{StaticResource textStyle}" Height="16" Width="34"/>
+        <TextBox Name="appName" Width="200" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False" Height="18" Margin="0,6"/>
+        <TextBlock Text="Version:" Grid.Row="3" Margin="0,7,10,7" VerticalAlignment="Center" HorizontalAlignment="Right" Style="{StaticResource textStyle}" Height="16" Width="42"/>
+        <TextBox Name="appVersion" Width="200" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False" Height="18" Margin="0,6"/>
+        <TextBlock Text="Max Players" Grid.Row="4" Margin="0,7,10,7" VerticalAlignment="Center" HorizontalAlignment="Right" Style="{StaticResource textStyle}" Height="16" Width="63"/>
+        <TextBox Name="maxPlayers" Width="200" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False" Height="18" Margin="0,6"/>
+
+        <TextBlock Text="Websocket URL:" Grid.Row="6" Margin="0,7,10,7" VerticalAlignment="Center" HorizontalAlignment="Right" Style="{StaticResource textStyle}" Height="16"/>
+        <TextBox Name="apiURL" Text="ws://localhost:{port}/ReactiveSpaces" Width="200" Grid.Row="6" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False" Height="18" Margin="0,6"/>
+        <TextBlock Text="Websocket Port:"  Grid.Row="7" Margin="0,7,10,7" VerticalAlignment="Center" HorizontalAlignment="Right" Style="{StaticResource textStyle}" Height="16"/>
+        <TextBox Name="apiPort" Text="8080" Width="200" Grid.Row="7" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Height="18" Margin="0,6" KeyDown="onPortChanged" LostFocus="onPortLostFocus"/>
+        <TextBlock Grid.Row="8" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0 0 50 0" 
+                   Style="{StaticResource textStyle}" Foreground="#999" TextWrapping="Wrap" >
+            The default websocket port is 8080. 
+            If the box is red, or the program fails to listen for app connections, this can be changed. PLEASE NOTE that this will require the 
+            JavaScript portion of the API to be updated with the new port number. Developpers should include this ability to make their apps as 
+            compatible as possible. See the API documentation for more details.
+        </TextBlock>
+
     </Grid>
 </Page>

@@ -7,9 +7,10 @@
       d:DesignHeight="400" d:DesignWidth="640"
 	Title="Network">
 
-    <Grid Background="White">
+    <Grid Background="#3d4142">
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
+            <RowDefinition Height="80"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
@@ -17,28 +18,32 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="139"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        
+
         <!-- current profile-->
-        <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2" VerticalAlignment="Center">
-            <TextBlock Text="Server Status: " Grid.Row="0" VerticalAlignment="Center" FontSize="18" Grid.ColumnSpan="2"/>
-            <TextBlock Name="serverStatus" Text="Disconnected" Grid.Row="0" VerticalAlignment="Center" FontSize="18" Grid.ColumnSpan="2" Foreground="Red"/>
-            <Button Name="connect" Style="{StaticResource iconButton}" Margin="2 0 0 0" Padding="5" Grid.Column="1" Click="onConnectClick">&#xE149;</Button>
+        <TextBlock Text="Server Status: " Grid.Row="0" VerticalAlignment="Center" FontSize="18" Grid.ColumnSpan="2" 
+                       Style="{StaticResource textStyle}"
+                       Padding="15 0 0 0"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="15 0 0 0">
+            <TextBlock Name="serverStatus" Text="Disconnected" Grid.Row="0" VerticalAlignment="Center" FontSize="40" Grid.ColumnSpan="2" Foreground="#FFFF00D5"/>
+            <Button Name="connect" Style="{StaticResource iconButton}" Margin="2 0 0 0" Padding="5" Grid.Column="1" FontSize="20" Click="onConnectClick">&#xE149;</Button>
         </StackPanel>
-        <TextBlock Text="Station Profile:" Grid.Row="1" Width="640" VerticalAlignment="Center" FontSize="18" Grid.ColumnSpan="2"/>
-        <TextBlock Text="Name:" Grid.Row="2" Margin="0 0 10 0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-        <TextBox Name="currentName" Width="200" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" KeyDown="onProfileChanged" LostFocus="onProfileLostFocus"/>
-        <TextBlock Text="Location:" Grid.Row="3" Margin="0 0 10 0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-        <TextBox Name="currentLocation" Width="200" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" KeyDown="onProfileChanged" LostFocus="onProfileLostFocus"/>
-        <TextBlock Text="Session ID:" Grid.Row="4" Margin="0 0 10 0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-        <TextBox Name="currentSessionID" Width="200" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False"/>
-        
+        <TextBlock Text="Station Profile:" Grid.Row="2" VerticalAlignment="Center" FontSize="18" Grid.ColumnSpan="2" 
+                   Style="{StaticResource textStyle}" Padding="15 0 0 0" Height="24" Margin="0,3"/>
+        <TextBlock Text="Name:" Grid.Row="3" Margin="0,7,10,7" VerticalAlignment="Center" HorizontalAlignment="Right" Style="{StaticResource textStyle}" Height="16" Width="34"/>
+        <TextBox Name="currentName" Width="200" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" KeyDown="onProfileChanged" LostFocus="onProfileLostFocus" Height="18" Margin="0,6"/>
+        <TextBlock Text="Location:" Grid.Row="4" Margin="0,7,10,7" VerticalAlignment="Center" HorizontalAlignment="Right" Style="{StaticResource textStyle}" Height="16" Width="48"/>
+        <TextBox Name="currentLocation" Width="200" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" KeyDown="onProfileChanged" LostFocus="onProfileLostFocus" Height="18" Margin="0,6"/>
+        <TextBlock Text="Session ID:" Grid.Row="5" Margin="0,7,10,7" VerticalAlignment="Center" HorizontalAlignment="Right" Style="{StaticResource textStyle}" Height="16" Width="57"/>
+        <TextBox Name="currentSessionID" Width="200" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False" Height="18" Margin="0,6"/>
+
         <!-- connected peers -->
         <DataGrid Name="connectedStations" CanUserAddRows="False" CanUserResizeColumns="True" 
-                  CanUserSortColumns="True" IsReadOnly="True" Grid.Row="5" Height="200" ItemsSource="{Binding}"
-                  AutoGenerateColumns="False" Grid.ColumnSpan="2">
+                  CanUserSortColumns="True" IsReadOnly="True" Grid.Row="6" ItemsSource="{Binding}"
+                  AutoGenerateColumns="False" Grid.ColumnSpan="2"
+                  Background="#999" Margin="15,25">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name" Binding="{Binding Path=name}" Width="250"/>
                 <DataGridTextColumn Header="Location" Binding="{Binding Path=location}" Width="290"/>

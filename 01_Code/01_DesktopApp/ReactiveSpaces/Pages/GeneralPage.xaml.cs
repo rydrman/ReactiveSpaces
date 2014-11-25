@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 using RSNetworker;
 
@@ -24,7 +25,10 @@ namespace ReactiveSpaces
     public partial class GeneralPage : Page
     {
         public delegate void OnSendButton(string message);
-        public OnSendButton _onSendButton = null;
+        public delegate void OnPortChanged(int port);
+        public OnPortChanged _onPortChanged = null;
+
+        int currentPort = 8080;
 
         private bool connected = false;
 
@@ -39,12 +43,12 @@ namespace ReactiveSpaces
             if(listening)
             {
                 listenStatus.Text = "Listening";
-                listenStatus.Foreground = Brushes.Green;
+                listenStatus.Foreground = (SolidColorBrush)(new BrushConverter().ConvertFrom("#14ccc1"));
             }
             else
             {
                 listenStatus.Text = "Not Listening";
-                listenStatus.Foreground = Brushes.Gray;
+                listenStatus.Foreground = (SolidColorBrush)(new BrushConverter().ConvertFrom("#999")); ;
             }
         }
 
@@ -57,7 +61,7 @@ namespace ReactiveSpaces
                 appVersion.Text = "";
                 maxPlayers.Text = "";
                 appStatus.Text = "Disconnected";
-                appStatus.Foreground = Brushes.Red;
+                appStatus.Foreground = (SolidColorBrush)(new BrushConverter().ConvertFrom("#ff00d5"));//pink/red
             }
             else if(!connected)
             {
@@ -66,8 +70,41 @@ namespace ReactiveSpaces
                 appVersion.Text = newInfo.version.ToString("0.00");
                 maxPlayers.Text = newInfo.maxPeers.ToString();
                 appStatus.Text = "Connected";
-                appStatus.Foreground = Brushes.Green;
+                appStatus.Foreground = (SolidColorBrush)(new BrushConverter().ConvertFrom("#14ccc1")); //green
             }
+        }
+
+        public void onPortStatusChanged(bool success)
+        {
+            if (success)
+                apiPort.Background = Brushes.White;
+            else
+                apiPort.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#ff00d5"));//pink/red
+        }
+
+        public void onPortChanged(object sender, KeyEventArgs e)
+        {
+            //check if its valid
+            if (e.Key == Key.Return)
+            {
+                Regex regex = new Regex("[0-9][0-9][0-9][0-9]"); //regex that matches disallowed text
+                if( !regex.IsMatch(apiPort.Text) )
+                {
+                    apiPort.Text = currentPort.ToString("####");
+                    return;
+                }
+
+                int newPort = Convert.ToInt16(apiPort.Text);
+                currentPort = newPort;
+                if (_onPortChanged != null)
+                    _onPortChanged(newPort);
+            }
+            
+        }
+
+        public void onPortLostFocus(object sender, EventArgs e)
+        {
+            apiPort.Text = currentPort.ToString("####");
         }
     }
 }

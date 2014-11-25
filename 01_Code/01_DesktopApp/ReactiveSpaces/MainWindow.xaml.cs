@@ -48,6 +48,8 @@ namespace ReactiveSpaces
             kinectPage = new KinectPage();
             networkPage = new NetworkPage();
 
+            generalTabButton.IsChecked = true;
+
             kinectManager = new KinectManager();
             kinectManager.InitializeKinect(false, false, true);
 
@@ -65,7 +67,7 @@ namespace ReactiveSpaces
             timer.Start();
 
             //set handlers
-            generalPage._onSendButton = onSendMessage;
+            generalPage._onPortChanged = onPortChanged;
 
             //setup data
             networkPage._onReconnect = onReconnect;
@@ -156,6 +158,16 @@ namespace ReactiveSpaces
                 //send to peers
                 networker.updateLocalKinect(kinectManager.players);    
             }
+            
+            if(localNet.portStatusChanged)
+            {
+                generalPage.onPortStatusChanged(localNet.validPort);
+            }
+        }
+
+        private void onPortChanged( int port )
+        {
+            localNet.changePort(port);
         }
 
         private void onSkeletonsUpdated()

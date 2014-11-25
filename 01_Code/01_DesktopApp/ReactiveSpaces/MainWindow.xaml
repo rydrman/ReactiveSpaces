@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Reactive Spaces Desktop App" Width="640" Height="480" WindowStyle="None" AllowsTransparency="True" ResizeMode="NoResize">
-    <Grid>
+    <Grid Background="#3d4142">
         <Grid.RowDefinitions>
             <RowDefinition Height="30px"/>
             <RowDefinition Height="50px"/>
@@ -15,12 +15,15 @@
         </Grid.ColumnDefinitions>
         
         <!-- window controls-->
-        <TextBlock Name="windowTitle" Text="Reactive Spaces" MouseLeftButtonDown="onTitleBarMouseDown" />
-        <Button Name="minimizeButton" Grid.Row="0" Grid.Column="1" Click="onMinimizeButtonClick"/>
-        <Button Name="closeButton" Grid.Row="0" Grid.Column="2" Click="onCloseButtonClick"/>
+        <TextBlock Name="windowTitle" Text="Reactive Spaces Desktop" MouseLeftButtonDown="onTitleBarMouseDown" 
+                   Foreground="#ebebeb" FontSize="20" Padding="15 0 0 0"/>
+        <Button Name="minimizeButton" Content="_" Grid.Row="0" Grid.Column="1" Click="onMinimizeButtonClick"
+                Background="#3d4142" BorderBrush="#14ccc1" Foreground="#ebebeb"/>
+        <Button Name="closeButton" Content="X" Grid.Row="0" Grid.Column="2" Click="onCloseButtonClick"
+                Background="#3d4142" BorderBrush="#14ccc1" Foreground="#ebebeb"/>
         
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.ColumnSpan="3" HorizontalAlignment="Center">
-            <ToggleButton Name="generalTabButton" Content="General" Style="{StaticResource tabButton}" Click="tabButtonClick"/>
+            <ToggleButton Name="generalTabButton" Content="General" Style="{StaticResource tabButton}"  Click="tabButtonClick" IsChecked="True" />
             <ToggleButton Name="kinectTabButton" Content="Kinect" Style="{StaticResource tabButton}" Click="tabButtonClick"/>
             <ToggleButton Name="networkTabButton" Content="Network" Style="{StaticResource tabButton}" Click="tabButtonClick"/>
         </StackPanel>
