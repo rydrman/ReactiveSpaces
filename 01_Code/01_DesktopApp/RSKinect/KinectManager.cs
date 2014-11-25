@@ -94,7 +94,7 @@ namespace RSKinect
                         //another app is trying to read the data
                         //TODO
                         status = "Device In Use";
-                        statusBrush = Brushes.Red;
+                        statusBrush = (SolidColorBrush)(new BrushConverter().ConvertFrom("#ff00d5"));
                         return false;
                     }
                     for (int i = 0; i < players.Length; ++i)
@@ -104,7 +104,7 @@ namespace RSKinect
                     }
 
                     status = "Connected";
-                    statusBrush = Brushes.Green;
+                    statusBrush = (SolidColorBrush)(new BrushConverter().ConvertFrom("#14ccc1")); //green
                     connected = true;
                     statusChanged = true;
                     return true;
@@ -117,7 +117,7 @@ namespace RSKinect
                 KinectSensor.KinectSensors.StatusChanged += SensorStatusChanged;
             }
             status = "No Devices Found";
-            statusBrush = Brushes.Red;
+            statusBrush = (SolidColorBrush)(new BrushConverter().ConvertFrom("#ff00d5"));
             statusChanged = true;
             return false;
         }
@@ -139,12 +139,12 @@ namespace RSKinect
 
         private bool SetStatus(KinectStatus kStatus)
         {
-            statusBrush = Brushes.Red;
+            statusBrush = (SolidColorBrush)(new BrushConverter().ConvertFrom("#ff00d5"));
             switch (kStatus)
             {
                 case KinectStatus.Connected:
                     status = "Connected";
-                    statusBrush = Brushes.Green;
+                    statusBrush = (SolidColorBrush)(new BrushConverter().ConvertFrom("#14ccc1")); //green
                     connected = true;
                     return true;
                 case KinectStatus.DeviceNotGenuine:

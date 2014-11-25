@@ -36,6 +36,9 @@ namespace RSLocalhost
 
         JavaScriptSerializer jSerializer;
 
+        int port = 8080;
+        public bool validPort = true;
+        public bool portStatusChanged = false;
         TcpListener listener;
         Thread listenThread = null;
 
@@ -60,7 +63,7 @@ namespace RSLocalhost
             kinectManager._onPlayerIn = AddLocalKinect;
             kinectManager._onPlayerOut = RemoveLocalKinect;
 
-            listener = new TcpListener(IPAddress.Any, 8080);
+            listener = new TcpListener(IPAddress.Any, port);
 
             kinectTimer = new Stopwatch();
             kinectTimer.Start();
@@ -68,8 +71,26 @@ namespace RSLocalhost
             StartListenerThread();
         }
 
+        public void changePort(int newPort)
+        {
+            port = newPort;
+            Disconnect();
+
+            if(listener != null)
+                listener.Stop();
+            listener = null;
+            listener = new TcpListener(IPAddress.Any, port);
+
+            listening = false;
+            listeningChanged = true;
+
+            StartListenerThread();
+        }
+
         private void StartListenerThread()
         {
+            if (listenThread != null && listenThread.ThreadState == System.Threading.ThreadState.Running)
+                listenThread.Abort();
             listenThread = new Thread(WaitForConnection);
 
             listenThread.Start();
@@ -79,7 +100,29 @@ namespace RSLocalhost
         {
         connectionStart:
 
-            listener.Start();
+            try
+            {
+                listener.Start();
+            }
+            catch(SocketException e)
+            {
+                if(e.ErrorCode == (int)SocketError.AddressAlreadyInUse || e.ErrorCode == (int)SocketError.AddressNotAvailable)
+                {
+                    validPort = false;
+                    portStatusChanged = true;
+                    Disconnect();
+                    return;
+                }
+                else
+                {
+                    //Should never get here...
+                    Debugger.Break();
+                    Reconnect();
+                    return;
+                }
+            }
+            validPort = true;
+            portStatusChanged = true;
             listening = true;
             listeningChanged = true;
             client = null;
