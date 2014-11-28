@@ -29,7 +29,7 @@ RS.socketSupported = false;
 RS.socket = null;
 RS.connected = false;
 //RS.userClosed = false;
-RS.lastMessage = new Date().getMilliseconds;
+RS.lastMessage = new Date().getTime();
 
 //to keep station profiles
 RS.station = null;
