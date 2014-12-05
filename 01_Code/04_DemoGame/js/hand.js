@@ -16,7 +16,7 @@ var Hand = function(imgEmpty, imgFull, imgCollect)
 
 Hand.prototype.update = function(deltaTime)
 {  
-    if(this.joint != null)
+    if(this.joint instanceof RS.SkeletonJoint)
     {
         this.position.x = this.joint.positionSmoothed.x;
         this.position.y = this.joint.positionSmoothed.y;

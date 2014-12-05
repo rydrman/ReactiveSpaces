@@ -31,8 +31,8 @@ var Game = function()
     this.initialTime = new Date().getTime();
     this.roundStart = new Date().getTime();
     this.lobbyStart = new Date().getTime();
-    this.roundLength = 5000;
-    this.lobbyLength = 5000;
+    this.roundLength = 60000;
+    this.lobbyLength = 15000;
     this.inRound = false;
     this.lastFrame = this.initialTime;
     this.lastMainDot = this.initialTime;
@@ -58,7 +58,9 @@ var Game = function()
     
     //setup mouse hand
     this.useMouse = true;
-    this.hands.push( new Hand(this.handEmptyImg, this.handFullImg, this.handCollectImg) );
+    var mouseHand = new Hand(this.handEmptyImg, this.handFullImg, this.handCollectImg);
+    mouseHand.joint = 'mouse';
+    this.hands.push( mouseHand );
     
     RS.addEventListener(RS.Events.message, function(station, message){game.onMsgRecieved.call(game, station, message)});
     RS.addEventListener(RS.Events.localplayerenter, function(station, skeleton){game.onPlayerEnter.call(game, station, skeleton)});
@@ -161,6 +163,21 @@ Game.prototype.onMsgRecieved = function( station, msg )
     {
         station.score = msg.score;
     }
+    if(typeof(msg.round) != 'undefined')
+    {
+        if(true == msg.round && !this.inRound)
+        {
+            this.roundLength = msg.roundLength;
+            this.startRound();
+        }
+        else if(false == msg.round && this.inRound) 
+                //&& this.roundLength - Date().getTime() - this.roundStart < 1000)
+        {
+            this.lobbyLength = msg.lobbyLength;
+            this.endRound();
+        }
+            
+    }
 }
 
 Game.prototype.update = function()
@@ -184,7 +201,10 @@ Game.prototype.update = function()
         var timeLeft = this.roundLength - ellapsedRound; 
         this.ui.timeLeft = timeLeft;
         if(timeLeft <= 0)
+        {
+            RS.Send({round: false, lobbyLength: this.lobbyLength});
             this.endRound();
+        }
     }
     else
     {
@@ -192,7 +212,10 @@ Game.prototype.update = function()
         var timeLeft = this.lobbyLength - ellapsedLobby; 
         this.ui.lobbyTimeLeft = timeLeft;
         if(timeLeft <= 0)
+        {
+            RS.Send({round: true, roundLength:this.roundLength});
             this.startRound();
+        }
     }
         
     
@@ -363,9 +386,10 @@ Game.prototype.update = function()
     for(var i = this.hands.length - 1; i >= 0; i--)
     {
         //check for removed
-        if(this.hands[i].joint != null)
+        if(this.hands[i].joint != 'mouse')
         {
-            if(!this.hands[i].joint.skeleton.userPresent)
+            
+            if(this.hands[i].joint == null || !this.hands[i].joint.skeleton.userPresent)
             {
                 this.hands.splice(i, 1);
                 continue;
@@ -487,7 +511,7 @@ Game.prototype.render = function()
     ctx.drawImage(this.uiImage, 0, 0);
     
     //debug fps
-    ctx.fillStyle = "#FF0";
+    ctx.fillStyle = "#333";
     ctx.fillText("FPS: " + Math.floor(this.framerate), 10, canvas.height -10);
 }
 
@@ -536,6 +560,7 @@ Game.prototype.removeScoreDot = function( scoreDot, getScore )
             if(getScore)
             {
                 this.ui.score++;
+                RS.Send({score: this.ui.score});
             }
             else
             {
@@ -583,8 +608,8 @@ Game.prototype.onMouseMove = function( mousePos )
 {
     if(!this.useMouse) return;
     
-    var percPos = new Vector( mousePos.x / this.bufferCanvaswidth,
-                              mousePos.y / this.bufferCanvaswidth );
+    var percPos = new Vector( mousePos.x / this.bufferCanvas.width,
+                              mousePos.y / this.bufferCanvas.height );
     
     this.hands[0].position.set( percPos );
 }

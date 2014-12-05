@@ -6,8 +6,8 @@ var game;
 function onLoad()
 {
     canvas = document.getElementById("canvas");
-    canvas.onclick = onMouseClick;
-    canvas.onmousemove = onMouseMove;
+    addEventListener('mousedown', onMouseClick);
+    addEventListener('mousemove', onMouseMove);
     ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = true;
     game = new Game();
