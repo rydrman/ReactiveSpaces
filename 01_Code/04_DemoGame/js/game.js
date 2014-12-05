@@ -272,6 +272,8 @@ Game.prototype.update = function()
         }
 
         //collide with hands
+        if(!this.inRound) continue;
+        
         for(var j in this.hands)
         {
             if(this.hands[j].emptying) continue;
@@ -335,7 +337,9 @@ Game.prototype.update = function()
     {
         if (this.scoreDots[i].collected) continue;
         this.scoreDots[i].update(deltaTime);
-
+        
+        if(!this.inRound) continue;
+        
         for (var j in this.largeDots)
         {
             var collision = this.largeDots[j].checkCollision(this.scoreDots[i].position, this.scoreDotRad);
