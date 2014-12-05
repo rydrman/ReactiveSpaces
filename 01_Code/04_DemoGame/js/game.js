@@ -37,6 +37,7 @@ var Game = function()
     this.lastFrame = this.initialTime;
     this.lastMainDot = this.initialTime;
     this.lastScoreDot = this.initialTime;
+    this.framerate = 30;
     
     //main dots 
     this.maxMainDots = 10;
@@ -173,6 +174,8 @@ Game.prototype.update = function()
     this.ellapsedTime = now - this.initialTime;
     var deltaTime = (now - this.lastFrame) * 0.001; 
     this.lastFrame = now;
+    if(deltaTime != 0)
+        this.framerate = 0.1 * (1 / deltaTime) + 0.9 * this.framerate;
     
     //get time left
     if(this.inRound)
@@ -482,6 +485,10 @@ Game.prototype.render = function()
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(this.bufferCanvas, 0, 0, this.bufferCanvas.width, this.bufferCanvas.height);
     ctx.drawImage(this.uiImage, 0, 0);
+    
+    //debug fps
+    ctx.fillStyle = "#FF0";
+    ctx.fillText("FPS: " + Math.floor(this.framerate), 10, canvas.height -10);
 }
 
 Game.prototype.removeLargeDot = function( largeDot )

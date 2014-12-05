@@ -18,6 +18,8 @@ var UI = function ()
     this.timeLeft = 0;
     this.lobbyTimeLeft = 0;
     this.score = 0;
+    
+    this.frame = 0;
 }
 
 UI.prototype.resize = function(x, y)
@@ -36,6 +38,7 @@ UI.prototype.resize = function(x, y)
 
 UI.prototype.getRender = function(cvs)
 {
+    this.frame++;
     
     this.drawTopBar(cvs);
     
@@ -164,7 +167,16 @@ UI.prototype.drawProfile = function(cvs, x, y, profile)
 
 UI.prototype.blurCanvas = function( cntx )
 {
-    boxBlurCanvasRGB(cntx, 0, 0, cntx.canvas.width, cntx.canvas.height, 5, 2);
+    //boxBlurCanvasRGBA(cntx, 0, 0, cntx.canvas.width, cntx.canvas.height, 2, 1);
+    
+    cntx.globalAlpha = 0.5;
+    var pa = 2;
+    cntx.drawImage( cntx.canvas, pa, 0 );
+    cntx.drawImage( cntx.canvas, 0, pa );
+    cntx.drawImage( cntx.canvas, pa, pa );
+    cntx.drawImage( cntx.canvas, -pa, 0 );
+    cntx.drawImage( cntx.canvas, 0, -pa );
+    cntx.drawImage( cntx.canvas, -pa, -pa );
 }
 
 UI.prototype.openMenu = function( timeout )
