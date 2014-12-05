@@ -609,7 +609,7 @@ Game.prototype.onMouseMove = function( mousePos )
     if(!this.useMouse) return;
     
     var percPos = new Vector( mousePos.x / this.bufferCanvas.width,
-                              mousePos.y / this.bufferCanvas.height );
+                              mousePos.y / this.bufferCanvas.width );
     
     this.hands[0].position.set( percPos );
 }
