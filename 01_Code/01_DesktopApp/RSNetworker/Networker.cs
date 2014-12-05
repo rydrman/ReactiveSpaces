@@ -128,12 +128,9 @@ namespace RSNetworker
 
             System.Threading.Thread.Sleep(100);
 
-            if (serverThread == null)
+            if (serverThread == null || serverThread.Status != TaskStatus.Running)
             {
                 serverThread = new Task(ServerConnectionHandler);
-            }
-            if(serverThread.Status != TaskStatus.Running)
-            {
                 serverThread.Start();
             }
 
@@ -285,6 +282,10 @@ namespace RSNetworker
                                 _onFeaturesMissing(missing);
                             break;
                         case MessageType.KeepAlive:
+                            if (Task.CurrentId != serverThread.Id)
+                            {
+                                return;
+                            }
                             SocketMessage resp = new SocketMessage();
                             resp.type = MessageType.KeepAlive;
                             resp.data = "{}";
@@ -320,7 +321,9 @@ namespace RSNetworker
 
         public void Reconnect()
         {
+            closing = true;
             Disconnect();
+            closing = false;
             ConnectToServer();
 
             //if (serverThread == null)

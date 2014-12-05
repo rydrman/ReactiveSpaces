@@ -158,7 +158,7 @@ ClientManager.prototype.passData = function(client, message)
     }
     
     var result = client.session.passData(client, message);
-    if(false == result)
+    if(false == result && client.appInfo != null)
     {
         client.session = null;
         this.matchClient(client);
