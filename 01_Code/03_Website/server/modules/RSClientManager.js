@@ -141,8 +141,8 @@ ClientManager.prototype.removeClient = function( client )
             out += this.clients[i].id;
         }
         console.log(out + " ]");
-        this.closeAll();
-        process.exit();
+        //this.closeAll();
+        //process.exit();
         
     }
     

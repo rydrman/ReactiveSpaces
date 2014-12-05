@@ -36,19 +36,39 @@ var Client = module.exports = function(socket, id)
     socket.on('error', function(e){self.onError.call(self, e)});
     socket.on('data', function(data){self.onData.call(self, data)});
     
-    socket.setKeepAlive(true, 2000);
+    //socket.setKeepAlive(true, 2000);
     
-    //this.lifeCheck = setInterval(function(){self.checkSocketState.call(self)}, 3000);
-    
+    this.aliveInterval = setInterval(function(){self.checkAlive.call(self)}, 5000);
+    this.aliveTimeout = null;
     //var message = new SocketMessage( SocketMessage.Types.MESSAGE, "hi" );
     
     //socket.write(JSON.stringify(message));
 };
 
-//Client.prototype.checkSocketState = function()
-//{
-//    
-//}
+Client.prototype.checkAlive = function()
+{
+    var msg = new SocketMessage(SocketMessage.types.KEEP_ALIVE, {});  
+    this.trySend(msg.getJSON());
+    
+    var self = this;
+    this.aliveTimeout = setTimeout(function(){self.aliveTimeoutCallback.call(self)}, 4000);
+}
+
+Client.prototype.aliveTimeoutCallback = function()
+{
+    console.log("Socket timed-out, disconnecting...");
+    if(typeof(this.socket.end) == 'function')
+    {
+        this.socket.end();
+        this.onDisconnect();
+        //console.log("success");
+    }
+    else
+    {
+        console.log("failed. Removing entry...");
+        this.onDisconnect();
+    }
+}
 
 Client.prototype.profileRecieved = function( id )
 {
@@ -146,8 +166,10 @@ Client.prototype.onDisconnect = function()
 {
     this.active = false;
     this.appDisconected();
+    clearInterval(this.aliveInterval);
     if(this.onClose != null)
         this.onClose(this);
+    console.log("client disconnect " + this.id);
 }
 
 Client.prototype.onData = function(json)
@@ -192,7 +214,8 @@ Client.prototype.onData = function(json)
             case SocketMessage.types.APP_INFO:
                 if(message.data == null)
                 {
-                    this.appDisconected();
+                    if(this.appInfo != null)
+                        this.appDisconected();
                     break;
                 }
                 this.appInfo = message.data;
@@ -221,6 +244,14 @@ Client.prototype.onData = function(json)
                 
                 if(this.passData != null)
                     this.passData(this, message);
+                continue;
+                
+            case SocketMessage.types.KEEP_ALIVE:
+                if(null != this.aliveTimeout)
+                {
+                    clearTimeout(this.aliveTimeout);
+                    this.aliveTimeout = null;
+                }
                 continue;
                 
             default:

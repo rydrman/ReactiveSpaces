@@ -17,13 +17,14 @@ namespace RSNetworker
         Kinect,
         AddKinect,
         RemoveKinect,
-        FeatureMissing
+        FeatureMissing,
+        KeepAlive
     }
 
     class SocketMessage
     {
         public MessageType type;
 
-        public string data;
+        public string data = "";
     }
 }

@@ -47,5 +47,6 @@ SocketMessage.types = {
     KINECT: 6,
     ADD_KINECT: 7,
     REMOVE_KINECT: 8,
-    FEATURE_MISSING: 9
+    FEATURE_MISSING: 9,
+    KEEP_ALIVE: 10
 };

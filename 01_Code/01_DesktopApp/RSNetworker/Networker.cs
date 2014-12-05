@@ -128,10 +128,6 @@ namespace RSNetworker
 
             System.Threading.Thread.Sleep(100);
 
-            sendStationProfile();
-            if (currentApp != null)
-                updateAppInfo(currentApp);
-
             if (serverThread == null)
             {
                 serverThread = new Task(ServerConnectionHandler);
@@ -144,6 +140,29 @@ namespace RSNetworker
             return SocketError.Success;
         }
 
+        private bool isConnectedWaiting()
+        {
+            if (closing
+                || !connected
+                || serverStream == null)
+                return false;
+
+            if (server.Client.Poll(0, SelectMode.SelectRead))
+            {
+                byte[] bytes = new byte[1];
+                if (server.Client.Receive(bytes, SocketFlags.Peek) == 0)
+                {
+                    // Client disconnected
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            return true;
+        }
+
         private void ServerConnectionHandler()
         {
             handlerStart:
@@ -151,11 +170,15 @@ namespace RSNetworker
             connected = true;
             connectionChanged = true;
 
+            sendStationProfile();
+            if (currentApp != null)
+                updateAppInfo(currentApp);
+
             while(!closing && connected && server.Connected)
             {
                 try
                 {
-                    while (!closing && connected && serverStream != null && !serverStream.DataAvailable) ;
+                    while (isConnectedWaiting() && !serverStream.DataAvailable) ;
                 }
                 catch(Exception e)
                 {
@@ -165,7 +188,7 @@ namespace RSNetworker
                 //only time we actually want this thread to run to completion
                 if (closing) return;
 
-                if (serverStream == null || !connected) break;
+                if (serverStream == null || !connected || !isConnectedWaiting()) break;
 
                 byte[] bytes = new byte[server.Available];
                 serverStream.Read(bytes, 0, bytes.Length);
@@ -261,6 +284,12 @@ namespace RSNetworker
                             if (_onFeaturesMissing != null)
                                 _onFeaturesMissing(missing);
                             break;
+                        case MessageType.KeepAlive:
+                            SocketMessage resp = new SocketMessage();
+                            resp.type = MessageType.KeepAlive;
+                            resp.data = "{}";
+                            SendMessage(resp);
+                            break;
                         default:
                             Debug.WriteLine("Unknown message type recieved from server.");
                             break;
@@ -291,10 +320,13 @@ namespace RSNetworker
 
         public void Reconnect()
         {
-            if (serverThread == null)
-                ConnectToServer();
-            else
-                connected = false;
+            Disconnect();
+            ConnectToServer();
+
+            //if (serverThread == null)
+            //   ConnectToServer();
+            //else
+            //    connected = false;
         }
 
         public void Disconnect()
@@ -509,7 +541,7 @@ namespace RSNetworker
             string src = jSerializer.Serialize(message);
             byte[] msg = Encoding.UTF8.GetBytes(src + "\0");
 
-            if (connected)
+            if (isConnectedWaiting())
             {
                 try
                 {

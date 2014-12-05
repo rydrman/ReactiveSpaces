@@ -52,6 +52,7 @@ UI.prototype.getRender = function(cvs)
     this.mainCtx.drawImage(this.topBarCanvas, 0, 0);
     if(!this.inRound)
         this.mainCtx.drawImage(this.countCanvas, this.mainCanvas.width * 0.1, this.mainCanvas.height * 0.2);
+    
     if(this.menuOpenAmount > 0)
     {
         for(var i = 0; i < RS.remoteStations.length; ++i)
@@ -171,11 +172,9 @@ UI.prototype.blurCanvas = function( cntx )
     
     cntx.globalAlpha = 0.5;
     var pa = 3;
-    cntx.drawImage( cntx.canvas, pa, 0 );
-    cntx.drawImage( cntx.canvas, 0, pa );
+    cntx.drawImage( cntx.canvas, pa, -pa );
+    cntx.drawImage( cntx.canvas, -pa, pa );
     cntx.drawImage( cntx.canvas, pa, pa );
-    cntx.drawImage( cntx.canvas, -pa, 0 );
-    cntx.drawImage( cntx.canvas, 0, -pa );
     cntx.drawImage( cntx.canvas, -pa, -pa );
 }
 
