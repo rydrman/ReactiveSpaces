@@ -45,6 +45,8 @@ namespace RSNetworker
 
         string serverBaseURL = "reactivespacesapi.com";
         int serverPort = 8080;
+        public bool validURL = false;
+        public bool urlStatusChanged = false;
         TcpClient server = null;
         Task serverThread = null;
         NetworkStream serverStream = null;
@@ -107,22 +109,79 @@ namespace RSNetworker
         private SocketError ConnectToServer()
         {
             server = new TcpClient();
-            IPAddress[] addresses = System.Net.Dns.GetHostAddresses(serverBaseURL);
+            IPAddress address = IPAddress.None;
 
-            if (addresses.Length == 0)
+            if (serverBaseURL != "localhost" && !IPAddress.TryParse(serverBaseURL, out address))
             {
-                return SocketError.AddressNotAvailable;
+                try
+                {
+                    IPAddress[] addresses = System.Net.Dns.GetHostAddresses(serverBaseURL);
+                    if (addresses.Length == 0)
+                    {
+
+                        validURL = false;
+                        urlStatusChanged = true;
+                        return SocketError.AddressNotAvailable;
+                    }
+                    else address = addresses[0];
+                }
+                catch
+                {
+                    validURL = false;
+                    urlStatusChanged = true;
+                    return SocketError.AddressNotAvailable;
+                }
             }
 
-            IPEndPoint serverEndPoint = new IPEndPoint(addresses[0], serverPort);
-            try
+            if (serverBaseURL == "localhost")
             {
-                server.Connect(serverEndPoint);
+                try
+                {
+                    server.Connect("localhost", serverPort);
+                }
+                catch (SocketException e)
+                {
+                    validURL = false;
+                    urlStatusChanged = true;
+                    return e.SocketErrorCode;
+                }
+                catch (Exception e)
+                {
+                    validURL = false;
+                    urlStatusChanged = true;
+                    return SocketError.HostNotFound;
+                }
             }
-            catch(SocketException e)
+            else
             {
-                return e.SocketErrorCode;
+                IPEndPoint serverEndPoint = new IPEndPoint(address, serverPort);
+
+                try
+                {
+                    server.Connect(serverEndPoint);
+                }
+                catch (SocketException e)
+                {
+                    validURL = false;
+                    urlStatusChanged = true;
+                    return e.SocketErrorCode;
+                }
+                catch (Exception e)
+                {
+                    validURL = false;
+                    urlStatusChanged = true;
+                    return SocketError.HostNotFound;
+                }
             }
+
+            if(!server.Connected)
+            {
+                validURL = false;
+                urlStatusChanged = true;
+                return SocketError.ConnectionRefused;
+            }
+            validURL = true;
+            urlStatusChanged = true;
             serverStream = server.GetStream();
             connected = true;
 
@@ -300,7 +359,7 @@ namespace RSNetworker
             
             //reconnect
             Disconnect();
-            if (closing)
+            if (closing || !validURL)
             {
                 return;
             }
@@ -308,6 +367,15 @@ namespace RSNetworker
             ConnectToServer();
 
             goto handlerStart;
+        }
+
+        public void onURLChanged(string url, int port)
+        {
+            Disconnect();
+            System.Threading.Thread.Sleep(100);
+            serverBaseURL = url;
+            serverPort = port;
+            ConnectToServer();
         }
 
         public void sendCustomData(string data)

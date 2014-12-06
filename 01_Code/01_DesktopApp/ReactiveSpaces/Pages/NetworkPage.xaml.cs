@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 using RSNetworker;
 
 namespace ReactiveSpaces
@@ -28,6 +29,12 @@ namespace ReactiveSpaces
 
         public delegate void OnReconnect();
         public OnReconnect _onReconnect = null;
+
+        public delegate void OnURLChanged(string url, int port);
+        public OnURLChanged _onURLChanged = null;
+
+        int currentPort = 8080;
+        string currentURL = "http://reactivespacesapi.com";
 
         ObservableCollection<StationProfile> peers;
         public NetworkPage()
@@ -91,6 +98,49 @@ namespace ReactiveSpaces
             foreach(StationProfile p in newData)
             {
                 peers.Add(p);
+            }
+        }
+
+        public void OnURLStatusChanged(bool success)
+        {
+            if (success)
+            {
+                serverURL.Background = Brushes.White;
+                serverPort.Background = Brushes.White;
+            }
+            else
+            {
+                serverURL.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#ff00d5"));//pink/red
+                serverPort.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#ff00d5"));//pink/red
+            }
+        }
+
+        public void OnPortChanged(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                Regex regex = new Regex("[0-9][0-9][0-9][0-9]"); //regex that matches disallowed text
+                if (!regex.IsMatch(serverPort.Text))
+                {
+                    serverPort.Text = currentPort.ToString("####");
+                    return;
+                }
+
+                int newPort = Convert.ToInt16(serverPort.Text);
+                currentPort = newPort;
+                if (_onURLChanged != null)
+                    _onURLChanged(currentURL, currentPort);
+            }
+        }
+
+        public void OnURLUserChanged(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                currentURL = serverURL.Text;
+
+                if (_onURLChanged != null)
+                    _onURLChanged(currentURL, currentPort);
             }
         }
 

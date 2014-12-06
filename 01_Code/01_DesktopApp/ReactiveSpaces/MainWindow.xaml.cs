@@ -70,6 +70,7 @@ namespace ReactiveSpaces
             generalPage._onPortChanged = onPortChanged;
 
             //setup data
+            networkPage._onURLChanged = onServerURLChanged;
             networkPage._onReconnect = onReconnect;
 
             //navigate
@@ -161,8 +162,20 @@ namespace ReactiveSpaces
             
             if(localNet.portStatusChanged)
             {
+                localNet.portStatusChanged = false;
                 generalPage.onPortStatusChanged(localNet.validPort);
             }
+            
+            if(networker.urlStatusChanged)
+            {
+                networker.urlStatusChanged = false;
+                networkPage.OnURLStatusChanged(networker.validURL);
+            }
+        }
+
+        private void onServerURLChanged(string url, int port)
+        {
+            networker.onURLChanged(url, port);
         }
 
         private void onPortChanged( int port )
