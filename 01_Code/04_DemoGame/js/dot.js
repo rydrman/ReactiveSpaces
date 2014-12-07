@@ -16,6 +16,10 @@ var Dot = function( type, rad, img )
     this.acceleration = new Vector();
     this.friction = 1;
     this.force = new Vector();
+    
+    //for sprite anim
+    this.frames = img.width / img.height;
+    this.frame = 0;
 }
 
 Dot.prototype.scaleAll = function( scale )
@@ -36,7 +40,13 @@ Dot.prototype.render = function(cntx)
     cntx.globalAlpha = this.alpha;
     cntx.translate(this.position.x * cntx.canvas.width, this.position.y * cntx.canvas.width);
     cntx.rotate(this.rotation);
-    cntx.drawImage(this.img, -this.radius * cntx.canvas.width, -this.radius * cntx.canvas.width, this.radius*cntx.canvas.width*2, this.radius*cntx.canvas.width*2);
+    if(this.frames == 0)
+        cntx.drawImage(this.img, -this.radius * cntx.canvas.width, -this.radius * cntx.canvas.width, this.radius*cntx.canvas.width*2, this.radius*cntx.canvas.width*2);
+    else
+        cntx.drawImage(this.img, 
+                       this.img.height * this.frame, 0, this.img.height, this.img.height,
+                       -this.radius * cntx.canvas.width, -this.radius * cntx.canvas.width, this.radius*cntx.canvas.width*2, this.radius*cntx.canvas.width*2
+                      );
     cntx.restore();
 }
 
@@ -51,6 +61,10 @@ Dot.prototype.update = function(deltaTime)
     this.position.add(this.speed.getMultScalar(deltaTime));
     this.collideWithBorders();
     this.rotation += this.angularSpeed * deltaTime;
+    
+    this.frame++;
+    if(this.frame >= this.frames)
+        this.frame = 0;
 }
 
 //main movement functionality

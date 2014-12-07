@@ -14,6 +14,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Threading;
 using System.Text.RegularExpressions;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 using RSNetworker;
 
@@ -28,7 +31,7 @@ namespace ReactiveSpaces
         public delegate void OnPortChanged(int port);
         public OnPortChanged _onPortChanged = null;
 
-        int currentPort = 8080;
+        int currentPort = 8081;
 
         private bool connected = false;
 
@@ -37,6 +40,34 @@ namespace ReactiveSpaces
             InitializeComponent();
         }
 
+        public void Load()
+        {
+            //try to load settings
+            if (File.Exists("local.bin"))
+            {
+                try
+                {
+                    using (FileStream fStream = File.OpenRead("local.bin"))
+                    {
+                        byte[] remoteBytes = new byte[fStream.Length];
+                        fStream.Read(remoteBytes, 0, remoteBytes.Length);
+
+                        BinaryFormatter formatter = new BinaryFormatter();
+                        MemoryStream stream = new MemoryStream();
+                        stream.Write(remoteBytes, 0, remoteBytes.Length);
+                        stream.Seek(0, SeekOrigin.Begin);
+                        serverInfo loadInfo = (serverInfo)formatter.Deserialize(stream);
+
+                        currentPort = loadInfo.port;
+                        apiPort.Text = currentPort.ToString("####");
+
+                        if (_onPortChanged != null)
+                            _onPortChanged(currentPort);
+                    }
+                }
+                catch { }
+            }
+        }
 
         public void updateListenState(bool listening)
         {
@@ -105,6 +136,27 @@ namespace ReactiveSpaces
         public void onPortLostFocus(object sender, EventArgs e)
         {
             apiPort.Text = currentPort.ToString("####");
+        }
+
+        public void OnClose()
+        {
+            try
+            {
+                using (FileStream fStream = File.OpenWrite("local.bin"))
+                {
+                    serverInfo toSave = new serverInfo();
+                    toSave.port = currentPort;
+                    toSave.host = "";
+
+                    BinaryFormatter formatter = new BinaryFormatter();
+                    MemoryStream stream = new MemoryStream();
+                    formatter.Serialize(stream, toSave);
+                    byte[] saveBytes = stream.ToArray();
+
+                    fStream.Write(saveBytes, 0, saveBytes.Length);
+                }
+            }
+            catch { }
         }
     }
 }

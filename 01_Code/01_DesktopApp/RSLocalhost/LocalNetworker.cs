@@ -36,7 +36,7 @@ namespace RSLocalhost
 
         JavaScriptSerializer jSerializer;
 
-        int port = 8080;
+        int port = 8081;
         public bool validPort = true;
         public bool portStatusChanged = false;
         TcpListener listener;

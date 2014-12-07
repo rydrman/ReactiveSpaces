@@ -14,6 +14,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using RSNetworker;
 
 namespace ReactiveSpaces
@@ -21,6 +24,14 @@ namespace ReactiveSpaces
     /// <summary>
     /// Interaction logic for Network.xaml
     /// </summary>
+    /// 
+
+    [Serializable()]
+    public struct serverInfo
+    {
+        public int port;
+        public string host;
+    }
 
     public partial class NetworkPage : Page
     {
@@ -34,7 +45,7 @@ namespace ReactiveSpaces
         public OnURLChanged _onURLChanged = null;
 
         int currentPort = 8080;
-        string currentURL = "http://reactivespacesapi.com";
+        string currentURL = "reactivespacesapi.com";
 
         ObservableCollection<StationProfile> peers;
         public NetworkPage()
@@ -44,6 +55,37 @@ namespace ReactiveSpaces
             peers = new ObservableCollection<StationProfile>();
             connectedStations.ItemsSource = peers;
             //connectedStations.DataContext = peers;
+        }
+
+        public void Load()
+        {
+            //try to load settings
+            if (File.Exists("remote.bin"))
+            {
+                try
+                {
+                    using (FileStream fStream = File.OpenRead("remote.bin"))
+                    {
+                        byte[] remoteBytes = new byte[fStream.Length];
+                        fStream.Read(remoteBytes, 0, remoteBytes.Length);
+
+                        BinaryFormatter formatter = new BinaryFormatter();
+                        MemoryStream stream = new MemoryStream();
+                        stream.Write(remoteBytes, 0, remoteBytes.Length);
+                        stream.Seek(0, SeekOrigin.Begin);
+                        serverInfo loadInfo = (serverInfo)formatter.Deserialize(stream);
+
+                        currentURL = loadInfo.host;
+                        currentPort = loadInfo.port;
+                        serverURL.Text = currentURL;
+                        serverPort.Text = currentPort.ToString("####");
+
+                        if(_onURLChanged != null)
+                            _onURLChanged(currentURL, currentPort);
+                    }
+                }
+                catch { }
+            }
         }
 
         public void serverConnectionChanged(bool connected)
@@ -133,6 +175,11 @@ namespace ReactiveSpaces
             }
         }
 
+        public void OnPortLostFocus(object sender, EventArgs e)
+        {
+            serverPort.Text = currentPort.ToString("####");
+        }
+
         public void OnURLUserChanged(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Return)
@@ -143,6 +190,30 @@ namespace ReactiveSpaces
                     _onURLChanged(currentURL, currentPort);
             }
         }
+        public void OnURLLostFocus(object sender, EventArgs e)
+        {
+            serverURL.Text = currentURL;
+        }
 
+        public void OnClose()
+        {
+            try
+            {
+                using (FileStream fStream = File.OpenWrite("remote.bin"))
+                {
+                    serverInfo toSave = new serverInfo();
+                    toSave.port = currentPort;
+                    toSave.host = currentURL;
+
+                    BinaryFormatter formatter = new BinaryFormatter();
+                    MemoryStream stream = new MemoryStream();
+                    formatter.Serialize(stream, toSave);
+                    byte[] saveBytes = stream.ToArray();
+
+                    fStream.Write(saveBytes, 0, saveBytes.Length);
+                }
+            }
+            catch { }
+        }
     }
 }

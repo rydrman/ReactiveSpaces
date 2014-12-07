@@ -359,7 +359,7 @@ namespace RSNetworker
             
             //reconnect
             Disconnect();
-            if (closing || !validURL)
+            if (closing || !validURL || Task.CurrentId != serverThread.Id)
             {
                 return;
             }
