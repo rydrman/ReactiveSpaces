@@ -8,7 +8,7 @@ var Game = function()
     this.bufferCtx = this.bufferCanvas.getContext('2d');
     
     //scoring
-    this.ui = new UI();
+    this.ui = new UI(this.ReactiveSpacesImg);
     
     
     //images
@@ -19,6 +19,7 @@ var Game = function()
     this.handEmptyImg = document.getElementById("handEmptyImage");
     this.handFullImg = document.getElementById("handFullImage");
     this.handCollectImg = document.getElementById("handCollectImage");
+    this.ReactiveSpacesImg = document.getElementById("ReactiveSpacesImage");
     
     this.mainDots = [];
     this.largeDots = [];

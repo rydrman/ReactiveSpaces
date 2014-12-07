@@ -1,4 +1,4 @@
-var UI = function ()
+var UI = function (logoImg)
 {
     this.mainCanvas = document.createElement('canvas');
     this.mainCtx = this.mainCanvas.getContext('2d');
@@ -18,6 +18,7 @@ var UI = function ()
     this.timeLeft = 0;
     this.lobbyTimeLeft = 0;
     this.score = 0;
+    this.image = logoImg;
     
     this.frame = 0;
 }
@@ -153,11 +154,14 @@ UI.prototype.drawRoundCountdown = function(cvs)
     this.countCtx.fillStyle = "rgba(255, 255, 255, 0.1)";
     this.countCtx.fillRect(0, 0, this.countCanvas.width, this.countCanvas.height);
 
+    //drawing the Reactive Spaces Logo
+    this.countCtx.drawImage(this.image, this.countCanvas.width * 0.5, this.countCanvas.height * 0.1);
+    
     //draw countown to next round
     this.countCtx.font = this.fontSize + "px Futura, sans-serif";
-    this.countCtx.textAlign = "left";
+    this.countCtx.textAlign = "center";
     this.countCtx.fillStyle = "#FFF";
-    this.countCtx.fillText("NEXT ROUND", this.countCanvas.width * 0.15, this.countCanvas.height * 0.3);
+    this.countCtx.fillText("NEXT ROUND", this.countCanvas.width * 0.5, this.countCanvas.height * 0.3);
     
     //Adding time left
     this.countCtx.font = Math.floor(this.countCanvas.width * 0.5) + "px Futura, sans-serif";
