@@ -459,13 +459,15 @@ Game.prototype.render = function()
     //draw remote skeletons
     for(var i in RS.remotePlayers)
     {
-        RS.DrawSkeleton(this.bufferCtx, RS.remotePlayers[i], "rgba(64, 64, 64, 0.2)", true);
+        if(RS.remotePlayers[i].userPresent)
+            RS.DrawSkeleton(this.bufferCtx, RS.remotePlayers[i], "rgba(64, 64, 64, 0.2)", true);
     }
     
     //draw local skeletons
     for(var i in RS.players)
     {
-        RS.DrawSkeleton(this.bufferCtx, RS.players[i], "rgba(255, 255, 255, 0.2)", true);
+        if(RS.players[i].userPresent)
+            RS.DrawSkeleton(this.bufferCtx, RS.players[i], "rgba(255, 255, 255, 0.2)", true);
     }
 
     //LARGE DOT
