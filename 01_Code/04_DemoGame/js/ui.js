@@ -87,11 +87,12 @@ UI.prototype.drawTopBar = function(cvs)
     //draw text
     //UI 
     this.topBarCtx.fillStyle = "#FFF";
-    this.topBarCtx.font = this.fontSize + "px sans-serif";
+    this.topBarCtx.font = this.fontSize + "px Futura, sans-serif";
     this.topBarCtx.textAlign = 'left';
     
     //score
-    this.topBarCtx.fillText("Score: " + this.score, this.topBarCanvas.width*0.01, this.topBarCanvas.height * 0.5 + this.fontSize * 0.35);
+    this.topBarCtx.fillText("SCORE:", this.topBarCanvas.width*0.02, this.topBarCanvas.height * 0.15 + this.fontSize * 0.05)
+    this.topBarCtx.fillText("" + this.score, this.topBarCanvas.width*0.02, this.topBarCanvas.height * 0.35 + this.fontSize * 0.15);
     
     if(this.inRound)
     {
@@ -100,7 +101,7 @@ UI.prototype.drawTopBar = function(cvs)
         this.topBarCtx.fillText(
             padNumber( Math.floor(this.timeLeft / 60000), 2) + ":" + 
             padNumber( Math.floor((this.timeLeft % 60000) / 1000), 2), 
-            this.topBarCanvas.width * 0.5, this.topBarCanvas.height * 0.5 + this.fontSize * 0.35);
+            this.topBarCanvas.width * 0.5, this.topBarCanvas.height * 0.55 + this.fontSize * 0.15);
     }
     //menu icon
     this.topBarCtx.textAlign = 'right';
