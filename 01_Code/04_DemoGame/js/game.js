@@ -84,6 +84,7 @@ Game.prototype.startRound = function()
     this.remoteDots = [];
     this.largeDots = [];
     this.ui.score = 0;
+    this.ui.displayScore = 0;
     this.roundStart = new Date().getTime();
     this.inRound = true;
     this.ui.inRound = true;
@@ -510,8 +511,8 @@ Game.prototype.render = function()
         this.bufferCtx.save();
         this.bufferCtx.fillStyle = this.scoreCounters[i].color;
         this.bufferCtx.globalAlpha = this.scoreCounters[i].alpha;
-        this.bufferCtx.translate(this.scoreCounters[i].position.x * this.bufferCanvaswidth, 
-                      this.scoreCounters[i].position.y * this.bufferCanvaswidth);
+        this.bufferCtx.translate(this.scoreCounters[i].position.x * this.bufferCanvas.width, 
+                      this.scoreCounters[i].position.y * this.bufferCanvas.width);
         this.bufferCtx.fillText(this.scoreCounters[i].value, 0, 0);
         this.bufferCtx.restore();
     }
@@ -566,7 +567,7 @@ Game.prototype.removeScoreDot = function( scoreDot, getScore )
                 position.set(scoreDot.position);
                 var counter = {
                     id: this.lastScoreCounterID++,
-                    value: "+1",
+                    value: "+100",
                     position: position,
                     color: "#FFF",
                     alpha:1
@@ -574,7 +575,8 @@ Game.prototype.removeScoreDot = function( scoreDot, getScore )
             
             if(getScore)
             {
-                this.ui.score++;
+                this.ui.score += 100;
+                TweenLite.to(this.ui, 1, {displayScore: this.ui.score, ease:Linear.easeOut});
                 RS.Send({score: this.ui.score});
             }
             else

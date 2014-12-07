@@ -18,6 +18,7 @@ var UI = function (logoImg)
     this.timeLeft = 0;
     this.lobbyTimeLeft = 0;
     this.score = 0;
+    this.displayScore = 0;
     this.logoImg = logoImg;
     this.rad = 0.05;
     
@@ -34,8 +35,6 @@ UI.prototype.resize = function(x, y)
     this.countCanvas.height = y * 0.6;
     this.profileCanvas.width = x * 0.3;
     this.profileCanvas.height = y * 0.25;
-    //this.image.width = x * 0.5;
-    //this.image.height = y * 0.5;
     
     this.fontSize = Math.floor(this.topBarCanvas.height * 0.4);
 }
@@ -108,7 +107,7 @@ UI.prototype.drawTopBar = function(cvs)
     this.topBarCtx.font = ctx.fontSize + "px Futura, sans-serif";
 
     //score numbers
-    this.topBarCtx.fillText("" + this.score, this.topBarCanvas.width*0.02, this.topBarCanvas.height * 0.6 + ctx.fontSize * 0.4);
+    this.topBarCtx.fillText("" + Math.floor(this.displayScore), this.topBarCanvas.width*0.02, this.topBarCanvas.height * 0.6 + ctx.fontSize * 0.4);
     
     if(this.inRound)
     {
