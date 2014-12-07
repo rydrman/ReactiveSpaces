@@ -55,6 +55,18 @@ UI.prototype.getRender = function(cvs)
     
     if(this.menuOpenAmount > 0)
     {
+        ////debug for marco editing.. draw local profile
+        
+        this.drawProfile(cvs, 
+                         this.mainCanvas.width - (this.menuOpenAmount * this.mainCanvas.width * 0.33), 
+                         this.mainCanvas.height * 0.15 + this.mainCanvas.height * 0.28 * 0,
+                         RS.station);
+        this.mainCtx.drawImage(this.profileCanvas,
+                               this.mainCanvas.width - (this.menuOpenAmount * this.mainCanvas.width * 0.33), 
+                               this.mainCanvas.height * 0.15 + this.mainCanvas.height * 0.28 * 0);
+        
+        ////
+        
         for(var i = 0; i < RS.remoteStations.length; ++i)
         {
             this.drawProfile(cvs, 
