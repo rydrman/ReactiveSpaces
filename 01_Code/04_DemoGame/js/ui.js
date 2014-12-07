@@ -27,7 +27,7 @@ UI.prototype.resize = function(x, y)
     this.mainCanvas.width = x;
     this.mainCanvas.height = y;
     this.topBarCanvas.width = x;
-    this.topBarCanvas.height = y * 0.1;
+    this.topBarCanvas.height = y * 0.12;
     this.countCanvas.width = y * 0.6;
     this.countCanvas.height = y * 0.6;
     this.profileCanvas.width = x * 0.3;
@@ -84,30 +84,55 @@ UI.prototype.drawTopBar = function(cvs)
     this.topBarCtx.fillStyle = "rgba(255, 255, 255, 0.1)";
     this.topBarCtx.fillRect(0, 0, this.topBarCanvas.width, this.topBarCanvas.height);
 
+    ctx.fontSize = Math.floor(this.fontSize * 0.4);
+    
     //draw text
-    //UI 
+    //UI
     this.topBarCtx.fillStyle = "#FFF";
-    this.topBarCtx.font = this.fontSize + "px Futura, sans-serif";
+    ctx.fontSize = Math.floor(this.fontSize * 0.4);
+    this.topBarCtx.font = ctx.fontSize + "px Futura, sans-serif";
     this.topBarCtx.textAlign = 'left';
     
-    //score
-    this.topBarCtx.fillText("SCORE:", this.topBarCanvas.width*0.02, this.topBarCanvas.height * 0.15 + this.fontSize * 0.05)
-    this.topBarCtx.fillText("" + this.score, this.topBarCanvas.width*0.02, this.topBarCanvas.height * 0.35 + this.fontSize * 0.15);
+    
+    //score title
+    ctx.fontSize = Math.floor(this.fontSize * 0.45);
+    this.topBarCtx.fillText("SCORE", this.topBarCanvas.width*0.02, this.topBarCanvas.height * 0.20 + this.fontSize * 0.5);
+
+    //sizing of score numbers
+    ctx.fontSize = Math.floor(this.fontSize * 0.85);
+    this.topBarCtx.font = ctx.fontSize + "px Futura, sans-serif";
+
+    //score numbers
+    this.topBarCtx.fillText("" + this.score, this.topBarCanvas.width*0.02, this.topBarCanvas.height * 0.6 + ctx.fontSize * 0.4);
     
     if(this.inRound)
     {
         //timer
+        //sizing of time title
+        ctx.fontSize = Math.floor(this.fontSize * 0.45);
+        this.topBarCtx.font = ctx.fontSize + "px Futura, sans-serif";
         this.topBarCtx.textAlign = 'center';
+        
+            this.topBarCtx.fillText("TIME", this.topBarCanvas.width*0.5, this.topBarCanvas.height * 0.20 + this.fontSize * 0.5);
+        
+        //sizing of time title
+        ctx.fontSize = Math.floor(this.fontSize * 0.85);
+        this.topBarCtx.font = ctx.fontSize + "px Futura, sans-serif";
+        this.topBarCtx.textAlign = 'center';
+        
+        //timer numbers
         this.topBarCtx.fillText(
             padNumber( Math.floor(this.timeLeft / 60000), 2) + ":" + 
             padNumber( Math.floor((this.timeLeft % 60000) / 1000), 2), 
-            this.topBarCanvas.width * 0.5, this.topBarCanvas.height * 0.55 + this.fontSize * 0.15);
+            this.topBarCanvas.width * 0.5, this.topBarCanvas.height * 0.6 + this.fontSize * 0.4);
     }
     //menu icon
+    ctx.fontSize = Math.floor(this.fontSize * 0.7);
+    this.topBarCtx.font = ctx.fontSize + "px Futura, sans-serif";
     this.topBarCtx.textAlign = 'right';
-    this.topBarCtx.fillText("__", this.topBarCanvas.width * 0.99, this.topBarCanvas.height * 0.5 - this.fontSize * 0.5);
-    this.topBarCtx.fillText("__", this.topBarCanvas.width * 0.99, this.topBarCanvas.height * 0.5 - this.fontSize * 0.2);
-    this.topBarCtx.fillText("__", this.topBarCanvas.width * 0.99, this.topBarCanvas.height * 0.5 + this.fontSize * 0.1);
+    this.topBarCtx.fillText("__", this.topBarCanvas.width * 0.98, this.topBarCanvas.height * 0.3 + this.fontSize * 0.15);
+    this.topBarCtx.fillText("__", this.topBarCanvas.width * 0.98, this.topBarCanvas.height * 0.4 + this.fontSize * 0.16);
+    this.topBarCtx.fillText("__", this.topBarCanvas.width * 0.98, this.topBarCanvas.height * 0.5 + this.fontSize * 0.17);
     this.topBarCtx.restore();
 }
 
@@ -129,13 +154,22 @@ UI.prototype.drawRoundCountdown = function(cvs)
     this.countCtx.fillRect(0, 0, this.countCanvas.width, this.countCanvas.height);
 
     //draw countown to next round
-    this.countCtx.font = this.fontSize + "px sans-serif";
+    this.countCtx.font = this.fontSize + "px Futura, sans-serif";
+    this.countCtx.textAlign = "left";
+    this.countCtx.fillStyle = "#FFF";
+    this.countCtx.fillText("NEXT ROUND", this.countCanvas.width * 0.15, this.countCanvas.height * 0.3);
+    
+    //Adding time left
+    this.countCtx.font = Math.floor(this.countCanvas.width * 0.5) + "px Futura, sans-serif";
+    this.countCtx.fillText(padNumber(Math.ceil(this.lobbyTimeLeft / 1000), 2), this.countCanvas.width * 0.2, this.countCanvas.height * 0.75);
+    
+    //reactivespacesapi.com and slogan
+    this.countCtx.font = this.fontSize * 0.45 + "px Futura, sans-serif";
     this.countCtx.textAlign = "center";
     this.countCtx.fillStyle = "#FFF";
-    this.countCtx.fillText("Next Round:", this.countCanvas.width * 0.5, this.countCanvas.height * 0.3);
+    this.countCtx.fillText("DISTRIBUTED. KINECT. WEB APPS.", this.countCanvas.width * 0.5, this.countCanvas.height * 0.9);
+    this.countCtx.fillText("REACTIVESPACESAPI.COM", this.countCanvas.width * 0.5, this.countCanvas.height * 0.95);
     
-    this.countCtx.font = Math.floor(this.countCanvas.width * 0.5) + "px sans-serif";
-    this.countCtx.fillText(padNumber(Math.ceil(this.lobbyTimeLeft / 1000), 2), this.countCanvas.width * 0.5, this.countCanvas.height * 0.75);
     this.countCtx.restore();
 }
 
