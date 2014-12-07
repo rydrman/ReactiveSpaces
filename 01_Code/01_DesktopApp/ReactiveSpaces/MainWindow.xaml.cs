@@ -68,10 +68,12 @@ namespace ReactiveSpaces
 
             //set handlers
             generalPage._onPortChanged = onPortChanged;
-
-            //setup data
             networkPage._onURLChanged = onServerURLChanged;
             networkPage._onReconnect = onReconnect;
+
+            //load settings
+            networkPage.Load();
+            generalPage.Load();
 
             //navigate
             mainFrame.Navigate(generalPage);
@@ -190,6 +192,8 @@ namespace ReactiveSpaces
 
         private void onCloseButtonClick(object sender, RoutedEventArgs e)
         {
+            networkPage.OnClose();
+            generalPage.OnClose();
             networker.closing = true;
             localNet.closing = true;
             networker.Disconnect();
