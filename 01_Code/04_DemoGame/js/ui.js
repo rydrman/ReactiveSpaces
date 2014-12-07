@@ -18,7 +18,7 @@ var UI = function (logoImg)
     this.timeLeft = 0;
     this.lobbyTimeLeft = 0;
     this.score = 0;
-    this.image = logoImg;
+    this.logoImg = logoImg;
     this.rad = 0.05;
     
     this.frame = 0;
@@ -59,18 +59,7 @@ UI.prototype.getRender = function(cvs)
     
     if(this.menuOpenAmount > 0)
     {
-        ////debug for marco editing.. draw local profile
-        
-        this.drawProfile(cvs, 
-                         this.mainCanvas.width - (this.menuOpenAmount * this.mainCanvas.width * 0.33), 
-                         this.mainCanvas.height * 0.15 + this.mainCanvas.height * 0.28 * 0,
-                         RS.station);
-        this.mainCtx.drawImage(this.profileCanvas,
-                               this.mainCanvas.width - (this.menuOpenAmount * this.mainCanvas.width * 0.33), 
-                               this.mainCanvas.height * 0.15 + this.mainCanvas.height * 0.28 * 0);
-        
-        ////
-        
+    
         for(var i = 0; i < RS.remoteStations.length; ++i)
         {
             this.drawProfile(cvs, 
@@ -170,7 +159,7 @@ UI.prototype.drawRoundCountdown = function(cvs)
     this.countCtx.fillRect(0, 0, this.countCanvas.width, this.countCanvas.height);
 
     //drawing the Reactive Spaces Logo
-    this.countCtx.drawImage(this.image, this.countCanvas.width * 0.3, this.countCanvas.height * 0.03, this.countCanvas.width * 0.4, this.countCanvas.height * 0.15);
+    this.countCtx.drawImage(this.logoImg, this.countCanvas.width * 0.3, this.countCanvas.height * 0.03, this.countCanvas.width * 0.4, this.countCanvas.height * 0.15);
     
     //draw countown to next round
     this.countCtx.font = this.fontSize + "px Futura, sans-serif";
