@@ -34,7 +34,7 @@ UI.prototype.resize = function(x, y)
     this.countCanvas.width = y * 0.6;
     this.countCanvas.height = y * 0.6;
     this.profileCanvas.width = x * 0.3;
-    this.profileCanvas.height = y * 0.25;
+    this.profileCanvas.height = y * 0.30;
     
     this.fontSize = Math.floor(this.topBarCanvas.height * 0.4);
 }
@@ -88,7 +88,6 @@ UI.prototype.drawTopBar = function(cvs)
     this.topBarCtx.fillStyle = "rgba(255, 255, 255, 0.1)";
     this.topBarCtx.fillRect(0, 0, this.topBarCanvas.width, this.topBarCanvas.height);
 
-    ctx.fontSize = Math.floor(this.fontSize * 0.4);
     
     //draw text
     //UI
@@ -198,13 +197,38 @@ UI.prototype.drawProfile = function(cvs, x, y, profile)
     this.profileCtx.fillRect(0, 0, this.profileCanvas.width, this.profileCanvas.height);
     
     //values
-    this.profileCtx.font = this.fontSize + "px sans-serif";
+    
+    ctx.fontSize = Math.floor(this.fontSize * 0.7);
+    this.profileCtx.font = ctx.fontSize + "px Futura, sans-serif";
     this.profileCtx.textAlign = "left";
     this.profileCtx.fillStyle = "#FFF";
     
-    this.profileCtx.fillText(profile.name, this.profileCanvas.width * 0.1, this.fontSize * 2.3);
-    this.profileCtx.fillText(profile.location, this.profileCanvas.width * 0.1, this.fontSize * 3.3);
-    this.profileCtx.fillText("Score: " + profile.score, this.profileCanvas.width * 0.1, this.fontSize * 4.9);
+    
+    //Name of Station
+    this.profileCtx.font = ctx.fontSize * 0.6 + "px Futura, sans-serif";
+    this.profileCtx.fillText("STATION NAME", this.profileCanvas.width * 0.08, this.profileCanvas.height * 0.08 + this.fontSize * 0.5)
+    
+    //Input Name
+    this.profileCtx.font = ctx.fontSize * 0.95 + "px Futura, sans-serif";
+    this.profileCtx.fillText(profile.name, this.profileCanvas.width * 0.08, this.profileCanvas.height * 0.23 + this.fontSize * 0.3);
+    
+    //Location of Station
+    this.profileCtx.font = ctx.fontSize * 0.6 + "px Futura, sans-serif";
+    this.profileCtx.fillText("STATION LOCATION", this.profileCanvas.width * 0.08, this.profileCanvas.height * 0.4 + this.fontSize * 0.5)
+    
+    
+    //Input Location
+    this.profileCtx.font = ctx.fontSize * 0.95 + "px Futura, sans-serif";
+    this.profileCtx.fillText(profile.location, this.profileCanvas.width * 0.08, this.profileCanvas.height * 0.55 + this.fontSize * 0.3);
+    
+    //Score title
+    this.profileCtx.font = ctx.fontSize * 0.6 + "px Futura, sans-serif";
+    this.profileCtx.fillText("SCORE", this.profileCanvas.width * 0.08, this.profileCanvas.height * 0.72 + this.fontSize * 0.5)
+    
+    //Score number
+    this.profileCtx.font = ctx.fontSize * 0.95 + "px Futura, sans-serif";
+    this.profileCtx.fillText("" + profile.score, this.profileCanvas.width * 0.08, this.profileCanvas.height * 0.87 + this.fontSize * 0.3);
+    
     
 }
 
