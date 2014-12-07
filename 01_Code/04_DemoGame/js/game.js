@@ -33,7 +33,7 @@ var Game = function()
     this.roundStart = new Date().getTime();
     this.lobbyStart = new Date().getTime();
     this.roundLength = 60000;
-    this.lobbyLength = 15000;
+    this.lobbyLength = 10000;
     this.inRound = false;
     this.lastFrame = this.initialTime;
     this.lastMainDot = this.initialTime;
@@ -453,11 +453,17 @@ Game.prototype.render = function()
     this.bufferCtx.save();
     this.bufferCtx.fillStyle = "#151518";
     this.bufferCtx.fillRect(0, 0, this.bufferCanvas.width, this.bufferCanvas.height);
-
+    
     //draw remote skeletons
     for(var i in RS.remotePlayers)
     {
-        RS.DrawSkeleton(this.bufferCtx, RS.remotePlayers[i], "rgba(255, 255, 255, 0.2)", true);
+        RS.DrawSkeleton(this.bufferCtx, RS.remotePlayers[i], "rgba(64, 64, 64, 0.2)", true);
+    }
+    
+    //draw local skeletons
+    for(var i in RS.players)
+    {
+        RS.DrawSkeleton(this.bufferCtx, RS.players[i], "rgba(255, 255, 255, 0.2)", true);
     }
 
     //LARGE DOT
