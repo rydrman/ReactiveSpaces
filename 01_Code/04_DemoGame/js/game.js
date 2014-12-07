@@ -19,7 +19,7 @@ var Game = function()
     this.handFullImg = document.getElementById("handFullImage");
     this.handCollectImg = document.getElementById("handCollectImage");
     this.ReactiveSpacesImg = document.getElementById("ReactiveSpacesImage");
-    this.backgroundImg = document.getElementById("backgoundImage");
+    //this.backgroundImg = document.getElementById("backgoundImage");
     
     //scoring
     this.ui = new UI(this.ReactiveSpacesImg);
@@ -450,9 +450,9 @@ Game.prototype.update = function()
 
 }
 
-Game.prototype.render = function(backgroundImg)
+Game.prototype.render = function() //backgroundImg
 {
-    this.image = backgroundImg;
+    //this.image = backgroundImg;
     this.bufferCtx.setTransform(1, 0, 0, 1, 0, 0);
     this.bufferCtx.save();
     this.bufferCtx.fillStyle = "#151518";

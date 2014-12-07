@@ -18,12 +18,7 @@ var UI = function (logoImg)
     this.timeLeft = 0;
     this.lobbyTimeLeft = 0;
     this.score = 0;
-<<<<<<< HEAD
     this.image = logoImg;
-=======
-    this.logoImg = logoImg;
-    this.rad = 0.05;
->>>>>>> 0ea8ad175598dfbad49f509c8c9c78f5b51c64a8
     
     this.frame = 0;
 }
