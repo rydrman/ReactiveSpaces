@@ -19,6 +19,7 @@ var UI = function (logoImg)
     this.lobbyTimeLeft = 0;
     this.score = 0;
     this.image = logoImg;
+    this.rad = 0.05;
     
     this.frame = 0;
 }
@@ -33,6 +34,8 @@ UI.prototype.resize = function(x, y)
     this.countCanvas.height = y * 0.6;
     this.profileCanvas.width = x * 0.3;
     this.profileCanvas.height = y * 0.25;
+    //this.image.width = x * 0.5;
+    //this.image.height = y * 0.5;
     
     this.fontSize = Math.floor(this.topBarCanvas.height * 0.4);
 }
@@ -155,7 +158,7 @@ UI.prototype.drawRoundCountdown = function(cvs)
     this.countCtx.fillRect(0, 0, this.countCanvas.width, this.countCanvas.height);
 
     //drawing the Reactive Spaces Logo
-    this.countCtx.drawImage(this.image, this.countCanvas.width * 0.5, this.countCanvas.height * 0.1);
+    this.countCtx.drawImage(this.image, this.countCanvas.width * 0.3, this.countCanvas.height * 0.03, this.countCanvas.width * 0.4, this.countCanvas.height * 0.15);
     
     //draw countown to next round
     this.countCtx.font = this.fontSize + "px Futura, sans-serif";
@@ -165,7 +168,7 @@ UI.prototype.drawRoundCountdown = function(cvs)
     
     //Adding time left
     this.countCtx.font = Math.floor(this.countCanvas.width * 0.5) + "px Futura, sans-serif";
-    this.countCtx.fillText(padNumber(Math.ceil(this.lobbyTimeLeft / 1000), 2), this.countCanvas.width * 0.2, this.countCanvas.height * 0.75);
+    this.countCtx.fillText(padNumber(Math.ceil(this.lobbyTimeLeft / 1000), 2), this.countCanvas.width * 0.5, this.countCanvas.height * 0.75);
     
     //reactivespacesapi.com and slogan
     this.countCtx.font = this.fontSize * 0.45 + "px Futura, sans-serif";

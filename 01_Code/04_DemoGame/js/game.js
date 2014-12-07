@@ -7,8 +7,7 @@ var Game = function()
     this.bufferCanvas = document.createElement('canvas');
     this.bufferCtx = this.bufferCanvas.getContext('2d');
     
-    //scoring
-    this.ui = new UI(this.ReactiveSpacesImg);
+    
     
     
     //images
@@ -21,6 +20,9 @@ var Game = function()
     this.handCollectImg = document.getElementById("handCollectImage");
     this.ReactiveSpacesImg = document.getElementById("ReactiveSpacesImage");
     
+    //scoring
+    this.ui = new UI(this.ReactiveSpacesImg);
+    
     this.mainDots = [];
     this.largeDots = [];
     this.scoreDots = [];
@@ -32,7 +34,7 @@ var Game = function()
     this.initialTime = new Date().getTime();
     this.roundStart = new Date().getTime();
     this.lobbyStart = new Date().getTime();
-    this.roundLength = 60000;
+    this.roundLength = 3000;
     this.lobbyLength = 10000;
     this.inRound = false;
     this.lastFrame = this.initialTime;
