@@ -28,7 +28,7 @@ namespace ReactiveSpaces
         public delegate void OnPortChanged(int port);
         public OnPortChanged _onPortChanged = null;
 
-        int currentPort = 8080;
+        int currentPort = 8081;
 
         private bool connected = false;
 

@@ -43,10 +43,10 @@
         <TextBlock Text="Websocket URL:" Grid.Row="6" Margin="0,7,10,7" VerticalAlignment="Center" HorizontalAlignment="Right" Style="{StaticResource textStyle}" Height="16"/>
         <TextBox Name="apiURL" Text="ws://localhost:{port}/ReactiveSpaces" Width="200" Grid.Row="6" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False" Height="18" Margin="0,6"/>
         <TextBlock Text="Websocket Port:"  Grid.Row="7" Margin="0,7,10,7" VerticalAlignment="Center" HorizontalAlignment="Right" Style="{StaticResource textStyle}" Height="16"/>
-        <TextBox Name="apiPort" Text="8080" Width="200" Grid.Row="7" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Height="18" Margin="0,6" KeyDown="onPortChanged" LostFocus="onPortLostFocus"/>
+        <TextBox Name="apiPort" Text="8081" Width="200" Grid.Row="7" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Height="18" Margin="0,6" KeyDown="onPortChanged" LostFocus="onPortLostFocus"/>
         <TextBlock Grid.Row="8" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0 0 50 0" 
                    Style="{StaticResource textStyle}" Foreground="#999" TextWrapping="Wrap" >
-            The default websocket port is 8080. 
+            The default websocket port is 8081. 
             If the box is red, or the program fails to listen for app connections, this can be changed. PLEASE NOTE that this will require the 
             JavaScript portion of the API to be updated with the new port number. Developpers should include this ability to make their apps as 
             compatible as possible. See the API documentation for more details.

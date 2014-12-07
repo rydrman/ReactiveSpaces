@@ -12,7 +12,7 @@ window.RS = window.ReactiveSpaces = {version: 0.1};
 
 //constants and settings etc
 RS.BASEURL = "ws://localhost";
-RS.LOCALPORT = 8080;
+RS.LOCALPORT = 8081;
 RS.MESSAGE_DELAY = 100;
 RS.SUPORTED_PLAYERS = 2;
 RS.MOVEMENT_BLENDING = true;

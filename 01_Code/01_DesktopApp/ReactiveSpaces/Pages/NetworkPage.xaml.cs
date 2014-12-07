@@ -34,7 +34,7 @@ namespace ReactiveSpaces
         public OnURLChanged _onURLChanged = null;
 
         int currentPort = 8080;
-        string currentURL = "http://reactivespacesapi.com";
+        string currentURL = "reactivespacesapi.com";
 
         ObservableCollection<StationProfile> peers;
         public NetworkPage()
@@ -133,6 +133,11 @@ namespace ReactiveSpaces
             }
         }
 
+        public void OnPortLostFocus(object sender, EventArgs e)
+        {
+            serverPort.Text = currentPort.ToString("####");
+        }
+
         public void OnURLUserChanged(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Return)
@@ -142,6 +147,10 @@ namespace ReactiveSpaces
                 if (_onURLChanged != null)
                     _onURLChanged(currentURL, currentPort);
             }
+        }
+        public void OnURLLostFocus(object sender, EventArgs e)
+        {
+            serverURL.Text = currentURL;
         }
 
     }
