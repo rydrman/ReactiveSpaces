@@ -1,6 +1,14 @@
 html,body{height:100%;width:100%; background-color:#222222;}
 * { margin: 0; padding: 0; }
 
+::-webkit-scrollbar{
+  width:10px;
+  background-color: rgba(255,255,255,10);
+}
+::-webkit-scrollbar-thumb{
+   	background-color: #60C4B9;
+	height:20px;
+}  
 @font-face {
     font-family: BaronNeue;
     src: url("../fonts/BaronNeue.otf");
@@ -16,16 +24,67 @@ html,body{height:100%;width:100%; background-color:#222222;}
 }
 
 
-
-h3{
-	color:#fdfdfd;
-	font-size:10pt;
+h1{
 	width:100%;
 	float:left;
+	font-weight:normal;
 	text-align:center;
+	font-size: 30pt;
 	font-family: Century;
-	font-weight: normal;
-	padding: 2px 0px 2px 0px;
+	color: #E7E8E8;
+	margin-top: 100px;
+}
+h3{
+	width:100%;
+	float:left;
+	font-weight:normal;
+	text-align:center;
+	font-size: 14pt;
+	font-family: Century;
+	color: #E7E8E8;
+	margin-top:5px;
+	
+}
+.downloadHolder{
+	width:100%;
+	text-align:center;
+	float:left;
+	margin-top:20px;
+	display:table;
+}
+.downloadButton{
+	text-align:center;
+	font-size: 22pt;
+	font-family: Century;
+	background-color: #60C4B9;
+	color: #E7E8E8;
+	padding: 7px 14px 7px 14px;
+	margin-top:5px;
+	border-radius: 5px;
+	text-decoration:none;
+}
+.downloadButton:hover{
+	-webkit-animation: download 1s;
+    animation: download 1s;
+	color:#3D4142;
+}
+/* Chrome, Safari, Opera */
+@-webkit-keyframes download {
+    from {color: #E7E8E8;}
+    to {color:#3D4142;}
+}
+
+/* Standard syntax */
+@keyframes download {
+    from {color: #E7E8E8;}
+    to {color:#3D4142;}
+}
+
+.black{
+	color:#000 !important;
+}
+.black:hover{
+	color:#60C4B9 !important;
 }
 
 
@@ -36,4 +95,90 @@ h3{
 	font-family:Make;
 	color:#dfdfdf;
 	font-size:50pt;
+}
+
+.navBoxButton{
+	border:2px solid #E7E8E8;
+	border-radius:5px;
+	padding:3px 7px 3px 7px;
+	margin-top:-5px;
+}
+.navBoxButton:hover{
+	background-color:#60C4B9;
+	color:#E7E8E8 !important;
+}
+
+#writing{
+	width:94%;
+	margin-left: 3%;
+	margin-top: 40px;
+	float:left;
+}
+#writing #fullWright{
+	width:100%;
+	float:left;
+	text-align: justify;
+	font-size: 12pt;
+	line-height: 20pt;
+	color:#333;
+	font-family: Arial, Helvetica, sans-serif;
+	text-indent: 50px;
+}
+
+#leftWright{
+	width:48%;
+	float:left;
+	text-align: justify;
+	font-size: 12pt;
+	line-height: 20pt;
+	color:#333;
+	font-family: Arial, Helvetica, sans-serif;
+	text-indent: 50px;
+  
+}
+#rightWright{
+	width:48%;
+	float:right;
+	text-align: justify;
+	font-size: 12pt;
+	line-height: 20pt;
+	color:#333;
+	font-family: Arial, Helvetica, sans-serif;
+	text-indent: 50px;
+}
+
+
+footer{
+	width:100%;
+	float:left;
+	text-align:center;
+	background-color:#222;
+	font-family:Century;
+	color:#fdfdfd;
+	font-weight:normal;
+	font-size:9pt;
+	margin:5px 0px 20px 0px;
+}
+.hide{
+	display:none;
+}
+
+.limit{
+	max-width:600px;
+}
+.ie{
+	display:none;
+}
+
+.space{
+	margin-top: 12px;
+}
+
+.perc h3:hover{
+	color:#60C4B9;
+}
+
+a{
+	color:#60C4B9;
+    text-decoration: none;
 }

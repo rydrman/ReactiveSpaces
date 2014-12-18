@@ -1,0 +1,190 @@
+#page{
+	width:100%;
+	background-color:#fdfdfd;
+	float:left;
+
+}
+::-webkit-scrollbar{
+  width:10px;
+  background-color: rgba(255,255,255,10);
+}
+::-webkit-scrollbar-thumb{
+   	background-color: #60C4B9;
+	height:20px;
+}
+.pagePart{
+	width:100%;
+	padding-top:40px;
+	background-color:#fdfdfd;
+	float:left;
+	
+}
+h2{
+	font-family: Century;
+	font-size: 25pt;
+	text-align: center;
+	width:100%;
+	float:left;
+	font-weight: normal;
+	margin: 0px 0px 20px 0px;
+	color:#333;
+}
+#Projects{
+	height:1000px;
+}
+
+#Projects h2{
+	margin-bottom: 30px;
+}
+
+.proThumb{
+	float: left;
+	margin:0.5%;
+	width:24%;
+	background-color: #333;
+	height:100px;
+	background-size:cover;
+	font-family:Century;
+	color:#fff;
+	font-size:24pt;
+	text-decoration:none;
+	text-align:center;
+	padding-top:50px;
+	opacity:1;
+}
+.proThumb:hover{
+	color: #60C4B9;
+	opacity:0.75;
+}
+
+#demoVid{
+	
+	width:94%;
+	margin-left: 3%;
+	margin-top: 25px;
+	height:auto;
+	float:left;
+}
+
+#Documents{
+	height:auto;
+}
+#Documents h3{
+	width:100%;
+	color:#000;
+	font-size:15pt;
+	text-align: left;
+}
+#sideNav{
+	width:20%;
+	float:left;
+	border:2px solid #222;
+	padding:5px;
+	height:500px;
+	overflow-Y:scroll;
+	overflow-X:hidden;
+
+}
+#sideNav h1{
+	width:100%;
+	float:left;
+	color:#000;
+	font-size:14pt;
+	margin:0px 0px 15px 0px;
+	border-bottom:1px solid #222;
+}
+
+#sideNav a{
+	width:100%;
+	float:left;
+	color:#000;
+	font-size:12pt;
+	margin:0px;
+	margin-left: 15px;
+	font-family:Century;
+	text-decoration:none;
+}
+#sideNav #big{
+	width:100%;
+	float:left;
+	color:#000;
+	font-size:14pt;
+	margin:0px;
+	margin-left: 0px;
+	font-family:Century;
+	text-decoration:none;
+}
+#sideNav a:hover{
+	color: #60C4B9;
+}
+#sideNav #big:hover{
+	color: #60C4B9;
+}
+#DocContent{
+	width:70%;
+	float:left;
+	padding-left:2%;
+	color:#000;
+	font-size:14pt;
+	margin:0px 0px 15px 0px;
+	height:800px;
+    font-family:Century;
+	overflow-Y:scroll;
+	
+}
+
+
+
+table{
+	border:1px solid #000;
+	padding: 10px;
+}
+
+td{
+	text-align: left;
+	border-bottom:1px solid #eee;
+	padding:5px;
+}
+
+tr{
+	text-align: left;
+}
+
+
+
+
+
+
+
+
+
+
+#Contact{
+	background-color: #222222!important;
+	margin-top:0px !important;
+}
+#Contact h2{
+	color:#fdfdfd;
+	font-weight: thin;
+	margin-top:-10px;
+}
+#Contact p{
+	color:#fdfdfd;
+	font-weight:thin;
+	font-size: 10pt;
+}
+#Contact #writing{
+	margin-bottom: 30pt;
+}
+
+#Contact #leftWright{
+	text-indent: 0px ;
+	text-align: left;
+	line-height: 10pt;
+}
+#Contact #rightWright{
+	text-indent: 0px ;
+	text-align: right;
+	line-height: 10pt;
+}
+

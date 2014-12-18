@@ -1,0 +1,457 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script src="http://code.jquery.com/jquery-migrate-1.1.1.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="../css/Main.css">
+  <link rel="stylesheet" type="text/css" href="../css/Splash.css">
+  <link rel="stylesheet" type="text/css" href="../css/Projects.css">
+  <link rel="stylesheet" type="text/css" href="../css/Media.css">
+	
+</head>
+<html>
+<body>
+               
+ 					<nav id="topnav">
+                     	<a id="logo"> 
+                        	<img src="../img/Reactive-Spaces-White.png" />
+                        </a>
+                        <div id="rest">
+                            <a href="../downloads/ReactiveSpacesAPI.zip" download class=" navBoxButton">DOWNLOAD</a>
+                            <a href="../subpages/projects.html" class="linkNav">PROJECTS</a>
+                            <a href="../subpages/documentation.html" class="linkNav">DOCUMENTATION</a> 
+                            <a href="../index.html#GettingStarted" class="linkNav">GETTING STARTED</a> 
+                            <a href="../index.html" class="linkNav">HOME</a> 
+                        </div>
+                     </nav>
+                     	              		
+                     
+
+<div id="page">
+  
+    
+
+ <div class="pagePart" id="Documents">
+    <h2>REACTIVE SPACES API - DOCUMENTATION</h2>
+	<div id="sideNav">
+    	<h1> Index </h1>
+         <a id="big" href="#d_methods"> Settings </a>
+          <a href="#RS_BASEURL"> RS.BASEURL  </a>
+          <a href="#RS_LOCALPORT"> RS.LOCALPORT  </a>
+          <a href="#RS_MESSAGE_DELAY"> RS.MESSAGE_DELAY </a>
+          <a href="#RS_MOVEMENT_BLENDING"> RS.MOVEMENT_BLENDING </a>
+
+        <a id="big" href="#d_members"> Members </a>
+          <a href="#RS_socketSupported"> RS.socketSupported  </a>
+          <a href="#RS_socket "> RS.socket  </a>
+          <a href="#RS_connected"> RS.connected  </a>
+          <a href="#RS_lastMessage"> RS.lastMessage </a>
+          <a href="#RS_station"> RS.station  </a>
+          <a href="#RS_remoteStations"> RS.remoteStations  </a>
+          <a href="#RS_players"> RS.players  </a>
+          <a href="#RS_remotePlayers"> RS.remotePlayers  </a>
+          <a href="#RS_lastBlendUpdate"> RS.lastBlendUpdate  </a>
+          <a href="#RS_listeners"> RS.listeners  </a>
+          <a href="#RS_messenger"> RS.messenger </a>
+          <a href="#RS_appInfo"> RS.appInfo  </a>
+          
+        <a id="big" href="#d_methods"> Methods </a>
+          <a href="#RS_Connect"> RS.Connect()  </a>
+          <a href="#RS_Disconnect"> RS.Disconnect () </a>
+          <a href="#RS_BlendUpdate"> RS.BlendUpdate () </a>
+          <a href="#RS_ActivateMessenger"> RS.ActivateMessenger () </a>
+          <a href="#RS_addEventListener"> RS.addEventListener () </a>
+          <a href="#RS_removeEventListener"> RS.removeEventListener () </a>
+          <a href="#RS_Send"> RS.Send () </a>
+
+         <a id="big" href="#d_types"> Types </a>
+          <a href="#RS_Skeleton"> RS.Skeleton ()  </a>
+          <a href="#RS_Skeleton.Update"> RS.Skeleton.Update () </a>
+          <a href="#RS_Skeleton.BlendUpdate"> RS.Skeleton.BlendUpdate () </a>
+          <a href="#RS_SkeletonJoint"> RS.SkeletonJoint () </a>
+          <a href="#RS_SkeletonJoint.SetFromJoint"> RS.SkeletonJoint.SetFromJoint () </a>
+          <a href="#RS_SkeletonJoint.BlendUpdate"> RS.SkeletonJoint.BlendUpdate () </a>
+          <a href="#RS_Vector3.SubVector"> RS.Vector3.SubVector () </a>
+          <a href="#RS_Vector3.MultiplyScalar"> RS.Vector3.MultiplyScalar () </a>
+          <a href="#RS_Vector3.Normalize"> RS.Vector3.Normalize () </a>
+          <a href="#RS_Vector3.Length"> RS.Vector3.Length () </a>
+          <a href="#RS_Vector3.LengthSqd"> RS.Vector3.LengthSqd () </a>
+
+          <a id="big" href="#d_utilityFunctions"> Utility Functions </a>
+            <a href="#RS_DrawSkeleton"> RS.DrawSkeleton ()  </a>
+
+          <a id="big" href="#d_enumerators"> Enumerators </a>
+            <a href="#RS_Features"> RS.Features  </a>
+            <a href="#RS_JointTypes"> RS.JointTypes   </a>
+            <a href="#RS_MessageTypes"> RS.MessageTypes   </a>
+            <a href="#RS_Events"> RS.Events   </a>  
+            
+       
+       
+    </div> 
+    <div id="DocContent">
+    	  <p id="fullWright">
+              All data and functions exist in a global object accessible as ReactiveSpaces or simple RS.
+        </p></br>
+        <!--METHODS///////////////////////////////////////////////////////////////-->
+        <h2 id="d_settings">Settings</h2>
+
+        <h3 id="RS_BASEURL"> RS.BASEURL  </h3>
+        <p id="fullWright">
+                 Stores the base host/url for connecting to the desktop client. In most cases, this should not be changed. If you wanted to try launching the desktop app on another PC and then use its Kinect, it should theoretically work by changing this address.</br></br>
+Default value : "ws://localhost"
+        </p></br>
+
+        <h3 id="RS_LOCALPORT"> RS.LOCALPORT   </h3>
+        <p id="fullWright">
+                 Stores the port on which to connect to the desktop app. Only change this value if you needed to change the connection port in the desktop app. </br></br>
+Default value : 8080
+        </p></br>
+
+        <h3 id="RS_MESSAGE_DELAY"> RS.MESSAGE_DELAY   </h3>
+        <p id="fullWright">
+                 Stores the number of milliseconds delay required between each sent message. Shortening this value could cause instability and lag in the system and server. If you’re game requires messages more often than this, you should look at using a true multiplayer system. </br></br>
+Default value : 100 </br></br>
+RS.SUPORTED_PLAYERS = 2;</br></br>
+Represents the maximum number of local players that will ever be tracked. Changing this value has no effect.</br></br>
+Default value : 2
+        </p></br>
+
+        <h3 id="RS_MOVEMENT_BLENDING"> RS.MOVEMENT_BLENDING   </h3>
+        <p id="fullWright">
+                 Boolean value denoting weather or not to blend skeleton frame data and create smoother joint movement. Turning this off can improve performance, but blended joint positions will no longer update. </br></br>
+Default value : true
+        </p></br>
+
+      <!--METHODS///////////////////////////////////////////////////////////////-->
+        <h2 id="d_members">Methods</h2>
+
+        <h3 id="RS_socketSupported">RS.socketSupported   </h3>
+        <p id="fullWright">
+                 Stores weather or not the browser supports web sockets. If false, Reactive Spaces will not be able to connect to the desktop app or server.
+        </p></br>
+
+        <h3 id="RS_socket">RS.socket  </h3>
+        <p id="fullWright">
+                Stores the current socket connection to the desktop app (if any). 
+        </p></br>
+
+        <h3 id="RS_connected">RS.connected  </h3>
+        <p id="fullWright">
+                Boolean value representing the current connection status of Reactive Spaces. 
+        </p></br>
+
+        <h3 id="RS_lastMessage">RS.lastMessage </h3>
+        <p id="fullWright">
+                UNIX timestamp denoting the last time a message was sent from Reactive Spaces to the desktop app. 
+        </p></br>
+
+        <h3 id="RS_station">RS.station  </h3>
+        <p id="fullWright">
+                Stores the RS.StationProfile object representing the local station information. If no connection to the desktop app has been made, this value can also be null.
+        </p></br>
+
+        <h3 id="RS_remoteStations">RS.remoteStations  </h3>
+        <p id="fullWright">
+                Stores a list of RS.StationProfile objects representing the remote stations that are in the same game session.
+        </p></br>
+
+        <h3 id="RS_players">RS.players  </h3>
+        <p id="fullWright">
+                Stores a list of RS.Skeleton objects representing the current local players.
+        </p></br>
+
+        <h3 id="RS_remotePlayers">RS.remotePlayers  </h3>
+        <p id="fullWright">
+                Stores a list of RS.Skeleton objects representing the current remote players.
+        </p></br>
+
+        <h3 id="RS_lastBlendUpdate">RS.lastBlendUpdate  </h3>
+        <p id="fullWright">
+                UNIX timestamp denoting the last time the blended skeleton data was updated.
+        </p></br>
+
+        <h3 id="RS_listeners">RS.listeners  </h3>
+        <p id="fullWright">
+                Stores all event listeners added to Reactive Spaces
+        </p></br>
+
+        <h3 id="RS_messenger">RS.messenger  </h3>
+        <p id="fullWright">
+                Provides basic error logging capabilities for Reactive Spaces.</br></br>
+Also defines a Global Message object which has an enumerator for message types defined as </br></br>
+Message.type = {“MESSAGE” : 0, “WARNING” : 1, “ERROR” : 2}
+        </p></br>
+
+        <h3 id="RS_appInfo">RS.appInfo  </h3>
+        <p id="fullWright">
+               Stores information about the connected web app. Members are:  name, version, maxPeers.</br></br>
+Default Value:{  </br></br>
+    name: "Default App Name",</br></br>
+    version: 0,</br></br>
+    maxPeers: 4</br></br>
+}
+        </p></br>
+
+      <!--METHODS///////////////////////////////////////////////////////////////-->
+        <h2 id="d_methods">Methods</h2>
+
+        <h3 id="RS_Connect"> RS.Connect ( appName, appVersion, features, port ) </h3>
+        <p id="fullWright">
+                 appName : name of web app that is connecting </br>
+appVersion : version of app that is connecting (int or float). Only app instances with the same version will be matched on the server </br>
+features : list of features that are required by the app. Use enumerator RS.Features.</br>
+port (optional): connection port to use. If omitted, RS.LOCALPORT will be used</br></br>
+Attempts to connect to the Reactive Spaces Desktop App. Returns true or false depending on whether connection was successful or not.
+        </p></br>
+
+         <h3 id="RS_Disconnect">RS.Disconnect () </h3>
+        <p id="fullWright">
+                 Disconnects from the desktop app and server. 
+        </p></br>
+        
+        <h3 id="RS_BlendUpdate">RS.BlendUpdate ()  </h3>
+        <p id="fullWright">
+                 DUpdates the blended skeleton positions. Called automatically when RS.MOVEMENT_BLENDING is true on connection. Can be called manually on your apps update loop if desired. 
+        </p></br>
+
+        <h3 id="RS_ActivateMessenger">RS.ActivateMessenger ()  </h3>
+        <p id="fullWright">
+                 Reactive Spaces provides an optional messenger system to display messages, warnings and errors easily. </br></br>
+Include the messenger in you project with</br></br>
+script src=” http://reactivespacesapi.com/lib/Messenger.js </br></br>
+And then call this function to upgrade RS.messenger to this advanced messenger. Post your own messages with RS.messenger.display( Messenge.type type, string message, string solution).
+        </p></br>
+       
+       <h3 id="RS_addEventListener">RS.addEventListener (event, callback) </h3>
+        <p id="fullWright">
+                 event : string denoting the envent to listen to. Use enumerator RS.Events or see RS.Events in the documentation for a full list</br></br>
+callback : function pointer for function to be called when event fires
+        </p></br>
+
+        <h3 id="RS_removeEventListener">RS.removeEventListener (event, callback) </h3>
+        <p id="fullWright">
+                 This function currently has no effect
+        </p></br>
+
+        <h3 id="RS_Send">RS.Send ( object ) </h3>
+        <p id="fullWright">
+                 Tobject: javascript object to send</br></br>
+Sends the given object to all stations in the current app session.
+
+        </p></br>
+        <!--UtilityFunctions///////////////////////////////////////////////////////////////-->
+        <h2 id="d_utilityFunctions">Utility Functions</h2>
+
+        <h3 id="RS_DrawSkeleton">RS.DrawSkeleton ( context, skeleton, color, blend ) </h3>
+        <p id="fullWright">
+                Draws given skeleton on the given 2D context. Maps screen position to the bounds of the canvas.</br></br>
+context: valid 2D drawing context for an html 5 canvas</br></br>
+skeleton: valid skeleton object from ReactiveSpaces</br></br>
+color (optional): string canvas color identifier, default is "#FFF"</br></br>
+blend (optional): boolean - sets weather or not to use the blended skeleton. RS.MOVEMENT_BLEND must be set to true (default is false)
+        </p></br>
+
+        <!--Types///////////////////////////////////////////////////////////////-->
+        <h2 id="d_types">Types</h2>
+
+        <h3 id="RS_Skeleton">RS.Skeleton () </h3>
+        <p id="fullWright">
+                Describes the skeleton object that ReactiveSpaces uses to store Kinect data
+        </p></br>
+
+        <h3 id="RS_Skeleton.Update">RS.Skeleton.Update ( skeleton ) </h3>
+        <p id="fullWright">
+                skeleton: the skeleton object to copy the data from </br></br>
+Updates the joint positions and data from another skeleton object. This is used for incoming data streams from the desktop. 
+        </p></br>
+
+        <h3 id="RS_Skeleton.BlendUpdate">RS.Skeleton.BlendUpdate ( deltaTimeS ) </h3>
+        <p id="fullWright">
+                Blends previous skeleton with current skeleton. ****
+        </p></br>
+
+        <h3 id="RS_SkeletonJoint">RS.SkeletonJoint ( skeleton ) </h3>
+        <p id="fullWright">
+                skeleton: the skeleton object to copy the data from</br></br>
+Describes a skeleton joint object
+        </p></br>
+
+        <h3 id="RS_SkeletonJoint.SetFromJoint">RS.SkeletonJoint.SetFromJoint ( joint ) </h3>
+        <p id="fullWright">
+                joint: valid RS.SkeletonJoint object</br></br>
+Copies data of the given joint into this one
+        </p></br>
+
+        <h3 id="RS_SkeletonJoint.BlendUpdate">RS.SkeletonJoint.BlendUpdate ( deltaTimeS ) </h3>
+        <p id="fullWright">
+               Called by ReactiveSpaces to update the smoothed screenPosition. Also updates joint velocities.
+        </p></br>
+
+        <h3 id="RS_Vector3">RS.Vector3 ( x, y, z ) </h3>
+        <p id="fullWright">
+               x (optional): inital x value, default is 0</br></br>
+y (optional): inital y value, default is 0</br></br>
+z (optional): inital z value, default is 0</br></br>
+A simple object which defines a 3D point (x, y, z)
+        </p></br>
+
+        <h3 id="RS_Vector3.Set">RS.Vector3.Set ( x, y, z ) </h3>
+        <p id="fullWright">
+               x (optional): inital x value, default is 0</br></br>
+y (optional): inital y value, default is 0</br></br>
+z (optional): inital z value, default is 0</br></br>
+A simple object which defines a 3D point (x, y, z)
+        </p></br>
+
+        <h3 id="RS_Vector3.SetFromVector">RS.Vector3.SetFromVector ( vector ) </h3>
+        <p id="fullWright">
+               vector: object to copy from {x, y, z}</br></br>
+Sets the value of this vector from another vector. If x, y, or z are unset on the object it sets 0.
+        </p></br>
+
+        <h3 id="RS_Vector3.AddVector">RS.Vector3.AddVector ( vector )  </h3>
+        <p id="fullWright">
+              vector: object to add {x, y, z}</br></br>
+Adds given vector.
+        </p></br>
+
+        <h3 id="RS_Vector3.SubVector">RS.Vector3.SubVector ( vector )  </h3>
+        <p id="fullWright">
+              vector: object to subract {x, y, z}</br></br>
+Subtracts given vector.
+        </p></br>
+
+        <h3 id="RS_Vector3.MultiplyScalar">RS.Vector3.MultiplyScalar ( scalar )   </h3>
+        <p id="fullWright">
+              scalar: number to multiple vector by</br></br>
+Multiplies the vector by given scalar.
+        </p></br>
+
+        <h3 id="RS_Vector3.Normalize">RS.Vector3.Normalize ()  </h3>
+        <p id="fullWright">
+             Normalizes vector, length of vector = 1. 
+        </p></br>
+
+        <h3 id="RS_Vector3.Length">RS.Vector3.Length () </h3>
+        <p id="fullWright">
+             Returns the length of the vector. 
+        </p></br>
+
+        <h3 id="RS_Vector3.LengthSqd">RS.Vector3.LengthSqd () </h3>
+        <p id="fullWright">
+             Returns the squared length of the vector. 
+        </p></br>
+
+        <!--Enmumerators///////////////////////////////////////////////////////////////-->
+        <h2 id="d_enumerators">Enumerators</h2>
+        <h3 id="RS_Features">RS.Features  </h3>
+        <p id="fullWright">
+          Shows what features are supported. </br></br> 
+          <table style="width:100%">
+            <tr>
+              <td>Kinect</td> <td>0</td> 
+            </tr>
+          </table>
+        </p></br>
+
+        <h3 id="RS_JointTypes">RS.JointTypes  </h3>
+        <p id="fullWright">
+          To pick joints from the skeleton object. </br></br> 
+          <table style="width:100%">
+            <tr><td>Head</td><td>0</td>       </tr>
+            <tr>       <td>SHOULDER_CENTER</td>            <td>1</td>         </tr>
+            <tr><td>SPINE</td><td>2</td></tr>
+            <tr><td>HIP_CENTER</td><td>3</td></tr>
+            <tr><td>SHOULDER_LEFT</td><td>4</td></tr>
+            <tr><td>SHOULDER_RIGHT</td><td>5</td></tr>
+            <tr><td>ELBOW_LEFT</td><td>6</td></tr>
+            <tr><td>ELBOW_RIGHT</td><td>7</td></tr>
+            <tr><td>WRIST_LEFT</td><td>8</td></tr>
+            <tr><td>WRIST_RIGHT</td><td>9</td></tr>
+            <tr><td>HAND_LEFT</td><td>10</td></tr>
+            <tr><td>HAND_RIGHT</td><td>11</td></tr>
+            <tr><td>HIP_LEFT</td><td>12</td></tr>
+            <tr><td>HIP_RIGHT</td><td>13</td></tr>
+            <tr><td>KNEE_LEFT</td><td>14</td></tr>
+            <tr><td>KNEE_RIGHT</td><td>15</td></tr>
+            <tr><td>ANKLE_LEFT</td><td>16</td></tr>
+            <tr><td>ANKLE_RIGHT</td><td>17</td></tr>
+            <tr><td>FOOT_LEFT</td><td>18</td></tr>
+            <tr><td>FOOT_RIGHT</td><td>19</td></tr>
+          </table>
+        </p></br>
+
+
+        <h3 id="RS_MessageTypes ">RS.MessageTypes  </h3>
+        <p id="fullWright">
+         Enumerator for incoming web socket messages. </br></br> 
+          <table style="width:100%">
+            <tr><td>APP_INFO</td><td>0</td></tr>
+            <tr><td>CUSTOM</td><td>1</td></tr>
+            <tr><td>KINECT</td><td>2</td></tr>
+            <tr><td>REMOTE_KINECT</td><td>3</td></tr>
+            <tr><td>STATION_PROFILE</td><td>4</td></tr>
+            <tr><td>PEER_CONNECT</td><td>5</td></tr>
+            <tr><td>PEER_UPDATE</td><td>6</td></tr>
+            <tr><td>PEER_DISCONNECT</td><td>7</td></tr>
+            <tr><td>LOCAL_PLAYER_ENTER</td><td>8</td></tr>
+            <tr><td>LOCAL_PLAYER_EXIT</td><td>9</td></tr>
+            <tr><td>REMOTE_PLAYER_ENTER</td><td>10</td></tr>
+            <tr><td>REMOTE_PLAYER_EXIT</td><td>11</td></tr>     
+            <tr><td>FEATURE_MISSING</td><td>12</td></tr>      
+          </table>
+        </p></br>
+
+        <h3 id="RS_Events">RS.Events  </h3>
+        <p id="fullWright">
+         A simple list of event types dispatched by ReactiveSpaces. </br></br> 
+          <table style="width:100%">
+            <tr><td>connect</td></tr>
+            <tr><td>disconnect</td></tr>
+            <tr><td>localkinectT</td></tr>
+            <tr><td>remotekinect</td></tr>
+            <tr><td>message</td></tr>
+            <tr><td>featuremissing</td></tr>
+            <tr><td>stationlocal</td></tr>
+            <tr><td>stationconnect</td></tr>
+            <tr><td>stationupdate</td></tr>
+            <tr><td>satationdisconnect</td></tr>
+            <tr><td>localplayerenter</td></tr>
+            <tr><td>localplayerexit</td></tr>
+            <tr><td>remoteplayerenter</td></tr>
+            <tr><td>remoteplayerexit</td></tr>            
+          </table>
+        </p></br>
+
+    </div>
+    
+ </div>
+
+
+  <div class="pagePart" id="Contact">
+    <h2>Contact Information</h2>
+      <div id="writing">
+        <p id="leftWright">              
+           Carleton University | Canal Building</br></br>
+           Ottawa, Ontario </br></br>
+           <!--   K1S 5B6</br></br>
+           ReactiveSpacesAPI@gmail.com</br></br>-->
+           
+        </p>
+        <p id="rightWright">
+            Zara Tooth</br></br>
+            Ryan Bottriell</br></br>
+            Matthew Fournier</br></br>
+            Marco Brito</br></br>
+        </p>
+
+      </div>
+      
+  </div>
+  
+</div>
+<footer> Reactive Spaces API 2014 </footer>
+</body>
+</html>

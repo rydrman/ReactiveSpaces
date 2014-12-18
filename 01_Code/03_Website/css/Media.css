@@ -1,22 +1,58 @@
-@media screen and (max-width: 1400px) {
-
+@media screen and (min-width: 1150px) {
+.limit{
+	margin:auto;	
+	float:none !important;
+}
 
 }
 @media screen and (max-width: 1200px) {
-	#topnav a{		
-		width:20%;
-		font-size:18pt;
-		margin: 0px 5% 0px 5%;
-
-	}
+	#topnav #rest a{
+		text-decoration:none;
+		color:#E7E8E8;
+		margin-right:2%;
+		font-size:12pt;
+		float:right;
+   }
 	#downloadIcon{		
 		font-size:50pt;
 		
 	}
-	
+	#lightBack{
+		width:50% !important;
+	}
+	#demoVid{
+		width:100%;
+		margin-left: 0%;
+		margin-top: 25px;
+		height:auto;
+		float:left;
+	}	
 }
 
-@media screen and (max-width: 720px) {
+@media screen and (max-width: 857px) {
+	#topnav #rest a{
+		text-decoration:none;
+		color:#E7E8E8;
+		margin-right:1.5%;
+		font-size:12pt;
+		float:right;
+	}
+	#rest{
+		width:100%;
+		margin-right:0%;
+	}
+	#logo{
+		display:none;
+	}
+	#lightBack{
+		width:80% !important;
+	}
+	.proThumb{
+
+		margin:0.5%;
+		width:49%;
+	
+	}
 	 #leftWright{
 		width:100%;
 
@@ -37,14 +73,7 @@
 		margin-top: 0pt;
 
 	}
-	#topnav a{
-		
-		
-		width:20%;
-		font-size:14pt;
-		margin: 0px 2% 0px 2%;
-
-	}
+	
 	.small{
 		display: block;
 	}
