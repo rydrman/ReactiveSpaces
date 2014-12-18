@@ -1,7 +1,7 @@
 $( document ).ready(function() {
 
 
-$(".linkNav").click(function(event) {
+$(".mover").click(function(event) {
 		event.preventDefault();
 		var link = "#"+$(this).attr("href");
 		//alert(link);

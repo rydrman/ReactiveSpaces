@@ -9,43 +9,54 @@
   <link rel="stylesheet" type="text/css" href="css/Sections.css">
    <link rel="stylesheet" type="text/css" href="css/Media.css">
 	<script src="js/Main.js"></script>
-  <script src="js/Animate.js"></script>
+  	<script src="js/Animate.js"></script>
 </head>
 <html>
-<body>
 
-
-
-<h3>R e a c t i v e S p a c e s  A P I</h3>
 <div id="splash">
        <div id="container">
                <div id="content page-wrap">
-                     <h1 class="lefter perc big">Reactive Spaces</h1>
-                     <h1 class="lefter perc small">R S</h1>
-                     <div class="object perc">G</div>
-                     <h1 class="righter perc">A P I</h1>
-            
-               		 
-                     <nav id="topnav">
-                   	  	<a href="About" class="linkNav">About</a> |
-                        <a href="Download" class="linkNav">Download</a> |
-                        <a href="Demo" class="linkNav">Demo</a> |
-                        <a href="Contact" class="linkNav">Contact</a> 	
-                     
+               
+ 					 <nav id="topnav">
+                     	<a id="logo"> 
+                        	<img id="darkBack" src="img/Reactive-Spaces-White.png" />
+                            <img id="lightBack" class="hide" src="img/Reactive-Spaces-Black.png" />
+                        </a>
+                        <div id="rest">
+                            <a href="downloads/ReactiveSpacesAPI.zip" download class=" navBoxButton">DOWNLOAD</a>
+                            <a href="subpages/projects.html" class="linkNav">PROJECTS</a> 	
+                            <a href="subpages/documentation.html" class="linkNav">DOCUMENTATION</a> 
+                            <a href="#GettingStarted" class="linkNav">GETTING STARTED</a> 
+                            <a href="#container" class="linkNav">HOME</a> 
+                        </div>
                      </nav>
-               
-               
+                     	              		
+                     <h1 class="perc">DISTRIBUTED. KINECT. WEB APPS.</h1>
+                     <h3>The API for developers</h3>
+                     <div class="downloadHolder">
+                      <a href="downloads/ReactiveSpacesAPI.zip" download class="downloadButton">DOWNLOAD</a> 
+
+
+                        <!--<h3 > Coming Soon</h3>
+                        <h3 id="downloadIcon"> Coming Soon</h3>-->
+                        <h3 class="space">or</h3>
+                     <a href="https://github.com/rydrman/ReactiveSpaces" target="_blank"class="perc"><h3>Fork us on GitHub<h3></a>
+                     </div>
+
+                     
+                   	<a id="downArrow" class="linkNav mover" href="GettingStarted"> D </a>
+                  	
                </div>
+                 
        </div>
 </div>
 
 <div id="page">
-<div id="line">L</div>
-  <div class="pagePart" id="About">
-    <h2>About</h2>
+  <div class="pagePart" id="GettingStarted">
+    <h2>GETTING STARTED</h2>
       <div id="writing">
         <p id="leftWright">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam cursus lectus nisi, sit amet rhoncus dolor faucibus a. Praesent vulputate sollicitudin lacus, sit amet vestibulum lacus tempus ac. Nulla pellentesque tempus elit, non sollicitudin leo tempus at. Nullam vitae rutrum libero, eu porta risus. Quisque varius, ipsum et viverra efficitur, mauris metus laoreet augue, a condimentum nisl ipsum eget ligula. Phasellus ut nisl id nulla feugiat lacinia. Maecenas lacus nunc, aliquam ac facilisis vel, faucibus nec odio.
+            Reactive Spaces is ready to go right out of the box. To get started, download our desktop app. You'll also need to install the <a href="http://www.microsoft.com/en-ca/download/details.aspx?id=40277">Kinect Runtime</a> or <a href="http://www.microsoft.com/en-ca/download/details.aspx?id=40278">Kinect SDK v1.8</a>.
         </p>
         <p id="rightWright">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam cursus lectus nisi, sit amet rhoncus dolor faucibus a. Praesent vulputate sollicitudin lacus, sit amet vestibulum lacus tempus ac. Nulla pellentesque tempus elit, non sollicitudin leo tempus at. Nullam vitae rutrum libero, eu porta risus. Maecenas lacus nunc, aliquam ac facilisis vel, faucibus nec odio. Quisque varius, ipsum et viverra efficitur, mauris metus laoreet augue, a condimentu.
@@ -55,34 +66,63 @@
   	
       
   </div>
-  <div class="pagePart" id="Download">
-    <h2>Download</h2>
-    <a href="downloads/.jpg" download id="downloadIcon"><!--D--></a>
-      
+ 
+  <div class="pagePart" id="Documentation">
+    <h2>DOCUMENTATION</h2>
+     
+     <div id="writing">
+        <p id="fullWright" class="limit">
+              Once you've started development, head over to our documentation page to find information about the functionality of the API. We've tried to document everything in a clear, concise manner, but please get in touch if you think something could be improved.
+        </p>  
+        <p id="fullWright" class="limit">
+              
+        </p>  
+        
+	 
+      </div>
+      <a href="subpages/documentation.html" id="docLink">DOCUMENTATION PAGE</a>
+   
+        
   </div>
-  <div class="pagePart" id="Demo">
-    <h2>Demo</h2>
-     <video width="100%" height="auto" controls id="demoVid">
-      <source src="vid/ReactiveSpaceFinal.mp4" type="video/mp4" autoplay>
+ 
+  <div class="pagePart" id="Projects">
+    <h2>PROJECTS</h2>
+     <video width="100%" height="auto" controls id="demoVid" poster="img/placeholder.png">
+      <source src="vid/ReactiveSpacesAPITrailer.mp4" type="video/mp4" autoplay>
     </video>
+    <a href="subpages/projects.html"> More Projects </a>
+     <!-- <div class="proThumb">
+      </div>
+      <div class="proThumb">
+      </div>
+      <div class="proThumb">
+      </div>
+      <div class="proThumb">
+      </div>
+      <div class="proThumb">
+      </div>
+      <div class="proThumb">
+      </div>-->
+    
     
       
   </div>
+
+
   <div class="pagePart" id="Contact">
-    <h2>Contact</h2>
+    <h2>Contact Information</h2>
       <div id="writing">
         <p id="leftWright">              
            Carleton University | Canal Building</br></br>
            Ottawa, Ontario </br></br>
-           K1S 5B6</br></br>
-           ReactiveSpacesAPI@gmail.com</br></br>
+        <!--   K1S 5B6</br></br>
+           ReactiveSpacesAPI@gmail.com</br></br>-->
            
         </p>
         <p id="rightWright">
-            Team:</br></br>
-            Matthew Fournier</br></br>
             Zara Tooth</br></br>
             Ryan Bottriell</br></br>
+            Matthew Fournier</br></br>
             Marco Brito</br></br>
         </p>
 
@@ -90,9 +130,9 @@
       
   </div>
 </div>
-<h3>R e a c t i v e S p a c e s  A P I</h3>
-<div class="object bottom">G</div>
 
+<footer> Reactive Spaces API 2014 </footer>
 
+</div> <!--Wrapper-->
 </body>
 </html>

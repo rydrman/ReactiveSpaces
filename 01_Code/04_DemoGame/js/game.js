@@ -469,11 +469,11 @@ Game.prototype.render = function()
     }
     
     //draw local skeletons
-    for(var i in RS.players)
+    /*for(var i in RS.players)
     {
         if(RS.players[i].userPresent)
             RS.DrawSkeleton(this.bufferCtx, RS.players[i], "rgba(255, 255, 255, 0.2)", true);
-    }
+    }*/
 
     //LARGE DOT
     //rendering large dots
