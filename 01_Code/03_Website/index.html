@@ -51,15 +51,30 @@
        </div>
 </div>
 
+<div class="pagePart" id="About">
+    <h2>ABOUT</h2>
+     
+     <div id="writing">
+        <p id="fullWright" class="limit">
+              Reactive spaces is an API which allows for easy developmment of distributed web apps that use the Microsoft Kinect. Reactive Spaces is a three part system. There is a server, which deals with connecting instances of the same app and passing messages back and forth between them. Then, there is the JavaScript library which facilitates the use of Reactive Spaces in your web page. Finally, there is the desktop app, which reads data from the Kinect and acts as the messenger between the server and the web browser. All together you get a robust, distributed system and easy app development.
+        </p>  
+ 
+        
+	 
+      </div>
+   
+        
+</div>
+           
 <div id="page">
   <div class="pagePart" id="GettingStarted">
     <h2>GETTING STARTED</h2>
       <div id="writing">
         <p id="leftWright">
-            Reactive Spaces is ready to go right out of the box. To get started, download our desktop app. You'll also need to install the <a href="http://www.microsoft.com/en-ca/download/details.aspx?id=40277">Kinect Runtime</a> or <a href="http://www.microsoft.com/en-ca/download/details.aspx?id=40278">Kinect SDK v1.8</a>.
+            Reactive Spaces is ready to go right out of the box. To get started, download our desktop app. You don't need to have or use the Kinect functionality but you'll also need to install the <a href="http://www.microsoft.com/en-ca/download/details.aspx?id=40277">Kinect Runtime</a> or <a href="http://www.microsoft.com/en-ca/download/details.aspx?id=40278">Kinect SDK</a> v1.8. Once the desktop app is running, you can play any of the games hosted in our projects section, or start developing your own.
         </p>
         <p id="rightWright">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam cursus lectus nisi, sit amet rhoncus dolor faucibus a. Praesent vulputate sollicitudin lacus, sit amet vestibulum lacus tempus ac. Nulla pellentesque tempus elit, non sollicitudin leo tempus at. Nullam vitae rutrum libero, eu porta risus. Maecenas lacus nunc, aliquam ac facilisis vel, faucibus nec odio. Quisque varius, ipsum et viverra efficitur, mauris metus laoreet augue, a condimentu.
+            We will try to host a server here, but unfortunately we cannot guarentee it's reliablility. If the desktop app is having trouble connecting, try hosting your own server locally. Our server runs on any installation of <a href="http://nodejs.org/">node.js</a>. Once you have a server connection, simple send javascript objects back and forth between app instances using RS.Send( object );
         </p>
 
       </div>
@@ -72,7 +87,7 @@
      
      <div id="writing">
         <p id="fullWright" class="limit">
-              Once you've started development, head over to our documentation page to find information about the functionality of the API. We've tried to document everything in a clear, concise manner, but please get in touch if you think something could be improved.
+              Once you're ready for development, head over to our documentation page to find information about the functionality of the API. We've tried to document everything in a clear, concise manner, but please get in touch if you think something could be improved.
         </p>  
         <p id="fullWright" class="limit">
               
@@ -87,10 +102,21 @@
  
   <div class="pagePart" id="Projects">
     <h2>PROJECTS</h2>
-     <video width="100%" height="auto" controls id="demoVid" poster="img/placeholder.png">
+       <div id="writing">
+          <p id="fullWright" class="limit">
+                  There are endless possibilities for Reactive Spaces. Below is a video of our demo game in action at Carleton University. Check out the game yourself on the projects page. Get in touch if you'd like to see your project hosted here. 
+            </p> 
+      
+      <div id="demoVid">
+          <iframe style="padding: 0 0 20px 0" width="100%" height="600px" src="//www.youtube.com/embed/5822Q7wYUeo?showinfo=0&rel=0&color=white" frameborder="0" allowfullscreen></iframe>
+      </div>
+           
+      
+     <!--<video width="100%" height="auto" controls id="demoVid" poster="img/placeholder.png">
       <source src="vid/ReactiveSpacesAPITrailer.mp4" type="video/mp4" autoplay>
-    </video>
+    </video>-->
     <a href="subpages/projects.html"> More Projects </a>
+           </div>
      <!-- <div class="proThumb">
       </div>
       <div class="proThumb">
@@ -115,6 +141,7 @@
         <p id="leftWright">              
            Carleton University | Canal Building</br></br>
            Ottawa, Ontario </br></br>
+           <a href="mailto:ryanbottriell@live.ca">Email Us</a>
         <!--   K1S 5B6</br></br>
            ReactiveSpacesAPI@gmail.com</br></br>-->
            

@@ -110,13 +110,11 @@ h3{
 
 #writing{
 	width:94%;
-	margin-left: 3%;
-	margin-top: 40px;
+	margin: 3%;
 	float:left;
 }
 #writing #fullWright{
-	width:100%;
-	float:left;
+
 	text-align: justify;
 	font-size: 12pt;
 	line-height: 20pt;
@@ -124,6 +122,7 @@ h3{
 	font-family: Arial, Helvetica, sans-serif;
 	text-indent: 50px;
 }
+
 
 #leftWright{
 	width:48%;
@@ -165,6 +164,7 @@ footer{
 
 .limit{
 	max-width:600px;
+    margin: auto;
 }
 .ie{
 	display:none;
