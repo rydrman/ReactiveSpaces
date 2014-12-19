@@ -256,21 +256,22 @@ Game.prototype.update = function()
             for(var k in RS.remotePlayers[j].joints)
             {
                 joint = RS.remotePlayers[j].joints[k];
-                canvasPos.x =  RS.remotePlayers[j].joints[k].positionSmoothed.x * this.bufferCanvas.width;
-                canvasPos.y =  RS.remotePlayers[j].joints[k].positionSmoothed.y * this.bufferCanvas.height;
+                canvasPos.x =  RS.remotePlayers[j].joints[k].positionSmoothed.x;
+                canvasPos.y =  RS.remotePlayers[j].joints[k].positionSmoothed.y;
 
                 delta.SetFromVector( this.mainDots[i].position );
                 delta.SubVector( canvasPos );
                 delta.z = 0;
 
                 distSqd = delta.LengthSqd();
-                perc =  1 - (distSqd / (50 * 50));
+                perc =  1 - (distSqd / 0.01);
                 if(perc > 0)
                 {
                     //push dot
                     deltaSpeed.SetFromVector( joint.velocity );
                     deltaSpeed.SubVector( this.mainDots[i].speed );
                     deltaSpeed.MultiplyScalar( perc );
+                    deltaSpeed.MultiplyScalar( 0.5 );
                     this.mainDots[i].acceleration.add( deltaSpeed );
                 }
             }

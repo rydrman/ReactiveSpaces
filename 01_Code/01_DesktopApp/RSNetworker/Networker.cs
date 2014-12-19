@@ -433,8 +433,17 @@ namespace RSNetworker
                 catch { }
                 server = null;
             }
+
+            removeAllPeers();
+
             connected = false;
             connectionChanged = true;
+        }
+
+        private void removeAllPeers()
+        {
+            currentPeers.Clear();
+            peerListUpdated = true;
         }
 
         public void updateAppInfo(AppInfo newInfo)
